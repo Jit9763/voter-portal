@@ -27,5 +27,6 @@
     "block_bulk_slips": true,
     "scope_restricted": true,
     "cell_directory": true
-  }
+  },
+  "last_verified_test": "2026-10-10 23:00:00"
 }
