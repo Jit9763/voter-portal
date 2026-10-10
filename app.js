@@ -53,6 +53,10 @@ function getUserOverrides() {
     });
   }
   try {
+    if (localStorage.getItem('portal_tabs_default_search_v3') !== 'true') {
+      localStorage.removeItem('portal_user_overrides');
+      localStorage.setItem('portal_tabs_default_search_v3', 'true');
+    }
     const local = JSON.parse(localStorage.getItem('portal_user_overrides') || '{}');
     return Object.assign({}, overrides, local);
   } catch(e) {
@@ -2134,7 +2138,7 @@ function enforceGatekeeperState() {
   }
 
   // Enforce Allowed Tabs (Super Admin configuration has priority)
-  let allowedTabs = ['searchTab', 'alphaTab', 'directoryTab'];
+  let allowedTabs = ['searchTab'];
   if (isSuperAdmin) {
     allowedTabs = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab', 'candidateProfileTab', 'adminControlTab', 'settingsTab'];
   } else if (Array.isArray(u.allowed_tabs)) {
@@ -2146,9 +2150,9 @@ function enforceGatekeeperState() {
     // Vyavasthapak has view, download & bulk/single slip print rights for all 30 GPs
     allowedTabs = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab'];
   } else if (isCandidateUser) {
-    allowedTabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+    allowedTabs = ['searchTab'];
   } else if (u.role === 'BLO') {
-    allowedTabs = ['searchTab', 'alphaTab', 'directoryTab'];
+    allowedTabs = ['searchTab'];
   }
 
   document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -5521,7 +5525,7 @@ async function loadAdminUsersList() {
       status: u.status || 'ACTIVE',
       allowed_panchayats: u.assigned_panchayats || 'ALL',
       allowed_wards: u.assigned_wards || 'ALL',
-      allowed_tabs: ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
+      allowed_tabs: ['searchTab'],
       candidate_mode: 'user_edit'
     }));
   }
@@ -5836,7 +5840,7 @@ async function handleCreateUserSubmit(event) {
   const candidateMode = document.getElementById('newUserCandidateModeSelect')?.value || 'active';
 
   const tabBoxes = document.querySelectorAll('input[name="newUserTabs"]:checked');
-  const allowedTabs = tabBoxes.length > 0 ? Array.from(tabBoxes).map(b => b.value) : ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+  const allowedTabs = tabBoxes.length > 0 ? Array.from(tabBoxes).map(b => b.value) : ['searchTab'];
 
   if (!username || !password) {
     showToast('यूजरनेम और पासवर्ड अनिवार्य हैं!');
@@ -5862,7 +5866,7 @@ async function handleCreateUserSubmit(event) {
     panchayat: gp,
     allowed_panchayats: gp,
     allowed_wards: ward,
-    allowed_tabs: ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
+    allowed_tabs: allowedTabs,
     candidate_mode: 'user_edit'
   };
 
@@ -6931,7 +6935,7 @@ async function handleGatekeeperLogin(event) {
         panchayat: candMatch.allowed_panchayats || candMatch.panchayat || candMatch.assigned_panchayats || '',
         allowed_panchayats: candMatch.allowed_panchayats || candMatch.panchayat || candMatch.assigned_panchayats || '',
         allowed_wards: candMatch.allowed_wards || candMatch.ward || candMatch.assigned_wards || 'ALL',
-        allowed_tabs: (Array.isArray(candMatch.allowed_tabs) && candMatch.allowed_tabs.length > 0) ? candMatch.allowed_tabs : ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
+        allowed_tabs: (Array.isArray(candMatch.allowed_tabs) && candMatch.allowed_tabs.length > 0) ? candMatch.allowed_tabs : ['searchTab'],
         candidate_mode: 'user_edit'
       };
       State.currentUser = candUser;

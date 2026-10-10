@@ -1368,10 +1368,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1404,10 +1401,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1440,10 +1434,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1476,10 +1467,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1512,10 +1500,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1548,10 +1533,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1584,10 +1566,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1620,10 +1599,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1656,10 +1632,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1692,10 +1665,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1728,10 +1698,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1764,10 +1731,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1800,10 +1764,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1836,10 +1797,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1872,10 +1830,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1908,10 +1863,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1944,10 +1896,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -1980,10 +1929,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2016,10 +1962,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2052,10 +1995,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2088,10 +2028,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2124,10 +2061,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2160,10 +2094,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2196,10 +2127,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2232,10 +2160,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2268,10 +2193,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2304,10 +2226,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2340,10 +2259,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2376,10 +2292,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2412,10 +2325,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2448,10 +2358,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2484,10 +2391,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2520,10 +2424,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2556,10 +2457,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2592,10 +2490,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2628,10 +2523,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2664,10 +2556,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2700,10 +2589,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2736,10 +2622,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2772,10 +2655,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2808,10 +2688,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2844,10 +2721,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2880,10 +2754,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2916,10 +2787,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2952,10 +2820,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -2988,10 +2853,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3024,10 +2886,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3060,10 +2919,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3096,10 +2952,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3132,10 +2985,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3168,10 +3018,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3204,10 +3051,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3240,10 +3084,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3276,10 +3117,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3312,10 +3150,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3348,10 +3183,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3384,10 +3216,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3420,10 +3249,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,
@@ -3456,10 +3282,7 @@ window.MASTER_DIRECTORY = {
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "can_search": true,
       "can_view": true,

@@ -37,12 +37,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "bulkSlipTab",
-        "directoryTab",
-        "candidateProfileTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.271Z",
@@ -59,12 +54,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "bulkSlipTab",
-        "directoryTab",
-        "candidateProfileTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.280Z",
@@ -81,10 +71,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.293Z",
@@ -3247,11 +3234,7 @@
       "allowed_panchayats": "बड़गांव",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.280Z",
@@ -3268,11 +3251,7 @@
       "allowed_panchayats": "बड़ली",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.288Z",
@@ -3289,11 +3268,7 @@
       "allowed_panchayats": "बगराई",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.297Z",
@@ -3310,11 +3285,7 @@
       "allowed_panchayats": "बांदनवाड़ा",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.305Z",
@@ -3331,11 +3302,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.317Z",
@@ -3352,11 +3319,7 @@
       "allowed_panchayats": "बूबकिया",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.325Z",
@@ -3373,11 +3336,7 @@
       "allowed_panchayats": "चापानेरी",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.334Z",
@@ -3394,11 +3353,7 @@
       "allowed_panchayats": "छछून्दरा",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.344Z",
@@ -3415,11 +3370,7 @@
       "allowed_panchayats": "देवपुरा",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.353Z",
@@ -3436,11 +3387,7 @@
       "allowed_panchayats": "देवलियाकलां",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.362Z",
@@ -3457,11 +3404,7 @@
       "allowed_panchayats": "धांतोल",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.372Z",
@@ -3478,11 +3421,7 @@
       "allowed_panchayats": "एकलसिंहा",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.381Z",
@@ -3499,11 +3438,7 @@
       "allowed_panchayats": "घणा",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.390Z",
@@ -3520,11 +3455,7 @@
       "allowed_panchayats": "गुढाखुर्द",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.399Z",
@@ -3541,11 +3472,7 @@
       "allowed_panchayats": "हियालिया",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.408Z",
@@ -3562,11 +3489,7 @@
       "allowed_panchayats": "कनईकला",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.417Z",
@@ -3583,11 +3506,7 @@
       "allowed_panchayats": "करांटी",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.425Z",
@@ -3604,11 +3523,7 @@
       "allowed_panchayats": "कैरोंट",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.434Z",
@@ -3625,11 +3540,7 @@
       "allowed_panchayats": "खेडी",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.442Z",
@@ -3646,11 +3557,7 @@
       "allowed_panchayats": "कुम्हारिया",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.452Z",
@@ -3667,11 +3574,7 @@
       "allowed_panchayats": "लामगरा",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.461Z",
@@ -3688,11 +3591,7 @@
       "allowed_panchayats": "नागोला",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.470Z",
@@ -3709,11 +3608,7 @@
       "allowed_panchayats": "नान्दसी",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.478Z",
@@ -3730,11 +3625,7 @@
       "allowed_panchayats": "पड़ांगा",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.486Z",
@@ -3751,11 +3642,7 @@
       "allowed_panchayats": "पाडलिया",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.494Z",
@@ -3772,11 +3659,7 @@
       "allowed_panchayats": "राममालिया",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.503Z",
@@ -3793,11 +3676,7 @@
       "allowed_panchayats": "राताकोट",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.519Z",
@@ -3814,11 +3693,7 @@
       "allowed_panchayats": "सिंगावल",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.528Z",
@@ -3835,11 +3710,7 @@
       "allowed_panchayats": "सोबडी",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.536Z",
@@ -3856,11 +3727,7 @@
       "allowed_panchayats": "राममालिया, सोलखुर्द",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "candidateProfileTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "True",
       "created_at": "2026-10-10T14:37:52.544Z",
@@ -3877,10 +3744,7 @@
       "allowed_panchayats": "बड़गांव",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "searchTab",
-        "alphaTab",
-        "bulkSlipTab",
-        "candidateProfileTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.553Z",

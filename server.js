@@ -125,7 +125,7 @@ function exportToJson() {
     const rawUsers = db.prepare('SELECT * FROM users').all();
     const users = rawUsers.map(u => ({
       ...u,
-      allowed_tabs: (() => { try { return JSON.parse(u.allowed_tabs); } catch(e) { return ['searchTab', 'bulkSlipTab']; } })()
+      allowed_tabs: (() => { try { return JSON.parse(u.allowed_tabs); } catch(e) { return ['searchTab']; } })()
     }));
 
     const rawCandidates = db.prepare('SELECT * FROM candidates').all();
@@ -352,7 +352,7 @@ const server = http.createServer(async (req, res) => {
     // Fetch Remote Settings from GitHub Endpoint
     if (pathname === '/api/fetch-remote-settings' && req.method === 'POST') {
       const { exec } = require('node:child_process');
-      exec('git fetch origin main && git merge origin/main', { cwd: __dirname }, (error, stdout, stderr) => {
+      exec('git fetch origin main && git merge origin/main --no-edit -m "merge: auto sync remote"', { cwd: __dirname }, (error, stdout, stderr) => {
         try {
           seedDatabase();
           res.end(JSON.stringify({ 
@@ -520,7 +520,7 @@ const server = http.createServer(async (req, res) => {
 
         const candidate = db.prepare('SELECT * FROM candidates WHERE user_id = ?').get(user.id) || null;
         let allowed_tabs = [];
-        try { allowed_tabs = JSON.parse(user.allowed_tabs); } catch(e) { allowed_tabs = ['searchTab', 'bulkSlipTab']; }
+        try { allowed_tabs = JSON.parse(user.allowed_tabs); } catch(e) { allowed_tabs = ['searchTab']; }
 
         res.end(JSON.stringify({
           success: true,
@@ -581,7 +581,7 @@ const server = http.createServer(async (req, res) => {
         const usernameStr = toStr(u.username).trim();
         const tabsJson = Array.isArray(u.allowed_tabs)
           ? JSON.stringify(u.allowed_tabs)
-          : (typeof u.allowed_tabs === 'string' ? u.allowed_tabs : JSON.stringify(['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab']));
+          : (typeof u.allowed_tabs === 'string' ? u.allowed_tabs : JSON.stringify(['searchTab']));
 
         const existing = db.prepare('SELECT * FROM users WHERE id = ? OR username = ?').get(userId, usernameStr);
         const passwordToUse = toStr((u.password && String(u.password).trim()) || (existing ? existing.password : '123'));
