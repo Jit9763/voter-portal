@@ -89,7 +89,7 @@ function seedDatabase() {
       });
 
       const insertCand = db.prepare(`
-        INSERT OR IGNORE INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, photo_url, slogan, mobile, show_banner_on_slip, updated_at)
+        INSERT OR REPLACE INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, photo_url, slogan, mobile, show_banner_on_slip, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
