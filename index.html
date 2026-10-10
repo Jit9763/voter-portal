@@ -53,63 +53,13 @@
 
         <!-- Simplified Unified Login Form -->
         <form id="gatekeeperLoginForm" onsubmit="handleGatekeeperLogin(event)" style="margin-top:12px;">
-          <input type="hidden" id="gatekeeperUsername" value="">
-
-          <!-- DROPDOWN 1: प्रकोष्ठ या 30 ग्राम पंचायतें -->
+          <!-- DIRECT USER ID INPUT -->
           <div class="form-group mb-3">
-            <label for="loginPanchayatSelect" style="font-size:0.9rem; color:#0f172a; font-weight:700;">
-              <strong>1. प्रकोष्ठ या ग्राम पंचायत चुनें *:</strong>
-            </label>
-            <select id="loginPanchayatSelect" class="form-select" onchange="onLoginPanchayatSelected(this.value)" style="font-weight:700; cursor:pointer; font-size:0.95rem; height:44px; border:2px solid #cbd5e1; background:#ffffff; color:#0f172a; width:100%; border-radius:8px; padding:0 10px;">
-              <option value="">-- कृपया पहले यहाँ चुनें --</option>
-              <optgroup label="🌟 ब्लॉक प्रभारी एवं निर्वाचन प्रकोष्ठ">
-                <option value="BLOCK_PRABHARI">🌟 ब्लॉक प्रभारी</option>
-                <option value="CELL">📁 समस्त 13 निर्वाचन प्रकोष्ठ (भिनाय)</option>
-              </optgroup>
-              <optgroup label="🏛️ समस्त 30 ग्राम पंचायतें (बी.एल.ओ.)">
-                <option value="एकलसिंहा">🏛️ ग्राम पंचायत एकलसिंहा</option>
-                <option value="कनईकला">🏛️ ग्राम पंचायत कनईकला</option>
-                <option value="करांटी">🏛️ ग्राम पंचायत करांटी</option>
-                <option value="कुम्हारिया">🏛️ ग्राम पंचायत कुम्हारिया</option>
-                <option value="कैरोंट">🏛️ ग्राम पंचायत कैरोंट</option>
-                <option value="खेडी">🏛️ ग्राम पंचायत खेडी</option>
-                <option value="गुढाखुर्द">🏛️ ग्राम पंचायत गुढाखुर्द</option>
-                <option value="घणा">🏛️ ग्राम पंचायत घणा</option>
-                <option value="चापानेरी">🏛️ ग्राम पंचायत चापानेरी</option>
-                <option value="छछून्दरा">🏛️ ग्राम पंचायत छछून्दरा</option>
-                <option value="देवपुरा">🏛️ ग्राम पंचायत देवपुरा</option>
-                <option value="देवलियाकलां">🏛️ ग्राम पंचायत देवलियाकलां</option>
-                <option value="धांतोल">🏛️ ग्राम पंचायत धांतोल</option>
-                <option value="नागोला">🏛️ ग्राम पंचायत नागोला</option>
-                <option value="नान्दसी">🏛️ ग्राम पंचायत नान्दसी</option>
-                <option value="पड़ांगा">🏛️ ग्राम पंचायत पड़ांगा</option>
-                <option value="पाडलिया">🏛️ ग्राम पंचायत पाडलिया</option>
-                <option value="बगराई">🏛️ ग्राम पंचायत बगराई</option>
-                <option value="बड़गांव">🏛️ ग्राम पंचायत बड़गांव</option>
-                <option value="बड़ली">🏛️ ग्राम पंचायत बड़ली</option>
-                <option value="बांदनवाड़ा">🏛️ ग्राम पंचायत बांदनवाड़ा</option>
-                <option value="बूबकिया">🏛️ ग्राम पंचायत बूबकिया</option>
-                <option value="भिनाय">🏛️ ग्राम पंचायत भिनाय</option>
-                <option value="राताकोट">🏛️ ग्राम पंचायत राताकोट</option>
-                <option value="राममालिया">🏛️ ग्राम पंचायत राममालिया</option>
-                <option value="लामगरा">🏛️ ग्राम पंचायत लामगरा</option>
-                <option value="सिंगावल">🏛️ ग्राम पंचायत सिंगावल</option>
-                <option value="सोबडी">🏛️ ग्राम पंचायत सोबडी</option>
-                <option value="सोलखुर्द">🏛️ ग्राम पंचायत सोलखुर्द</option>
-                <option value="हियालिया">🏛️ ग्राम पंचायत हियालिया</option>
-              </optgroup>
-            </select>
-          </div>
-
-          <!-- DROPDOWN 2: कार्मिक / बी.एल.ओ. चुनें -->
-          <div class="form-group mb-3" id="loginSecondarySelectGroup">
-            <label for="loginOfficerSelect" id="loginOfficerLabel" style="font-size:0.9rem; color:#0f172a; font-weight:700;">
-              <strong>2. कार्मिक / बी.एल.ओ. चुनें *:</strong>
-            </label>
-            <select id="loginOfficerSelect" class="form-select" onchange="onLoginOfficerChanged(this.value)" style="font-weight:700; cursor:pointer; font-size:0.92rem; height:44px; border:2px solid #cbd5e1; background:#ffffff; color:#0f172a; width:100%; border-radius:8px; padding:0 10px;" disabled>
-              <option value="">-- पहले ऊपर प्रकोष्ठ या पंचायत चुनें --</option>
-            </select>
-            <div id="loginSelectedDetailsBadge" style="display:none; font-size:0.8rem; margin-top:6px; font-weight:700; padding:6px 10px; border-radius:6px;"></div>
+            <label for="gatekeeperUsername" style="font-size:0.9rem; color:#0f172a; font-weight:700;"><strong>यूजर आईडी (User ID) *:</strong></label>
+            <div class="input-with-icon">
+              <span class="input-icon">👤</span>
+              <input type="text" id="gatekeeperUsername" class="form-input" placeholder="यूजर आईडी दर्ज करें (उदा. cand_gp01, blo_1)" required autocomplete="username" style="font-weight:700; height:44px; background:#ffffff; color:#0f172a; border:1.5px solid #cbd5e1;">
+            </div>
           </div>
 
           <!-- PASSWORD FIELD -->
@@ -132,7 +82,7 @@
           <div id="gatekeeperError" class="alert-error" style="display:none; margin-bottom:12px;"></div>
 
           <button type="submit" class="btn btn-login-submit btn-block" style="height:44px; font-size:1rem; font-weight:700;">
-            <span>बी.एल.ओ. / प्रकोष्ठ पोर्टल में प्रवेश करें (Login)</span>
+            <span>मतदाता पोर्टल में प्रवेश करें (Login & Access)</span>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </form>
