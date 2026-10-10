@@ -4939,3 +4939,93 @@ body.layout-10 .mini-booth-box {
     gap: 3mm !important;
   }
 }
+
+
+/* ==========================================================================
+   PASSWORD MODAL TRIGGER & ADMIN PASSWORD CONTROLS
+   ========================================================================== */
+#selfChangePassBtn, .btn-outline-light {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+  padding: 4px 12px !important;
+  font-size: 0.78rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+#selfChangePassBtn:hover, .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.admin-pass-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f8fafc;
+  padding: 2px 4px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.admin-pass-input {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  font-family: monospace !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  width: 90px !important;
+  padding: 2px 4px !important;
+  height: 24px !important;
+}
+
+.admin-pass-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.admin-pass-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.admin-pass-btn-save {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.admin-pass-btn-save:hover {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+}
+
+.admin-pass-btn-reset {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.admin-pass-btn-reset:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}

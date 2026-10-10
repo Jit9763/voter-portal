@@ -5,7 +5,7 @@
     {
       "id": "admin",
       "username": "admin",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "मुख्य व्यवस्थापक (Super Admin)",
       "mobile": "7023293283",
       "role": "SUPER_ADMIN",
@@ -29,7 +29,7 @@
     {
       "id": "incharge",
       "username": "incharge",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "ब्लॉक इनचार्ज (Incharge)",
       "mobile": "7023293283",
       "role": "INCHARGE",
@@ -46,7 +46,7 @@
     {
       "id": "vyavasthapak",
       "username": "vyavasthapak",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "व्यवस्थापक (Vyavasthapak)",
       "mobile": "9950705221",
       "role": "VYAVASTHAPAK",
@@ -63,7 +63,7 @@
     {
       "id": "block_prabhari",
       "username": "block_prabhari",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "ब्लॉक प्रभारी",
       "mobile": "9950705221",
       "role": "ब्लॉक प्रभारी",
@@ -80,7 +80,7 @@
     {
       "id": "cell_nirvachan_1",
       "username": "cell_nirvachan_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सुनिल कुमार मीना",
       "mobile": "7023293283",
       "role": "निर्वाचन शाखा (पर्यवेक्षण व नियंत्रण) - प्रभारी अधिकारी",
@@ -97,7 +97,7 @@
     {
       "id": "cell_nirvachan_2",
       "username": "cell_nirvachan_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मांगीलाल मीणा",
       "mobile": "9929075076",
       "role": "निर्वाचन शाखा (पर्यवेक्षण व नियंत्रण) - सहायक प्रभारी अधिकारी",
@@ -114,7 +114,7 @@
     {
       "id": "cell_nirvachan_3",
       "username": "cell_nirvachan_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सुरेश चन्द्र जांगिड",
       "mobile": "9950705221",
       "role": "निर्वाचन शाखा (पर्यवेक्षण व नियंत्रण) - प्रभारी कर्मचारी",
@@ -132,7 +132,7 @@
     {
       "id": "cell_nirvachan_4",
       "username": "cell_nirvachan_4",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री नरेन्द्र गौड",
       "mobile": "9829847303",
       "role": "निर्वाचन शाखा (पर्यवेक्षण व नियंत्रण) - प्रभारी कर्मचारी",
@@ -149,7 +149,7 @@
     {
       "id": "cell_nirvachan_5",
       "username": "cell_nirvachan_5",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री नवरतन नाथ",
       "mobile": "9784230043",
       "role": "निर्वाचन शाखा (पर्यवेक्षण व नियंत्रण) - प्रभारी कर्मचारी",
@@ -166,7 +166,7 @@
     {
       "id": "cell_nirvachan_6",
       "username": "cell_nirvachan_6",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री खुशीपाल तौणगरिया",
       "mobile": "8690198159",
       "role": "निर्वाचन शाखा (पर्यवेक्षण व नियंत्रण) - प्रभारी कर्मचारी",
@@ -183,7 +183,7 @@
     {
       "id": "cell_sansthapan_1",
       "username": "cell_sansthapan_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री प्रेमचन्द अलवरिया",
       "mobile": "9909254339",
       "role": "संस्थापन प्रकोष्ठ - प्रभारी अधिकारी",
@@ -200,7 +200,7 @@
     {
       "id": "cell_sansthapan_2",
       "username": "cell_sansthapan_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सीता राम माली",
       "mobile": "8619582839",
       "role": "संस्थापन प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -217,7 +217,7 @@
     {
       "id": "cell_evm_1",
       "username": "cell_evm_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री संजय कुमार सारस्वत",
       "mobile": "9928197741",
       "role": "ईवीएम प्रकोष्ठ - प्रभारी अधिकारी",
@@ -234,7 +234,7 @@
     {
       "id": "cell_evm_2",
       "username": "cell_evm_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री जितेन्द्र कुमार चौधरी",
       "mobile": "9928354317",
       "role": "ईवीएम प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -251,7 +251,7 @@
     {
       "id": "cell_evm_3",
       "username": "cell_evm_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री ललित कुमार शर्मा",
       "mobile": "9414669095",
       "role": "ईवीएम प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -268,7 +268,7 @@
     {
       "id": "cell_evm_4",
       "username": "cell_evm_4",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सुरेश खाती",
       "mobile": "9079884860",
       "role": "ईवीएम प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -285,7 +285,7 @@
     {
       "id": "cell_evm_5",
       "username": "cell_evm_5",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री गोविन्द राम डोडवाडिया",
       "mobile": "9782236621",
       "role": "ईवीएम प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -302,7 +302,7 @@
     {
       "id": "cell_route_post_1",
       "username": "cell_route_post_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शंकर लाल मुनोथ",
       "mobile": "9829976868",
       "role": "मतदान दल रूट चार्ट चैक पोस्ट वाहन ग्रुपिंग प्रकोष्ठ - प्रभारी अधिकारी",
@@ -319,7 +319,7 @@
     {
       "id": "cell_route_post_2",
       "username": "cell_route_post_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रघुविन्द्र सिंह",
       "mobile": "8769249378",
       "role": "मतदान दल रूट चार्ट चैक पोस्ट वाहन ग्रुपिंग प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -336,7 +336,7 @@
     {
       "id": "cell_voter_list_1",
       "username": "cell_voter_list_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शैलेन्द्र कुमार पहाडिया",
       "mobile": "9829354234",
       "role": "मतदाता सूची (कार्यकारी प्रति) प्रकोष्ठ - प्रभारी अधिकारी",
@@ -353,7 +353,7 @@
     {
       "id": "cell_voter_list_2",
       "username": "cell_voter_list_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री गुमान दान",
       "mobile": "7426662774",
       "role": "मतदाता सूची (कार्यकारी प्रति) प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -370,7 +370,7 @@
     {
       "id": "cell_voter_list_3",
       "username": "cell_voter_list_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री लक्की जैन",
       "mobile": "8000924816",
       "role": "मतदाता सूची (कार्यकारी प्रति) प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -387,7 +387,7 @@
     {
       "id": "cell_control_room_1",
       "username": "cell_control_room_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मुकेश रावत",
       "mobile": "9799203204",
       "role": "नियंत्रण कक्ष एवं हेल्पलाइन प्रकोष्ठ - प्रभारी अधिकारी",
@@ -404,7 +404,7 @@
     {
       "id": "cell_control_room_2",
       "username": "cell_control_room_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अनिल कुमार जोशी",
       "mobile": "9414550560",
       "role": "नियंत्रण कक्ष एवं हेल्पलाइन प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -421,7 +421,7 @@
     {
       "id": "cell_control_room_3",
       "username": "cell_control_room_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री नरेश पारीक",
       "mobile": "9828433020",
       "role": "नियंत्रण कक्ष एवं हेल्पलाइन प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -438,7 +438,7 @@
     {
       "id": "cell_control_room_4",
       "username": "cell_control_room_4",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिनेश कुमार स्वर्णकार",
       "mobile": "9587086986",
       "role": "नियंत्रण कक्ष एवं हेल्पलाइन प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -455,7 +455,7 @@
     {
       "id": "cell_control_room_5",
       "username": "cell_control_room_5",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अशोक कुम्हार",
       "mobile": "9460565960",
       "role": "नियंत्रण कक्ष एवं हेल्पलाइन प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -472,7 +472,7 @@
     {
       "id": "cell_mcc_1",
       "username": "cell_mcc_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मांगीलाल मीणा",
       "mobile": "9929075076",
       "role": "आदर्श आचार संहिता व कानून व्यवस्था प्रकोष्ठ - प्रभारी अधिकारी",
@@ -489,7 +489,7 @@
     {
       "id": "cell_mcc_2",
       "username": "cell_mcc_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दशरथ चौधरी",
       "mobile": "9001135902",
       "role": "आदर्श आचार संहिता व कानून व्यवस्था प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -506,7 +506,7 @@
     {
       "id": "cell_mcc_3",
       "username": "cell_mcc_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिनेश कुमार",
       "mobile": "9660475819",
       "role": "आदर्श आचार संहिता व कानून व्यवस्था प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -523,7 +523,7 @@
     {
       "id": "cell_micro_magistrate_1",
       "username": "cell_micro_magistrate_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शंकर लाल मुनोथ",
       "mobile": "9829976868",
       "role": "माइक्रो पर्यवेक्षक / एरिया / जोनल मजिस्ट्रेट समन्वय प्रकोष्ठ - प्रभारी अधिकारी",
@@ -540,7 +540,7 @@
     {
       "id": "cell_micro_magistrate_2",
       "username": "cell_micro_magistrate_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "मो० असलम",
       "mobile": "9828982060",
       "role": "माइक्रो पर्यवेक्षक / एरिया / जोनल मजिस्ट्रेट समन्वय प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -557,7 +557,7 @@
     {
       "id": "cell_accounts_1",
       "username": "cell_accounts_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "सुश्री पूजा शर्मा",
       "mobile": "6350555962",
       "role": "लेखा व निर्वाचन संबंधी प्रकोष्ठ - प्रभारी अधिकारी",
@@ -574,7 +574,7 @@
     {
       "id": "cell_accounts_2",
       "username": "cell_accounts_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री कृपा राम मेघवाल",
       "mobile": "9252495002",
       "role": "लेखा व निर्वाचन संबंधी प्रकोष्ठ - प्रभारी अधिकारी",
@@ -591,7 +591,7 @@
     {
       "id": "cell_accounts_3",
       "username": "cell_accounts_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिनेश कुमार गुर्जर",
       "mobile": "9636119670",
       "role": "लेखा व निर्वाचन संबंधी प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -608,7 +608,7 @@
     {
       "id": "cell_accounts_4",
       "username": "cell_accounts_4",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "निशा मीणा",
       "mobile": "9849047935",
       "role": "लेखा व निर्वाचन संबंधी प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -625,7 +625,7 @@
     {
       "id": "cell_transport_pol_1",
       "username": "cell_transport_pol_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री कृपा राम मेघवाल",
       "mobile": "9252495002",
       "role": "वाहन / पीओएल (Transport & POL) प्रकोष्ठ - प्रभारी अधिकारी",
@@ -642,7 +642,7 @@
     {
       "id": "cell_transport_pol_2",
       "username": "cell_transport_pol_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "सुश्री पूजा शर्मा",
       "mobile": "6350555962",
       "role": "वाहन / पीओएल (Transport & POL) प्रकोष्ठ - प्रभारी अधिकारी",
@@ -659,7 +659,7 @@
     {
       "id": "cell_transport_pol_3",
       "username": "cell_transport_pol_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री राजू लाल माली",
       "mobile": "9214969583",
       "role": "वाहन / पीओएल (Transport & POL) प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -676,7 +676,7 @@
     {
       "id": "cell_transport_pol_4",
       "username": "cell_transport_pol_4",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिनेश कुमार वैष्णव",
       "mobile": "7737335704",
       "role": "वाहन / पीओएल (Transport & POL) प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -693,7 +693,7 @@
     {
       "id": "cell_postal_ballot_1",
       "username": "cell_postal_ballot_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शैलेन्द्र कुमार मीणा",
       "mobile": "8209808889",
       "role": "पोस्टल बैलेट पेपर मेनेजमेन्ट प्रकोष्ठ - प्रभारी अधिकारी",
@@ -710,7 +710,7 @@
     {
       "id": "cell_postal_ballot_2",
       "username": "cell_postal_ballot_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सुमित कुमार",
       "mobile": "9785812191",
       "role": "पोस्टल बैलेट पेपर मेनेजमेन्ट प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -727,7 +727,7 @@
     {
       "id": "cell_postal_ballot_3",
       "username": "cell_postal_ballot_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "सुश्री खुशबु वर्मा",
       "mobile": "8619225243",
       "role": "पोस्टल बैलेट पेपर मेनेजमेन्ट प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -744,7 +744,7 @@
     {
       "id": "cell_it_stats_1",
       "username": "cell_it_stats_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री कैलाश चन्द्र",
       "mobile": "7849945905",
       "role": "कम्प्यूटर सेल व सांख्यिकी प्रकोष्ठ - प्रभारी अधिकारी",
@@ -761,7 +761,7 @@
     {
       "id": "cell_it_stats_2",
       "username": "cell_it_stats_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री निलय सिंह",
       "mobile": "9403223682",
       "role": "कम्प्यूटर सेल व सांख्यिकी प्रकोष्ठ - प्रभारी अधिकारी",
@@ -778,7 +778,7 @@
     {
       "id": "cell_it_stats_3",
       "username": "cell_it_stats_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शंकरलाल",
       "mobile": "8432457690",
       "role": "कम्प्यूटर सेल व सांख्यिकी प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -795,7 +795,7 @@
     {
       "id": "cell_it_stats_4",
       "username": "cell_it_stats_4",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री संजय",
       "mobile": "9667027283",
       "role": "कम्प्यूटर सेल व सांख्यिकी प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -812,7 +812,7 @@
     {
       "id": "cell_sveep_1",
       "username": "cell_sveep_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सुनील वर्मा",
       "mobile": "9588052106",
       "role": "स्वीप प्रकोष्ठ / विशेष योग्यजन प्रकोष्ठ - प्रभारी अधिकारी",
@@ -829,7 +829,7 @@
     {
       "id": "cell_sveep_2",
       "username": "cell_sveep_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री बुद्धराज कुम्हार",
       "mobile": "9414551061",
       "role": "स्वीप प्रकोष्ठ / विशेष योग्यजन प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -846,7 +846,7 @@
     {
       "id": "cell_sveep_3",
       "username": "cell_sveep_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अजित कावडिया",
       "mobile": "9588021621",
       "role": "स्वीप प्रकोष्ठ / विशेष योग्यजन प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -863,7 +863,7 @@
     {
       "id": "cell_polling_station_1",
       "username": "cell_polling_station_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती प्रमिला रासलोत",
       "mobile": "9414619897",
       "role": "मतदान केन्द्र प्रकोष्ठ - प्रभारी अधिकारी",
@@ -880,7 +880,7 @@
     {
       "id": "cell_polling_station_2",
       "username": "cell_polling_station_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अरविन्द कुमार सवासिया",
       "mobile": "9462959700",
       "role": "मतदान केन्द्र प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -897,7 +897,7 @@
     {
       "id": "cell_polling_station_3",
       "username": "cell_polling_station_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अंकुश मेघवंशी",
       "mobile": "9636483684",
       "role": "मतदान केन्द्र प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -914,7 +914,7 @@
     {
       "id": "cell_videography_1",
       "username": "cell_videography_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री निखिल तिवाडी",
       "mobile": "9079827847",
       "role": "फोटोग्राफी / वीडियोग्राफी प्रकोष्ठ - प्रभारी अधिकारी",
@@ -931,7 +931,7 @@
     {
       "id": "cell_videography_2",
       "username": "cell_videography_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भगवान लाल कुम्हार",
       "mobile": "8107996322",
       "role": "फोटोग्राफी / वीडियोग्राफी प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -948,7 +948,7 @@
     {
       "id": "cell_receipt_dispatch_1",
       "username": "cell_receipt_dispatch_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "सुश्री दीपा ज्ञानचंदानी",
       "mobile": "8955096690",
       "role": "आवक-जावक एवं पत्राचार प्रकोष्ठ - प्रभारी अधिकारी",
@@ -965,7 +965,7 @@
     {
       "id": "cell_receipt_dispatch_2",
       "username": "cell_receipt_dispatch_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती रेणू कंवर",
       "mobile": "7877360437",
       "role": "आवक-जावक एवं पत्राचार प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -982,7 +982,7 @@
     {
       "id": "cell_receipt_dispatch_3",
       "username": "cell_receipt_dispatch_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सुरेश कुमार भील",
       "mobile": "9521146101",
       "role": "आवक-जावक एवं पत्राचार प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -999,7 +999,7 @@
     {
       "id": "cell_duty_service_1",
       "username": "cell_duty_service_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मांगीलाल मीणा",
       "mobile": "9929075076",
       "role": "चुनाव डयूटी तामिली प्रकोष्ठ - प्रभारी अधिकारी",
@@ -1016,7 +1016,7 @@
     {
       "id": "cell_duty_service_2",
       "username": "cell_duty_service_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री तोफीक अहमद",
       "mobile": "9667159594",
       "role": "चुनाव डयूटी तामिली प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -1033,7 +1033,7 @@
     {
       "id": "cell_duty_service_3",
       "username": "cell_duty_service_3",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री ओम प्रकाश डोरिया",
       "mobile": "9928986712",
       "role": "चुनाव डयूटी तामिली प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -1050,7 +1050,7 @@
     {
       "id": "cell_medical_1",
       "username": "cell_medical_1",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "डॉ. जितेन्द्र सिंह",
       "mobile": "9610126013",
       "role": "मेडीकल (Medical) प्रकोष्ठ - प्रभारी अधिकारी",
@@ -1067,7 +1067,7 @@
     {
       "id": "cell_medical_2",
       "username": "cell_medical_2",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री बृजेश चौधरी",
       "mobile": "9829152268",
       "role": "मेडीकल (Medical) प्रकोष्ठ - प्रभारी कर्मचारी",
@@ -1101,7 +1101,7 @@
     {
       "id": "blo_330",
       "username": "blo_330",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री धनराज कुमावत",
       "mobile": "9649678869",
       "role": "बी.एल.ओ.",
@@ -1118,7 +1118,7 @@
     {
       "id": "blo_332",
       "username": "blo_332",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मुकुटमणी द्विवेदी",
       "mobile": "9460966310",
       "role": "बी.एल.ओ.",
@@ -1135,7 +1135,7 @@
     {
       "id": "blo_333",
       "username": "blo_333",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री ग्यारसी लाल बैरवा",
       "mobile": "9694969961",
       "role": "बी.एल.ओ.",
@@ -1152,7 +1152,7 @@
     {
       "id": "blo_331",
       "username": "blo_331",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री प्रेम सिंह शेखावत",
       "mobile": "9694969961",
       "role": "बी.एल.ओ.",
@@ -1169,7 +1169,7 @@
     {
       "id": "blo_225",
       "username": "blo_225",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती अहिल्या शर्मा",
       "mobile": "9610976472",
       "role": "बी.एल.ओ.",
@@ -1186,7 +1186,7 @@
     {
       "id": "blo_new_7",
       "username": "blo_new_7",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सहदेव चौधरी",
       "mobile": "8769007668",
       "role": "बी.एल.ओ.",
@@ -1203,7 +1203,7 @@
     {
       "id": "blo_227",
       "username": "blo_227",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भंवरलाल शर्मा",
       "mobile": "9950228331",
       "role": "बी.एल.ओ.",
@@ -1220,7 +1220,7 @@
     {
       "id": "blo_226",
       "username": "blo_226",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री नरेश कुमार शर्मा",
       "mobile": "9784195646",
       "role": "बी.एल.ओ.",
@@ -1237,7 +1237,7 @@
     {
       "id": "blo_236",
       "username": "blo_236",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री विजय सिंह चारण",
       "mobile": "9799979051",
       "role": "बी.एल.ओ.",
@@ -1254,7 +1254,7 @@
     {
       "id": "blo_237",
       "username": "blo_237",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री ज्ञानेश्वर प्रसाद प्रजापत",
       "mobile": "9672862304",
       "role": "बी.एल.ओ.",
@@ -1271,7 +1271,7 @@
     {
       "id": "blo_281",
       "username": "blo_281",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री राजेश कुमार वैष्णव",
       "mobile": "9269074489",
       "role": "बी.एल.ओ.",
@@ -1288,7 +1288,7 @@
     {
       "id": "blo_280",
       "username": "blo_280",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री संजय व्यास",
       "mobile": "8504884191",
       "role": "बी.एल.ओ.",
@@ -1305,7 +1305,7 @@
     {
       "id": "blo_282",
       "username": "blo_282",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सत्यनारायण बैरवा",
       "mobile": "7742356796",
       "role": "बी.एल.ओ.",
@@ -1322,7 +1322,7 @@
     {
       "id": "blo_279",
       "username": "blo_279",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मुरलीधर वैष्णव",
       "mobile": "9829649846",
       "role": "बी.एल.ओ.",
@@ -1339,7 +1339,7 @@
     {
       "id": "blo_278",
       "username": "blo_278",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भंवर लाल नायक",
       "mobile": "9636407387",
       "role": "बी.एल.ओ.",
@@ -1356,7 +1356,7 @@
     {
       "id": "blo_277",
       "username": "blo_277",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भूपेन्द्र सिंह राठौड",
       "mobile": "9649173100",
       "role": "बी.एल.ओ.",
@@ -1373,7 +1373,7 @@
     {
       "id": "blo_305",
       "username": "blo_305",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अजय सिंह देवडा",
       "mobile": "9571189634",
       "role": "बी.एल.ओ.",
@@ -1390,7 +1390,7 @@
     {
       "id": "blo_306",
       "username": "blo_306",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामगोपाल बैरवा",
       "mobile": "9269313486",
       "role": "बी.एल.ओ.",
@@ -1407,7 +1407,7 @@
     {
       "id": "blo_303",
       "username": "blo_303",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री धर्मेन्द्र कुमार वैष्णव",
       "mobile": "9079219657",
       "role": "बी.एल.ओ.",
@@ -1424,7 +1424,7 @@
     {
       "id": "blo_304",
       "username": "blo_304",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सज्जन सिंह गौड",
       "mobile": "8619276061",
       "role": "बी.एल.ओ.",
@@ -1441,7 +1441,7 @@
     {
       "id": "blo_301",
       "username": "blo_301",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री जीवन राम बैरवा",
       "mobile": "7073649458",
       "role": "बी.एल.ओ.",
@@ -1458,7 +1458,7 @@
     {
       "id": "blo_300",
       "username": "blo_300",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री चन्द्रप्रकाश सुराणा",
       "mobile": "7737537437",
       "role": "बी.एल.ओ.",
@@ -1475,7 +1475,7 @@
     {
       "id": "blo_302",
       "username": "blo_302",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री पवन कुमार जोशी",
       "mobile": "7976657633",
       "role": "बी.एल.ओ.",
@@ -1492,7 +1492,7 @@
     {
       "id": "blo_299",
       "username": "blo_299",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री धनराज बैरवा",
       "mobile": "9414749131",
       "role": "बी.एल.ओ.",
@@ -1509,7 +1509,7 @@
     {
       "id": "blo_310",
       "username": "blo_310",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री प्रमोद कुमार शर्मा",
       "mobile": "9784206704",
       "role": "बी.एल.ओ.",
@@ -1526,7 +1526,7 @@
     {
       "id": "blo_321",
       "username": "blo_321",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री निसार अहमद",
       "mobile": "9660514516",
       "role": "बी.एल.ओ.",
@@ -1543,7 +1543,7 @@
     {
       "id": "blo_317",
       "username": "blo_317",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री जियाउर रहमान",
       "mobile": "8890838204",
       "role": "बी.एल.ओ.",
@@ -1560,7 +1560,7 @@
     {
       "id": "blo_314",
       "username": "blo_314",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अनिल कुमार जांगिड",
       "mobile": "9414922890",
       "role": "बी.एल.ओ.",
@@ -1577,7 +1577,7 @@
     {
       "id": "blo_248",
       "username": "blo_248",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सांवर लाल शर्मा",
       "mobile": "992932295",
       "role": "बी.एल.ओ.",
@@ -1594,7 +1594,7 @@
     {
       "id": "blo_251",
       "username": "blo_251",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अशोक कुमार माली",
       "mobile": "8955274942",
       "role": "बी.एल.ओ.",
@@ -1611,7 +1611,7 @@
     {
       "id": "blo_249",
       "username": "blo_249",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामप्रसाद खारोल",
       "mobile": "9783038311",
       "role": "बी.एल.ओ.",
@@ -1628,7 +1628,7 @@
     {
       "id": "blo_250",
       "username": "blo_250",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री राकेश कुमार पारीक",
       "mobile": "9001300873",
       "role": "बी.एल.ओ.",
@@ -1645,7 +1645,7 @@
     {
       "id": "blo_new_34",
       "username": "blo_new_34",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री देवी सिंह शेखावत",
       "mobile": "9829964771",
       "role": "बी.एल.ओ.",
@@ -1662,7 +1662,7 @@
     {
       "id": "blo_293",
       "username": "blo_293",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री जितेन्द्र कुमार शर्मा",
       "mobile": "8107848825",
       "role": "बी.एल.ओ.",
@@ -1679,7 +1679,7 @@
     {
       "id": "blo_307",
       "username": "blo_307",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री महमूद देशवाली",
       "mobile": "9252234740",
       "role": "बी.एल.ओ.",
@@ -1696,7 +1696,7 @@
     {
       "id": "blo_289",
       "username": "blo_289",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दीपक कुमार सेन",
       "mobile": "9414551356",
       "role": "बी.एल.ओ.",
@@ -1713,7 +1713,7 @@
     {
       "id": "blo_288",
       "username": "blo_288",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सत्यनारायण खटीक",
       "mobile": "9929947564",
       "role": "बी.एल.ओ.",
@@ -1730,7 +1730,7 @@
     {
       "id": "blo_235",
       "username": "blo_235",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामप्रसाद रेगर",
       "mobile": "9166986070",
       "role": "बी.एल.ओ.",
@@ -1747,7 +1747,7 @@
     {
       "id": "blo_230",
       "username": "blo_230",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री साजन सिंह चौहान",
       "mobile": "9079245438",
       "role": "बी.एल.ओ.",
@@ -1764,7 +1764,7 @@
     {
       "id": "blo_232",
       "username": "blo_232",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रणजीत बैरवा",
       "mobile": "8890036667",
       "role": "बी.एल.ओ.",
@@ -1781,7 +1781,7 @@
     {
       "id": "blo_233",
       "username": "blo_233",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री ओमप्रकाश व्यास",
       "mobile": "9602444210",
       "role": "बी.एल.ओ.",
@@ -1798,7 +1798,7 @@
     {
       "id": "blo_231",
       "username": "blo_231",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री कशिन लाल बैरवा",
       "mobile": "9784970296",
       "role": "बी.एल.ओ.",
@@ -1815,7 +1815,7 @@
     {
       "id": "blo_234",
       "username": "blo_234",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री जितेन्द्र यादव",
       "mobile": "9929827714",
       "role": "बी.एल.ओ.",
@@ -1832,7 +1832,7 @@
     {
       "id": "blo_273",
       "username": "blo_273",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री विनोद कुमार वर्मा",
       "mobile": "9929183463",
       "role": "बी.एल.ओ.",
@@ -1849,7 +1849,7 @@
     {
       "id": "blo_274",
       "username": "blo_274",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामप्रसाद लक्षकार",
       "mobile": "9602372311",
       "role": "बी.एल.ओ.",
@@ -1866,7 +1866,7 @@
     {
       "id": "blo_275",
       "username": "blo_275",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री हनुमान प्रसाद",
       "mobile": "9928668009",
       "role": "बी.एल.ओ.",
@@ -1883,7 +1883,7 @@
     {
       "id": "blo_276",
       "username": "blo_276",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री राकेश चौधरी",
       "mobile": "8559910535",
       "role": "बी.एल.ओ.",
@@ -1900,7 +1900,7 @@
     {
       "id": "blo_309",
       "username": "blo_309",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री देवी लाल जाट",
       "mobile": "9928583202",
       "role": "बी.एल.ओ.",
@@ -1917,7 +1917,7 @@
     {
       "id": "blo_308",
       "username": "blo_308",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सुनील मेघवंशी",
       "mobile": "9571478807",
       "role": "बी.एल.ओ.",
@@ -1934,7 +1934,7 @@
     {
       "id": "blo_311",
       "username": "blo_311",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री चेतन हिन्डुनिया",
       "mobile": "8003774404",
       "role": "बी.एल.ओ.",
@@ -1951,7 +1951,7 @@
     {
       "id": "blo_255",
       "username": "blo_255",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भंवर लाल शर्मा",
       "mobile": "9829850973",
       "role": "बी.एल.ओ.",
@@ -1968,7 +1968,7 @@
     {
       "id": "blo_256",
       "username": "blo_256",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रजनीश",
       "mobile": "7014346762",
       "role": "बी.एल.ओ.",
@@ -1985,7 +1985,7 @@
     {
       "id": "blo_261",
       "username": "blo_261",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अनवर हुसैन अंसारी",
       "mobile": "9460357332",
       "role": "बी.एल.ओ.",
@@ -2002,7 +2002,7 @@
     {
       "id": "blo_254",
       "username": "blo_254",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती तारा व्यास",
       "mobile": "6376217543",
       "role": "बी.एल.ओ.",
@@ -2019,7 +2019,7 @@
     {
       "id": "blo_252",
       "username": "blo_252",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री गजराज बैरवा",
       "mobile": "6377819391",
       "role": "बी.एल.ओ.",
@@ -2036,7 +2036,7 @@
     {
       "id": "blo_253",
       "username": "blo_253",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री महावीर जांगिड",
       "mobile": "9929753094",
       "role": "बी.एल.ओ.",
@@ -2053,7 +2053,7 @@
     {
       "id": "blo_246",
       "username": "blo_246",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सत्यनारायण बैरवा",
       "mobile": "8003824561",
       "role": "बी.एल.ओ.",
@@ -2070,7 +2070,7 @@
     {
       "id": "blo_241",
       "username": "blo_241",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सर्वेश्वर प्रजापत",
       "mobile": "7878007541",
       "role": "बी.एल.ओ.",
@@ -2087,7 +2087,7 @@
     {
       "id": "blo_239",
       "username": "blo_239",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामलाल कीर",
       "mobile": "9799046258",
       "role": "बी.एल.ओ.",
@@ -2104,7 +2104,7 @@
     {
       "id": "blo_238",
       "username": "blo_238",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामजस अहीर",
       "mobile": "9929073806",
       "role": "बी.एल.ओ.",
@@ -2121,7 +2121,7 @@
     {
       "id": "blo_240",
       "username": "blo_240",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री उमराव सिंह बारी",
       "mobile": "9636224810",
       "role": "बी.एल.ओ.",
@@ -2138,7 +2138,7 @@
     {
       "id": "blo_257",
       "username": "blo_257",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिलीप सिंह कविया",
       "mobile": "7976180461",
       "role": "बी.एल.ओ.",
@@ -2155,7 +2155,7 @@
     {
       "id": "blo_258",
       "username": "blo_258",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री बलराम चौधरी",
       "mobile": "8003754501",
       "role": "बी.एल.ओ.",
@@ -2172,7 +2172,7 @@
     {
       "id": "blo_337",
       "username": "blo_337",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री लालाराम कुम्हार",
       "mobile": "9783203620",
       "role": "बी.एल.ओ.",
@@ -2189,7 +2189,7 @@
     {
       "id": "blo_338",
       "username": "blo_338",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अब्दुल कलाम",
       "mobile": "9549288805",
       "role": "बी.एल.ओ.",
@@ -2206,7 +2206,7 @@
     {
       "id": "blo_340",
       "username": "blo_340",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री धर्मेन्द्र कुमार चौधरी",
       "mobile": "9799510830",
       "role": "बी.एल.ओ.",
@@ -2223,7 +2223,7 @@
     {
       "id": "blo_339",
       "username": "blo_339",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामस्वरूप बैरवा",
       "mobile": "9001754262",
       "role": "बी.एल.ओ.",
@@ -2240,7 +2240,7 @@
     {
       "id": "blo_296",
       "username": "blo_296",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मकदूम अहमद",
       "mobile": "9414550711",
       "role": "बी.एल.ओ.",
@@ -2257,7 +2257,7 @@
     {
       "id": "blo_297",
       "username": "blo_297",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री विनोद कुमार सरवाल",
       "mobile": "9829121678",
       "role": "बी.एल.ओ.",
@@ -2274,7 +2274,7 @@
     {
       "id": "blo_298",
       "username": "blo_298",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री ओमप्रकाश शर्मा",
       "mobile": "9829663748",
       "role": "बी.एल.ओ.",
@@ -2291,7 +2291,7 @@
     {
       "id": "blo_344",
       "username": "blo_344",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती सुमित्रा शर्मा",
       "mobile": "9079825200",
       "role": "बी.एल.ओ.",
@@ -2308,7 +2308,7 @@
     {
       "id": "blo_345",
       "username": "blo_345",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती ममता गर्ग",
       "mobile": "9928024787",
       "role": "बी.एल.ओ.",
@@ -2325,7 +2325,7 @@
     {
       "id": "blo_343",
       "username": "blo_343",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री गंगाराम रेगर",
       "mobile": "9929136369",
       "role": "बी.एल.ओ.",
@@ -2342,7 +2342,7 @@
     {
       "id": "blo_342",
       "username": "blo_342",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री लोकेश जाट",
       "mobile": "9829243359",
       "role": "बी.एल.ओ.",
@@ -2359,7 +2359,7 @@
     {
       "id": "blo_291",
       "username": "blo_291",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री वैभव राज मेहरा",
       "mobile": "8209227928",
       "role": "बी.एल.ओ.",
@@ -2376,7 +2376,7 @@
     {
       "id": "blo_292",
       "username": "blo_292",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शिवराज",
       "mobile": "7737880781",
       "role": "बी.एल.ओ.",
@@ -2393,7 +2393,7 @@
     {
       "id": "blo_294",
       "username": "blo_294",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रघुवीर गुर्जर",
       "mobile": "8209143708",
       "role": "बी.एल.ओ.",
@@ -2410,7 +2410,7 @@
     {
       "id": "blo_295",
       "username": "blo_295",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रंगलाल गुर्जर",
       "mobile": "9829014609",
       "role": "बी.एल.ओ.",
@@ -2427,7 +2427,7 @@
     {
       "id": "blo_290",
       "username": "blo_290",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामप्रसाद भांबी",
       "mobile": "9+784344547",
       "role": "बी.एल.ओ.",
@@ -2444,7 +2444,7 @@
     {
       "id": "blo_283",
       "username": "blo_283",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री विजय कुमार वर्मा",
       "mobile": "9829981055",
       "role": "बी.एल.ओ.",
@@ -2461,7 +2461,7 @@
     {
       "id": "blo_287",
       "username": "blo_287",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दशरथ वैष्णव",
       "mobile": "9602719043",
       "role": "बी.एल.ओ.",
@@ -2478,7 +2478,7 @@
     {
       "id": "blo_286",
       "username": "blo_286",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री लक्ष्मण रैदास",
       "mobile": "9982638989",
       "role": "बी.एल.ओ.",
@@ -2495,7 +2495,7 @@
     {
       "id": "blo_285",
       "username": "blo_285",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री श्री वल्लभ पारीक",
       "mobile": "8890774112",
       "role": "बी.एल.ओ.",
@@ -2512,7 +2512,7 @@
     {
       "id": "blo_284",
       "username": "blo_284",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री कशिन गोपाल छिपा",
       "mobile": "9460546296",
       "role": "बी.एल.ओ.",
@@ -2529,7 +2529,7 @@
     {
       "id": "blo_229",
       "username": "blo_229",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामधन नंगवाडा",
       "mobile": "9950811061",
       "role": "बी.एल.ओ.",
@@ -2546,7 +2546,7 @@
     {
       "id": "blo_new_87",
       "username": "blo_new_87",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिनेश कुमार बैरवा",
       "mobile": "9588033508",
       "role": "बी.एल.ओ.",
@@ -2563,7 +2563,7 @@
     {
       "id": "blo_228",
       "username": "blo_228",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामकरण रेगर",
       "mobile": "9001498640",
       "role": "बी.एल.ओ.",
@@ -2580,7 +2580,7 @@
     {
       "id": "blo_247",
       "username": "blo_247",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री राजेन्द्र कुमार शर्मा",
       "mobile": "6375260217",
       "role": "बी.एल.ओ.",
@@ -2597,7 +2597,7 @@
     {
       "id": "blo_319",
       "username": "blo_319",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शेतान कुमावत",
       "mobile": "9610707972",
       "role": "बी.एल.ओ.",
@@ -2614,7 +2614,7 @@
     {
       "id": "blo_318",
       "username": "blo_318",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री बद्रीनारायण जाट",
       "mobile": "9784080563",
       "role": "बी.एल.ओ.",
@@ -2631,7 +2631,7 @@
     {
       "id": "blo_327",
       "username": "blo_327",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिलखुश वैष्णव",
       "mobile": "9602408532",
       "role": "बी.एल.ओ.",
@@ -2648,7 +2648,7 @@
     {
       "id": "blo_325",
       "username": "blo_325",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भोपालराम रैबारी",
       "mobile": "9784360584",
       "role": "बी.एल.ओ.",
@@ -2665,7 +2665,7 @@
     {
       "id": "blo_328",
       "username": "blo_328",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती कौशल्या भांबी",
       "mobile": "8690383076",
       "role": "बी.एल.ओ.",
@@ -2682,7 +2682,7 @@
     {
       "id": "blo_326",
       "username": "blo_326",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भागचन्द टांक",
       "mobile": "9828803505",
       "role": "बी.एल.ओ.",
@@ -2699,7 +2699,7 @@
     {
       "id": "blo_244",
       "username": "blo_244",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री महावीर प्रसाद प्रजापत",
       "mobile": "9928391527",
       "role": "बी.एल.ओ.",
@@ -2716,7 +2716,7 @@
     {
       "id": "blo_245",
       "username": "blo_245",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री बनवारी लाल गोस्वामी",
       "mobile": "9929447843",
       "role": "बी.एल.ओ.",
@@ -2733,7 +2733,7 @@
     {
       "id": "blo_242",
       "username": "blo_242",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री शान्ति लाल जैन",
       "mobile": "9828874347",
       "role": "बी.एल.ओ.",
@@ -2750,7 +2750,7 @@
     {
       "id": "blo_243",
       "username": "blo_243",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री पृथ्वीराज मीणा",
       "mobile": "8696157366",
       "role": "बी.एल.ओ.",
@@ -2767,7 +2767,7 @@
     {
       "id": "blo_341",
       "username": "blo_341",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भूपेन्द्र सिंह",
       "mobile": "8094624988",
       "role": "बी.एल.ओ.",
@@ -2784,7 +2784,7 @@
     {
       "id": "blo_272",
       "username": "blo_272",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भंवर लाल रेगर",
       "mobile": "9001077090",
       "role": "बी.एल.ओ.",
@@ -2801,7 +2801,7 @@
     {
       "id": "blo_269",
       "username": "blo_269",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामदयाल गुर्जर",
       "mobile": "8432781245",
       "role": "बी.एल.ओ.",
@@ -2818,7 +2818,7 @@
     {
       "id": "blo_270",
       "username": "blo_270",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री हंसराज गुर्जर",
       "mobile": "9649918501",
       "role": "बी.एल.ओ.",
@@ -2835,7 +2835,7 @@
     {
       "id": "blo_271",
       "username": "blo_271",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री कानाराम मीणा",
       "mobile": "9887322580",
       "role": "बी.एल.ओ.",
@@ -2852,7 +2852,7 @@
     {
       "id": "blo_336",
       "username": "blo_336",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री सत्यनारायण मीणा",
       "mobile": "9785389333",
       "role": "बी.एल.ओ.",
@@ -2869,7 +2869,7 @@
     {
       "id": "blo_334",
       "username": "blo_334",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती चिन्ता कुम्हार",
       "mobile": "8107731088",
       "role": "बी.एल.ओ.",
@@ -2886,7 +2886,7 @@
     {
       "id": "blo_335",
       "username": "blo_335",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामकुंवार कुम्हार",
       "mobile": "9829828478",
       "role": "बी.एल.ओ.",
@@ -2903,7 +2903,7 @@
     {
       "id": "blo_new_108",
       "username": "blo_new_108",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अभय सिंह पंवार",
       "mobile": "9001986838",
       "role": "बी.एल.ओ.",
@@ -2920,7 +2920,7 @@
     {
       "id": "blo_312",
       "username": "blo_312",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री प्रेमचंद उदय",
       "mobile": "7597814008",
       "role": "बी.एल.ओ.",
@@ -2937,7 +2937,7 @@
     {
       "id": "blo_313",
       "username": "blo_313",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रघुनाथ चौधरी",
       "mobile": "9799295594",
       "role": "बी.एल.ओ.",
@@ -2954,7 +2954,7 @@
     {
       "id": "blo_315",
       "username": "blo_315",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री ललित कशिोर शर्मा",
       "mobile": "8104466893",
       "role": "बी.एल.ओ.",
@@ -2971,7 +2971,7 @@
     {
       "id": "blo_316",
       "username": "blo_316",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री हेमराज दरोगा",
       "mobile": "7339841542",
       "role": "बी.एल.ओ.",
@@ -2988,7 +2988,7 @@
     {
       "id": "blo_268",
       "username": "blo_268",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री अविनाश प्रसाद वैष्णव",
       "mobile": "8769453569",
       "role": "बी.एल.ओ.",
@@ -3005,7 +3005,7 @@
     {
       "id": "blo_266",
       "username": "blo_266",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री हंसराज",
       "mobile": "9950323099",
       "role": "बी.एल.ओ.",
@@ -3022,7 +3022,7 @@
     {
       "id": "blo_new_115",
       "username": "blo_new_115",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री हरीश कुमार वैष्णव",
       "mobile": "9799266968",
       "role": "बी.एल.ओ.",
@@ -3039,7 +3039,7 @@
     {
       "id": "blo_267",
       "username": "blo_267",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री भंवर लाल जाट",
       "mobile": "9602067373",
       "role": "बी.एल.ओ.",
@@ -3056,7 +3056,7 @@
     {
       "id": "blo_265",
       "username": "blo_265",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री मोहम्मद रफीक",
       "mobile": "9928168738",
       "role": "बी.एल.ओ.",
@@ -3073,7 +3073,7 @@
     {
       "id": "blo_262",
       "username": "blo_262",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री धर्मीचन्द माली",
       "mobile": "9783966103",
       "role": "बी.एल.ओ.",
@@ -3090,7 +3090,7 @@
     {
       "id": "blo_264",
       "username": "blo_264",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री राजू लाल रेबारी",
       "mobile": "8239249326",
       "role": "बी.एल.ओ.",
@@ -3107,7 +3107,7 @@
     {
       "id": "blo_263",
       "username": "blo_263",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री रामेश्वर लाल डांगा",
       "mobile": "9929599039",
       "role": "बी.एल.ओ.",
@@ -3124,7 +3124,7 @@
     {
       "id": "blo_260",
       "username": "blo_260",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्रीमती कमला देवी भांबी",
       "mobile": "9680771546",
       "role": "बी.एल.ओ.",
@@ -3141,7 +3141,7 @@
     {
       "id": "blo_259",
       "username": "blo_259",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री उम्मेद सिंह देवडा",
       "mobile": "9571744755",
       "role": "बी.एल.ओ.",
@@ -3158,7 +3158,7 @@
     {
       "id": "blo_322",
       "username": "blo_322",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री हंसराज गुर्जर",
       "mobile": "9784277921",
       "role": "बी.एल.ओ.",
@@ -3175,7 +3175,7 @@
     {
       "id": "blo_323",
       "username": "blo_323",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री प्रदीप कुमार",
       "mobile": "9509776135",
       "role": "बी.एल.ओ.",
@@ -3192,7 +3192,7 @@
     {
       "id": "blo_324",
       "username": "blo_324",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री विनोद मीणा",
       "mobile": "9828393814",
       "role": "बी.एल.ओ.",
@@ -3209,7 +3209,7 @@
     {
       "id": "blo_320",
       "username": "blo_320",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "श्री दिनेश कुमार रेगर",
       "mobile": "8107193130",
       "role": "बी.एल.ओ.",
@@ -3226,7 +3226,7 @@
     {
       "id": "cand_gp01",
       "username": "cand_gp01",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (बड़गांव)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3243,7 +3243,7 @@
     {
       "id": "cand_gp02",
       "username": "cand_gp02",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (बड़ली)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3260,7 +3260,7 @@
     {
       "id": "cand_gp03",
       "username": "cand_gp03",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (बगराई)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3277,7 +3277,7 @@
     {
       "id": "cand_gp04",
       "username": "cand_gp04",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (बांदनवाड़ा)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3294,7 +3294,7 @@
     {
       "id": "cand_gp05",
       "username": "cand_gp05",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (भिनाय)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3311,7 +3311,7 @@
     {
       "id": "cand_gp06",
       "username": "cand_gp06",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (बूबकिया)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3328,7 +3328,7 @@
     {
       "id": "cand_gp07",
       "username": "cand_gp07",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (चापानेरी)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3345,7 +3345,7 @@
     {
       "id": "cand_gp08",
       "username": "cand_gp08",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (छछून्दरा)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3362,7 +3362,7 @@
     {
       "id": "cand_gp09",
       "username": "cand_gp09",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (देवपुरा)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3379,7 +3379,7 @@
     {
       "id": "cand_gp10",
       "username": "cand_gp10",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (देवलियाकलां)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3396,7 +3396,7 @@
     {
       "id": "cand_gp11",
       "username": "cand_gp11",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (धांतोल)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3413,7 +3413,7 @@
     {
       "id": "cand_gp12",
       "username": "cand_gp12",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (एकलसिंहा)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3430,7 +3430,7 @@
     {
       "id": "cand_gp13",
       "username": "cand_gp13",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (घणा)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3447,7 +3447,7 @@
     {
       "id": "cand_gp14",
       "username": "cand_gp14",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (गुढाखुर्द)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3464,7 +3464,7 @@
     {
       "id": "cand_gp15",
       "username": "cand_gp15",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (हियालिया)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3481,7 +3481,7 @@
     {
       "id": "cand_gp16",
       "username": "cand_gp16",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (कनईकला)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3498,7 +3498,7 @@
     {
       "id": "cand_gp17",
       "username": "cand_gp17",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (करांटी)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3515,7 +3515,7 @@
     {
       "id": "cand_gp18",
       "username": "cand_gp18",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (कैरोंट)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3532,7 +3532,7 @@
     {
       "id": "cand_gp19",
       "username": "cand_gp19",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (खेडी)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3549,7 +3549,7 @@
     {
       "id": "cand_gp20",
       "username": "cand_gp20",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (कुम्हारिया)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3566,7 +3566,7 @@
     {
       "id": "cand_gp21",
       "username": "cand_gp21",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (लामगरा)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3583,7 +3583,7 @@
     {
       "id": "cand_gp22",
       "username": "cand_gp22",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (नागोला)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3600,7 +3600,7 @@
     {
       "id": "cand_gp23",
       "username": "cand_gp23",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (नान्दसी)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3617,7 +3617,7 @@
     {
       "id": "cand_gp24",
       "username": "cand_gp24",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (पड़ांगा)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3634,7 +3634,7 @@
     {
       "id": "cand_gp25",
       "username": "cand_gp25",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (पाडलिया)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3651,7 +3651,7 @@
     {
       "id": "cand_gp26",
       "username": "cand_gp26",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (राममालिया)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3668,7 +3668,7 @@
     {
       "id": "cand_gp27",
       "username": "cand_gp27",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (राताकोट)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3685,7 +3685,7 @@
     {
       "id": "cand_gp28",
       "username": "cand_gp28",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (सिंगावल)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3702,7 +3702,7 @@
     {
       "id": "cand_gp29",
       "username": "cand_gp29",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (सोबडी)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3719,7 +3719,7 @@
     {
       "id": "cand_gp30",
       "username": "cand_gp30",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी प्रतिनिधि (सोलखुर्द)",
       "mobile": "9829000000",
       "role": "प्रत्याशी",
@@ -3736,7 +3736,7 @@
     {
       "id": "cand_kk",
       "username": "kk",
-      "password": "123",
+      "password": "bhinai2026",
       "full_name": "प्रत्याशी (kk)",
       "mobile": "9829000000",
       "role": "CANDIDATE",

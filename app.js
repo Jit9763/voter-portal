@@ -204,7 +204,7 @@ function openCustomScopeModal(userId) {
   setChk('scopePermDownload', pDown);
 
   // Password & Status
-  const curPass = uov.password || userObj.password || '123';
+  const curPass = uov.password || userObj.password || 'bhinai2026';
   const curStatus = uov.status || userObj.status || 'ACTIVE';
   const passInput = document.getElementById('scopePasswordInput');
   if (passInput) passInput.value = curPass;
@@ -372,7 +372,7 @@ function saveCustomScopeAllotment(event) {
   const canView = document.getElementById('scopePermView')?.checked;
   const canPrint = document.getElementById('scopePermPrint')?.checked;
   const canDownload = document.getElementById('scopePermDownload')?.checked;
-  const pass = document.getElementById('scopePasswordInput')?.value.trim() || '123';
+  const pass = document.getElementById('scopePasswordInput')?.value.trim() || 'bhinai2026';
   const status = document.getElementById('scopeStatusSelect')?.value || 'ACTIVE';
 
   // Save all to overrides
@@ -441,12 +441,61 @@ function toggleUserStatus(userId, explicitStatus) {
   showToast(`खाता स्थिति: ${userId} -> ${newStatus === 'ACTIVE' ? '🟢 सक्रिय' : '🔴 निष्क्रिय'}`);
 }
 
+// Standalone Universal Quick Password Updater & Viewer for Super Admin Hub
+async function quickUpdatePassword(userId, newPass) {
+  if (newPass === undefined || newPass === null) return;
+  const trimmed = String(newPass).trim();
+  if (!trimmed) {
+    showToast('⚠️ पासवर्ड रिक्त नहीं हो सकता!');
+    return;
+  }
+  
+  saveUserOverride(userId, 'password', trimmed);
+  setCustomUserPassword(userId, trimmed);
+  
+  if (State.adminControlUsers) {
+    const u = State.adminControlUsers.find(x => (x.id || x.username) === userId);
+    if (u) {
+      u.password = trimmed;
+      if (typeof saveAdminUserToServer === 'function') {
+        saveAdminUserToServer(u);
+      }
+    }
+  }
+  
+  try {
+    localStorage.setItem('portal_admin_users_overrides', JSON.stringify(State.adminControlUsers || []));
+  } catch(e) {}
+  
+  try {
+    await fetch('/api/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: userId, newPassword: trimmed })
+    });
+  } catch(e) {}
+  
+  showToast(`🔑 पासवर्ड सुरक्षित: ${userId} -> '${trimmed}'`);
+}
+
 function resetUserPasswordToDefault(userId) {
-  quickUpdatePassword(userId, '123');
-  showToast(`🔑 पासवर्ड डिफ़ॉल्ट '123' पर रीसेट कर दिया गया!`);
-  if (activeHubSubTab === 'cell') renderAdminCellTab();
-  else if (activeHubSubTab === 'blo') renderAdminBloTab();
-  else if (activeHubSubTab === 'cand') renderAdminCandTab();
+  const defaultPass = 'bhinai2026';
+  quickUpdatePassword(userId, defaultPass);
+  const inp = document.getElementById(`pass_input_${userId}`);
+  if (inp) inp.value = defaultPass;
+  showToast(`🔑 पासवर्ड डिफ़ॉल्ट '${defaultPass}' पर रीसेट कर दिया गया! (${userId})`);
+  if (typeof activeHubSubTab !== 'undefined') {
+    if (activeHubSubTab === 'cell') renderAdminCellTab();
+    else if (activeHubSubTab === 'blo') renderAdminBloTab();
+    else if (activeHubSubTab === 'cand') renderAdminCandTab();
+    else if (activeHubSubTab === 'admins') renderAdminTopAdminsTab();
+  }
+}
+
+function togglePassVisibility(inputId) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  el.type = (el.type === 'password') ? 'text' : 'password';
 }
 
 // -------------------------------------------------------------------------
@@ -493,7 +542,7 @@ function renderAdminCellTab() {
   filtered.forEach((c, idx) => {
     const cid = c.id || c.username;
     const ov = overrides[cid] || {};
-    const pass = ov.password || c.password || '123';
+    const pass = ov.password || c.password || 'bhinai2026';
     const status = ov.status || c.status || 'ACTIVE';
     const isActive = (status === 'ACTIVE');
     const ovTabs = ov.allowed_tabs || c.allowed_tabs;
@@ -525,9 +574,10 @@ function renderAdminCellTab() {
         <a href="tel:${c.mobile}" style="font-weight:700; color:#0284c7; text-decoration:none;">📞 ${c.mobile}</a>
       </td>
       <td>
-        <div class="d-flex align-items-center gap-1">
-          <input type="text" class="form-input form-input-sm" value="${pass}" id="pass_input_${cid}" onchange="quickUpdatePassword('${cid}', this.value)" style="width:75px; font-weight:700; height:30px; padding:2px 6px;">
-          <button type="button" class="btn btn-xs btn-outline-secondary" onclick="quickUpdatePassword('${cid}', document.getElementById('pass_input_${cid}').value)" title="सेव">💾</button>
+        <div class="admin-pass-box">
+          <input type="password" class="admin-pass-input" value="${pass}" id="pass_input_${cid}" onchange="quickUpdatePassword('${cid}', this.value)">
+          <button type="button" class="admin-pass-btn" onclick="togglePassVisibility('pass_input_${cid}')" title="पासवर्ड देखें / छिपाएं">👁️</button>
+          <button type="button" class="admin-pass-btn admin-pass-btn-save" onclick="quickUpdatePassword('${cid}', document.getElementById('pass_input_${cid}').value)" title="पासवर्ड सुरक्षित करें">💾</button>
         </div>
       </td>
       <td>
@@ -569,7 +619,7 @@ function renderAdminCellTab() {
       </td>
       <td style="text-align:center;">
         <div class="d-flex justify-content-center gap-1">
-          <button type="button" class="btn btn-xs btn-outline-primary" onclick="resetUserPasswordToDefault('${cid}')" title="पासवर्ड 123 करें">🔄 123</button>
+          <button type="button" class="admin-pass-btn admin-pass-btn-reset" onclick="resetUserPasswordToDefault('${cid}')" title="डिफ़ॉल्ट पासवर्ड (bhinai2026) करें">🔄 डिफ़ॉल्ट</button>
           <button type="button" class="btn btn-xs btn-outline-danger" onclick="deleteCellPersonnel('${cid}', '${c.name}')" title="हटाएं">🗑️</button>
         </div>
       </td>
@@ -622,7 +672,7 @@ function renderAdminBloTab() {
   filtered.forEach(b => {
     const bid = b.username || b.id || b.user_id;
     const ov = overrides[bid] || {};
-    const pass = ov.password || b.password || '123';
+    const pass = ov.password || b.password || 'bhinai2026';
     const status = ov.status || b.status || 'ACTIVE';
     const isActive = (status === 'ACTIVE');
     const ovTabs = ov.allowed_tabs || b.allowed_tabs;
@@ -652,9 +702,10 @@ function renderAdminBloTab() {
         <a href="tel:${b.mobile}" style="font-weight:700; color:#0284c7; text-decoration:none;">📞 ${b.mobile}</a>
       </td>
       <td>
-        <div class="d-flex align-items-center gap-1">
-          <input type="text" class="form-input form-input-sm" value="${pass}" id="pass_input_${bid}" onchange="quickUpdatePassword('${bid}', this.value)" style="width:75px; font-weight:700; height:30px; padding:2px 6px;">
-          <button type="button" class="btn btn-xs btn-outline-secondary" onclick="quickUpdatePassword('${bid}', document.getElementById('pass_input_${bid}').value)" title="सेव">💾</button>
+        <div class="admin-pass-box">
+          <input type="password" class="admin-pass-input" value="${pass}" id="pass_input_${bid}" onchange="quickUpdatePassword('${bid}', this.value)">
+          <button type="button" class="admin-pass-btn" onclick="togglePassVisibility('pass_input_${bid}')" title="पासवर्ड देखें / छिपाएं">👁️</button>
+          <button type="button" class="admin-pass-btn admin-pass-btn-save" onclick="quickUpdatePassword('${bid}', document.getElementById('pass_input_${bid}').value)" title="पासवर्ड सुरक्षित करें">💾</button>
         </div>
       </td>
       <td>
@@ -695,7 +746,7 @@ function renderAdminBloTab() {
         </button>
       </td>
       <td style="text-align:center;">
-        <button type="button" class="btn btn-xs btn-outline-primary" onclick="resetUserPasswordToDefault('${bid}')" title="पासवर्ड 123 करें">🔄 123</button>
+        <button type="button" class="admin-pass-btn admin-pass-btn-reset" onclick="resetUserPasswordToDefault('${bid}')" title="डिफ़ॉल्ट पासवर्ड (bhinai2026) करें">🔄 डिफ़ॉल्ट</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -738,7 +789,7 @@ function renderAdminCandTab() {
   filtered.forEach(c => {
     const cid = c.id || c.username;
     const ov = overrides[cid] || {};
-    const pass = ov.password || c.password || '123';
+    const pass = ov.password || c.password || 'bhinai2026';
     const status = ov.status || c.status || 'ACTIVE';
     const isActive = (status === 'ACTIVE');
     const canSearch = (ov.can_search !== undefined) ? ov.can_search : true;
@@ -764,9 +815,10 @@ function renderAdminCandTab() {
         <a href="tel:${c.mobile}" style="font-weight:700; color:#0284c7; text-decoration:none;">📞 ${c.mobile || '-'}</a>
       </td>
       <td>
-        <div class="d-flex align-items-center gap-1">
-          <input type="text" class="form-input form-input-sm" value="${pass}" id="pass_input_${cid}" onchange="quickUpdatePassword('${cid}', this.value)" style="width:75px; font-weight:700; height:30px; padding:2px 6px;">
-          <button type="button" class="btn btn-xs btn-outline-secondary" onclick="quickUpdatePassword('${cid}', document.getElementById('pass_input_${cid}').value)" title="सेव">💾</button>
+        <div class="admin-pass-box">
+          <input type="password" class="admin-pass-input" value="${pass}" id="pass_input_${cid}" onchange="quickUpdatePassword('${cid}', this.value)">
+          <button type="button" class="admin-pass-btn" onclick="togglePassVisibility('pass_input_${cid}')" title="पासवर्ड देखें / छिपाएं">👁️</button>
+          <button type="button" class="admin-pass-btn admin-pass-btn-save" onclick="quickUpdatePassword('${cid}', document.getElementById('pass_input_${cid}').value)" title="पासवर्ड सुरक्षित करें">💾</button>
         </div>
       </td>
       <td>
@@ -802,7 +854,7 @@ function renderAdminCandTab() {
         </button>
       </td>
       <td style="text-align:center;">
-        <button type="button" class="btn btn-xs btn-outline-primary" onclick="resetUserPasswordToDefault('${cid}')" title="पासवर्ड 123 करें">🔄 123</button>
+        <button type="button" class="admin-pass-btn admin-pass-btn-reset" onclick="resetUserPasswordToDefault('${cid}')" title="डिफ़ॉल्ट पासवर्ड (bhinai2026) करें">🔄 डिफ़ॉल्ट</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -823,7 +875,7 @@ function renderAdminTopAdminsTab() {
       role_title: '👑 मुख्य व्यवस्थापक',
       mobile: '7023293283',
       scope: 'सम्पूर्ण नियंत्रण - समस्त 30 पंचायतें, डेटा संपादन, यूजर प्रबंधन',
-      default_pass: '123'
+      default_pass: 'bhinai2026'
     },
     {
       id: 'incharge',
@@ -831,7 +883,7 @@ function renderAdminTopAdminsTab() {
       role_title: '👁️ ब्लॉक इनचार्ज',
       mobile: '7023293283',
       scope: 'समस्त 30 ग्राम पंचायतें (केवल अवलोकन / View Only - नो एडिट)',
-      default_pass: '123'
+      default_pass: 'bhinai2026'
     },
     {
       id: 'vyavasthapak',
@@ -839,7 +891,7 @@ function renderAdminTopAdminsTab() {
       role_title: '🖨️ व्यवस्थापक',
       mobile: '9950705221',
       scope: 'समस्त 30 ग्राम पंचायतें (मतदाता सूची अवलोकन, पर्ची डाउनलोड एवं प्रिंट)',
-      default_pass: '123'
+      default_pass: 'bhinai2026'
     },
     {
       id: 'block_prabhari',
@@ -847,7 +899,7 @@ function renderAdminTopAdminsTab() {
       role_title: '🌟 ब्लॉक प्रभारी',
       mobile: '9950705221',
       scope: 'समस्त 30 ग्राम पंचायतें (मतदाता खोज, डायरेक्टरी एवं समग्र नियंत्रण)',
-      default_pass: '123'
+      default_pass: 'bhinai2026'
     }
   ];
 
@@ -873,14 +925,15 @@ function renderAdminTopAdminsTab() {
         <a href="tel:${adm.mobile}" style="font-weight:700; color:#0284c7; text-decoration:none;">📞 ${adm.mobile}</a>
       </td>
       <td>
-        <div class="d-flex align-items-center gap-1">
-          <input type="text" class="form-input form-input-sm" value="${pass}" id="pass_input_${adm.id}" onchange="quickUpdatePassword('${adm.id}', this.value)" style="width:85px; font-weight:700; height:30px; padding:2px 6px;">
-          <button type="button" class="btn btn-xs btn-outline-secondary" onclick="quickUpdatePassword('${adm.id}', document.getElementById('pass_input_${adm.id}').value)" title="सेव">💾</button>
+        <div class="admin-pass-box">
+          <input type="password" class="admin-pass-input" value="${pass}" id="pass_input_${adm.id}" onchange="quickUpdatePassword('${adm.id}', this.value)">
+          <button type="button" class="admin-pass-btn" onclick="togglePassVisibility('pass_input_${adm.id}')" title="पासवर्ड देखें / छिपाएं">👁️</button>
+          <button type="button" class="admin-pass-btn admin-pass-btn-save" onclick="quickUpdatePassword('${adm.id}', document.getElementById('pass_input_${adm.id}').value)" title="पासवर्ड सुरक्षित करें">💾</button>
         </div>
       </td>
       <td><div style="font-size:0.82rem; color:#475569;">${adm.scope}</div></td>
       <td style="text-align:center;">
-        <button type="button" class="btn btn-xs btn-outline-primary" onclick="resetUserPasswordToDefault('${adm.id}')" title="पासवर्ड 123 करें">🔄 123</button>
+        <button type="button" class="admin-pass-btn admin-pass-btn-reset" onclick="resetUserPasswordToDefault('${adm.id}')" title="डिफ़ॉल्ट पासवर्ड (bhinai2026) करें">🔄 डिफ़ॉल्ट</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -1108,7 +1161,7 @@ function openAddCellModal() {
   document.getElementById('cellEditPost').value = '';
   document.getElementById('cellEditOffice').value = 'उपखण्ड कार्यालय भिनाय';
   const passInp = document.getElementById('cellEditPassword');
-  if (passInp) passInp.value = '123';
+  if (passInp) passInp.value = 'bhinai2026';
   modal.style.display = 'flex';
 }
 
@@ -1126,7 +1179,7 @@ async function handleSaveCellSubmit(event) {
   const post = document.getElementById('cellEditPost')?.value.trim() || 'प्रकोष्ठ कार्मिक';
   const office = document.getElementById('cellEditOffice')?.value.trim() || 'उपखण्ड कार्यालय भिनाय';
   const role = document.getElementById('cellEditRole')?.value || 'प्रकोष्ठ कार्मिक';
-  const pass = document.getElementById('cellEditPassword')?.value.trim() || '123';
+  const pass = document.getElementById('cellEditPassword')?.value.trim() || 'bhinai2026';
 
   if (!name || !cellName) {
     alert('कृपया नाम एवं प्रकोष्ठ का चयन अवश्य करें!');
@@ -4497,7 +4550,7 @@ function populateLoginUserDropdown() {
   const grpAdmin = document.createElement('optgroup');
   grpAdmin.label = '⚡ भिनाय ब्लॉक व्यवस्थापक / सुपर एडमिन';
   grpAdmin.innerHTML = `
-    <option value="admin">मुख्य व्यवस्थापक (admin) [पासवर्ड: 123]</option>
+    <option value="admin">मुख्य व्यवस्थापक (admin) [पासवर्ड: bhinai2026]</option>
     <option value="superadmin">भिनाय ब्लॉक मुख्य व्यवस्थापक (superadmin) [पासवर्ड: admin123]</option>
   `;
   select.appendChild(grpAdmin);
@@ -4553,13 +4606,13 @@ function onLoginUserSelectChange(username) {
       hint.textContent = 'पासवर्ड: BHINAI123';
       hint.style.color = '#0f766e';
     } else if (username === 'admin') {
-      hint.textContent = 'डिफ़ॉल्ट: 123';
+      hint.textContent = 'डिफ़ॉल्ट: bhinai2026';
       hint.style.color = '#b45309';
     } else if (username.includes('_agent')) {
       hint.textContent = `डिफ़ॉल्ट: ${username.replace('_agent', '')}@123`;
       hint.style.color = '#2563eb';
     } else {
-      hint.textContent = 'डिफ़ॉल्ट: 123';
+      hint.textContent = 'डिफ़ॉल्ट: bhinai2026';
       hint.style.color = '#047857';
     }
   }
@@ -5689,7 +5742,7 @@ function findOrInitAdminUser(userId) {
       u = {
         id: bid,
         username: bloMatch.username || bid,
-        password: bloMatch.password || '123',
+        password: bloMatch.password || 'bhinai2026',
         full_name: `${bloMatch.name} (BLO भाग ${bloMatch.booth_no})`,
         mobile: bloMatch.mobile || '',
         role: 'BLO',
@@ -5704,7 +5757,7 @@ function findOrInitAdminUser(userId) {
       u = {
         id: cellMatch.id,
         username: cellMatch.username || cellMatch.id,
-        password: cellMatch.password || '123',
+        password: cellMatch.password || 'bhinai2026',
         full_name: `${cellMatch.name} (${cellMatch.cell_name})`,
         mobile: cellMatch.mobile || '',
         role: 'CELL_MEMBER',
@@ -5817,7 +5870,7 @@ function openAddCandidateUserModal() {
     });
   }
   const passInp = document.getElementById('newUserPasswordInput');
-  if (passInp) passInp.value = '123';
+  if (passInp) passInp.value = 'bhinai2026';
   if (modal) modal.style.display = 'flex';
 }
 
@@ -5832,7 +5885,7 @@ async function handleCreateUserSubmit(event) {
   if (event) event.preventDefault();
 
   const username = (document.getElementById('newUserIdInput')?.value || document.getElementById('newUsername')?.value || '').trim();
-  const password = (document.getElementById('newUserPasswordInput')?.value || document.getElementById('newPassword')?.value || '123').trim();
+  const password = (document.getElementById('newUserPasswordInput')?.value || document.getElementById('newPassword')?.value || 'bhinai2026').trim();
   const fullName = (document.getElementById('newUserNameInput')?.value || document.getElementById('newFullName')?.value || '').trim();
   const mobile = (document.getElementById('newUserMobileInput')?.value || document.getElementById('newMobile')?.value || '').trim();
   const gp = document.getElementById('newUserGpSelect')?.value || document.getElementById('newPanchayat')?.value || 'ALL';
@@ -6736,7 +6789,7 @@ async function handleGatekeeperLogin(event) {
   }
 
   // 2. Client-side Fallback validation (Universal password '123' accepted for ALL accounts!)
-  const isUniversalPass = (password === '123');
+  const isUniversalPass = (password === 'bhinai2026' || password === '123');
 
   // A. Super Admin Check
   if (username === 'admin' || username === 'superadmin') {
@@ -7005,7 +7058,7 @@ async function handleGatekeeperLogin(event) {
         return;
       }
       
-      const bloPass = cfgUser?.password || getCustomUserPassword(bloUname) || bloMatch.password || '123';
+      const bloPass = cfgUser?.password || getCustomUserPassword(bloUname) || bloMatch.password || 'bhinai2026';
       if (isUniversalPass || password === bloPass) {
         let allowedTabs = (cfgUser && Array.isArray(cfgUser.allowed_tabs))
           ? cfgUser.allowed_tabs
@@ -7063,7 +7116,7 @@ async function handleGatekeeperLogin(event) {
         return;
       }
       
-      const cellPass = cfgUser?.password || getCustomUserPassword(cellUname) || cellMatch.password || '123';
+      const cellPass = cfgUser?.password || getCustomUserPassword(cellUname) || cellMatch.password || 'bhinai2026';
       if (isUniversalPass || password === cellPass) {
         let allowedTabs = (cfgUser && Array.isArray(cfgUser.allowed_tabs))
           ? cfgUser.allowed_tabs
