@@ -493,7 +493,7 @@ function renderAdminCellTab() {
     const status = ov.status || c.status || 'ACTIVE';
     const isActive = (status === 'ACTIVE');
     const ovTabs = ov.allowed_tabs || c.allowed_tabs;
-    const allowedTabs = Array.isArray(ovTabs) ? ovTabs : ['searchTab'];
+    const allowedTabs = Array.isArray(ovTabs) ? ovTabs : ['dashboardTab', 'searchTab', 'directoryTab'];
     const canPrint = (ov.can_print !== undefined) ? ov.can_print : (c.can_print === true);
     const canDownload = (ov.can_download !== undefined) ? ov.can_download : (c.can_download !== false);
     const scope = ov.allowed_panchayats || c.allowed_panchayats || 'ALL';
@@ -527,27 +527,27 @@ function renderAdminCellTab() {
         </div>
       </td>
       <td>
-        <div class="mb-1" style="font-size:0.75rem; font-weight:700; color:#334155;">अनुमत टैब (प्रकोष्ठ Tabs):</div>
+        <div class="mb-1" style="font-size:0.75rem; font-weight:700; color:#334155;">अनुमत टैब (Tabs):</div>
         <div class="d-flex flex-wrap gap-1 align-items-center mb-1">
-          <label class="perm-check-item ${allowedTabs.includes('searchTab') ? 'active' : ''}" title="मतदाता खोज">
+          <label class="perm-check-item ${allowedTabs.includes('dashboardTab') ? 'active' : ''}" title="डैशबोर्ड">
+            <input type="checkbox" ${allowedTabs.includes('dashboardTab') ? 'checked' : ''} onchange="toggleUserTab('${cid}', 'dashboardTab', this.checked)">
+            <span>📊 डैशबोर्ड</span>
+          </label>
+          <label class="perm-check-item ${allowedTabs.includes('searchTab') ? 'active' : ''}" title="खोज">
             <input type="checkbox" ${allowedTabs.includes('searchTab') ? 'checked' : ''} onchange="toggleUserTab('${cid}', 'searchTab', this.checked)">
             <span>🔍 खोज</span>
           </label>
-          <label class="perm-check-item ${allowedTabs.includes('alphaTab') ? 'active' : ''}" title="वर्णमाला सूची">
+          <label class="perm-check-item ${allowedTabs.includes('alphaTab') ? 'active' : ''}" title="वर्णमाला">
             <input type="checkbox" ${allowedTabs.includes('alphaTab') ? 'checked' : ''} onchange="toggleUserTab('${cid}', 'alphaTab', this.checked)">
             <span>🔤 वर्णमाला</span>
           </label>
-          <label class="perm-check-item ${allowedTabs.includes('directoryTab') ? 'active' : ''}" title="वार्ड व डायरेक्टरी">
+          <label class="perm-check-item ${allowedTabs.includes('directoryTab') ? 'active' : ''}" title="वार्ड/डायरेक्टरी">
             <input type="checkbox" ${allowedTabs.includes('directoryTab') ? 'checked' : ''} onchange="toggleUserTab('${cid}', 'directoryTab', this.checked)">
-            <span>📖 वार्ड/डायरेक्टरी</span>
+            <span>📖 वार्ड</span>
           </label>
-          <label class="perm-check-item ${allowedTabs.includes('bulkSlipTab') ? 'active' : ''}" title="पर्ची प्रिंट">
+          <label class="perm-check-item ${allowedTabs.includes('bulkSlipTab') ? 'active' : ''}" title="पर्ची">
             <input type="checkbox" ${allowedTabs.includes('bulkSlipTab') ? 'checked' : ''} onchange="toggleUserTab('${cid}', 'bulkSlipTab', this.checked)">
             <span>🖨️ पर्ची</span>
-          </label>
-          <label class="perm-check-item ${allowedTabs.includes('dashboardTab') ? 'active' : ''}" title="डैशबोर्ड सारांश">
-            <input type="checkbox" ${allowedTabs.includes('dashboardTab') ? 'checked' : ''} onchange="toggleUserTab('${cid}', 'dashboardTab', this.checked)">
-            <span>📊 डैशबोर्ड</span>
           </label>
         </div>
         <div class="d-flex align-items-center gap-1 mt-1" style="min-height:36px;">
@@ -622,7 +622,7 @@ function renderAdminBloTab() {
     const status = ov.status || b.status || 'ACTIVE';
     const isActive = (status === 'ACTIVE');
     const ovTabs = ov.allowed_tabs || b.allowed_tabs;
-    const allowedTabs = Array.isArray(ovTabs) ? ovTabs : ['searchTab'];
+    const allowedTabs = Array.isArray(ovTabs) ? ovTabs : ['searchTab', 'alphaTab', 'directoryTab'];
     const canPrint = (ov.can_print !== undefined) ? ov.can_print : (b.can_print === true);
     const canDownload = (ov.can_download !== undefined) ? ov.can_download : (b.can_download !== false);
     const scope = ov.allowed_panchayats || b.panchayat || 'BOOTH';
@@ -839,7 +839,7 @@ function renderAdminTopAdminsTab() {
     },
     {
       id: 'block_prabhari',
-      name: 'ब्लॉक प्रभारी',
+      name: 'श्री सुरेश चन्द्र जांगिड (शिक्षक)',
       role_title: '🌟 ब्लॉक प्रभारी',
       mobile: '9950705221',
       scope: 'समस्त 30 ग्राम पंचायतें (मतदाता खोज, डायरेक्टरी एवं समग्र नियंत्रण)',
@@ -1254,20 +1254,20 @@ function onLoginPrimarySelectChanged(val) {
     return;
   }
 
-  // 4. BLOCK_PRABHARI
+  // 4. BLOCK_PRABHARI (सुरेश जांगिड़ - शिक्षक)
   if (val === 'BLOCK_PRABHARI') {
     if (offGroup) offGroup.style.display = 'block';
     if (offLabel) offLabel.innerHTML = '<strong>2. अधिकृत ब्लॉक प्रभारी *:</strong>';
     if (offSelect) {
       offSelect.innerHTML = `
-        <option value="block_prabhari" data-name="ब्लॉक प्रभारी" data-role="ब्लॉक प्रभारी" data-office="उपखण्ड कार्यालय भिनाय" data-mobile="9950705221" data-cell="समस्त 30 ग्राम पंचायतें">🌟 ब्लॉक प्रभारी (मो. 9950705221)</option>
+        <option value="block_prabhari" data-name="श्री सुरेश चन्द्र जांगिड" data-role="ब्लॉक प्रभारी (शिक्षक)" data-office="उपखण्ड कार्यालय भिनाय" data-mobile="9950705221" data-cell="समस्त 30 ग्राम पंचायतें">🌟 श्री सुरेश चन्द्र जांगिड - शिक्षक (मो. 9950705221) [ब्लॉक प्रभारी]</option>
       `;
       offSelect.disabled = false;
       offSelect.value = 'block_prabhari';
     }
     if (uInput) uInput.value = 'block_prabhari';
     if (detailsBadge) {
-      detailsBadge.innerHTML = '🌟 <strong>ब्लॉक प्रभारी</strong> | समस्त 30 ग्राम पंचायतें (पूर्ण वोटर खोज अधिकार) | मो.: 9950705221';
+      detailsBadge.innerHTML = '🌟 <strong>श्री सुरेश चन्द्र जांगिड</strong> (शिक्षक) | <strong>ब्लॉक प्रभारी</strong> | समस्त 30 ग्राम पंचायतें (पूर्ण वोटर खोज अधिकार) | मो.: 9950705221';
       detailsBadge.style.background = '#ccfbf1';
       detailsBadge.style.color = '#0f766e';
       detailsBadge.style.border = '1px solid #99f6e4';
@@ -4502,7 +4502,7 @@ function populateLoginUserDropdown() {
   const grpBp = document.createElement('optgroup');
   grpBp.label = '🌟 ब्लॉक प्रभारी (समस्त 30 ग्राम पंचायतें पूर्ण एक्सेस)';
   grpBp.innerHTML = `
-    <option value="block_prabhari">🌟 ब्लॉक प्रभारी [पासवर्ड: BHINAI123]</option>
+    <option value="block_prabhari">🌟 श्री सुरेश चन्द्र जांगिड - शिक्षक (ब्लॉक प्रभारी) [पासवर्ड: BHINAI123]</option>
   `;
   select.appendChild(grpBp);
 
@@ -5532,8 +5532,8 @@ async function loadAdminUsersList() {
       id: 'block_prabhari',
       username: 'block_prabhari',
       password: 'BHINAI123',
-      name: 'ब्लॉक प्रभारी',
-      full_name: 'ब्लॉक प्रभारी',
+      name: 'श्री सुरेश चन्द्र जांगिड (शिक्षक)',
+      full_name: 'श्री सुरेश चन्द्र जांगिड (शिक्षक)',
       mobile: '9950705221',
       status: 'ACTIVE',
       allowed_panchayats: 'ALL',
@@ -5692,7 +5692,7 @@ function findOrInitAdminUser(userId) {
         status: 'ACTIVE',
         allowed_panchayats: JSON.stringify([bloMatch.panchayat]),
         allowed_wards: bloMatch.wards ? JSON.stringify(bloMatch.wards.split(',').map(w => w.trim())) : 'ALL',
-        allowed_tabs: ['searchTab'],
+        allowed_tabs: ['searchTab', 'alphaTab', 'directoryTab'],
         candidate_mode: 'admin_locked'
       };
       State.adminControlUsers.push(u);
@@ -5707,7 +5707,7 @@ function findOrInitAdminUser(userId) {
         status: 'ACTIVE',
         allowed_panchayats: 'ALL',
         allowed_wards: 'ALL',
-        allowed_tabs: ['searchTab'],
+        allowed_tabs: ['dashboardTab', 'searchTab', 'directoryTab'],
         candidate_mode: 'admin_locked'
       };
       State.adminControlUsers.push(u);
@@ -5757,9 +5757,9 @@ async function toggleUserTab(userId, tabName, isChecked) {
 
   if (!Array.isArray(u.allowed_tabs)) {
     try {
-      u.allowed_tabs = typeof u.allowed_tabs === 'string' ? JSON.parse(u.allowed_tabs) : ['searchTab'];
+      u.allowed_tabs = typeof u.allowed_tabs === 'string' ? JSON.parse(u.allowed_tabs) : ['searchTab', 'alphaTab', 'directoryTab'];
     } catch(e) {
-      u.allowed_tabs = ['searchTab'];
+      u.allowed_tabs = ['searchTab', 'alphaTab', 'directoryTab'];
     }
   }
 
@@ -6063,7 +6063,7 @@ function populateBloPrimaryDropdown() {
 
   pSelect.innerHTML = `
     <option value="">-- कृपया पद / प्रकोष्ठ या ग्राम पंचायत चुनें --</option>
-    <option value="BLOCK_PRABHARI" style="font-weight:800; color:#0f766e; background:#ccfbf1;">🌟 ब्लॉक प्रभारी</option>
+    <option value="BLOCK_PRABHARI" style="font-weight:800; color:#0f766e; background:#ccfbf1;">🌟 ब्लॉक प्रभारी (श्री सुरेश चन्द्र जांगिड - शिक्षक)</option>
     <option value="CELL" style="font-weight:800; color:#1e40af; background:#eff6ff;">🏢 चुनाव प्रकोष्ठ (13 चुनाव प्रकोष्ठ)</option>
   `;
 
@@ -6857,10 +6857,10 @@ async function handleGatekeeperLogin(event) {
         id: 'block_prabhari',
         username: 'block_prabhari',
         role: 'BLOCK_PRABHARI',
-        name: 'ब्लॉक प्रभारी',
-        full_name: 'ब्लॉक प्रभारी',
-        post: 'प्रभारी',
-        designation: 'ब्लॉक प्रभारी',
+        name: 'श्री सुरेश चन्द्र जांगिड',
+        full_name: 'श्री सुरेश चन्द्र जांगिड (शिक्षक)',
+        post: 'अध्यापक',
+        designation: 'अध्यापक / शिक्षक',
         office: 'उपखण्ड कार्यालय भिनाय',
         mobile: '9950705221',
         allowed_panchayats: 'ALL',
@@ -6880,7 +6880,7 @@ async function handleGatekeeperLogin(event) {
         sessionStorage.setItem(sk, JSON.stringify(bpUser));
       }
       enforceGatekeeperState();
-      showToast('नमस्ते! ब्लॉक प्रभारी सत्र प्रारंभ हुआ (समस्त 30 ग्रा.पं. खोज अधिकार)।');
+      showToast('नमस्ते श्री सुरेश चन्द्र जांगिड जी! ब्लॉक प्रभारी सत्र प्रारंभ हुआ (समस्त 30 ग्रा.पं. खोज अधिकार)।');
       return;
     }
   }
