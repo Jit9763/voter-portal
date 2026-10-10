@@ -1091,7 +1091,6 @@
       "allowed_panchayats": "बड़गांव",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
         "searchTab"
       ],
       "candidate_mode": "user_edit",
