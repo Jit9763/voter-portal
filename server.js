@@ -253,6 +253,25 @@ function executeGithubPush(reason = 'update', callback = null) {
   });
 }
 
+
+// =========================================================================
+// Periodic GitHub 5-Minute Auto-Poll Timer (Difference check & Auto-fetch)
+// =========================================================================
+const GITHUB_POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 Minutes
+setInterval(() => {
+  const deployScript = path.join(path.dirname(__dirname), 'deploy_tri_portals.py');
+  if (fs.existsSync(deployScript) && !isPushing) {
+    const { exec } = require('node:child_process');
+    exec(`python "${deployScript}" --poll`, { cwd: path.dirname(__dirname) }, (err, stdout) => {
+      if (stdout && stdout.includes('[AUTO-UPDATE]')) {
+        console.log(`[GITHUB 5-MIN SYNC] [${new Date().toLocaleTimeString('en-IN')}]: GitHub se naye updates auto-apply ho gaye.`);
+        console.log(stdout.trim());
+        try { seedDatabase(); } catch(e) {}
+      }
+    });
+  }
+}, GITHUB_POLL_INTERVAL_MS);
+
 const server = http.createServer(async (req, res) => {
   // CORS & Cache Busting Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
