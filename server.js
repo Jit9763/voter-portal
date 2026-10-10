@@ -9,6 +9,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 
+// Ensure standard toolchains are always in PATH for Windows
+const GIT_CMD_DIR = 'C:\\Program Files\\Git\\cmd';
+const PYTHON_DIR = 'C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python312';
+const NODE_DIR = 'C:\\Users\\HP\\AppData\\Local\\Programs\\nodejs';
+process.env.PATH = `${GIT_CMD_DIR};${PYTHON_DIR};${PYTHON_DIR}\\Scripts;${NODE_DIR};${process.env.PATH || ''}`;
+
+const PYTHON_BIN = fs.existsSync(path.join(PYTHON_DIR, 'python.exe'))
+  ? `"${path.join(PYTHON_DIR, 'python.exe')}"`
+  : 'python';
+
 const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'db.sqlite');
 const JSON_PATH = path.join(__dirname, 'portal_users.json');
@@ -229,14 +239,8 @@ function executeGithubPush(reason = 'update', callback = null) {
   if (!fs.existsSync(deployScript)) {
     deployScript = path.join(__dirname, 'deploy_tri_portals.py');
   }
-  if (!fs.existsSync(deployScript)) {
-    deployScript = 'C:\\Users\\jiten\\Desktop\\panchayat chunav\\deploy_tri_portals.py';
-  }
-  if (!fs.existsSync(deployScript)) {
-    deployScript = 'C:\\Users\\jiten\\Desktop\\panchyt order\\deploy_tri_portals.py';
-  }
-  console.log(`[AUTO-SYNC] [${new Date().toLocaleTimeString('en-IN')}] Running deployment script (Reason: ${reason}): python "${deployScript}" ...`);
-  exec(`python "${deployScript}"`, { cwd: path.dirname(deployScript) }, (error, stdout, stderr) => {
+  console.log(`[AUTO-SYNC] [${new Date().toLocaleTimeString('en-IN')}] Running deployment script (Reason: ${reason}): ${PYTHON_BIN} "${deployScript}" ...`);
+  exec(`${PYTHON_BIN} "${deployScript}"`, { cwd: path.dirname(deployScript), env: process.env }, (error, stdout, stderr) => {
     isPushing = false;
     if (error) {
       console.error('[AUTO-SYNC] Push failed:', error.message);
@@ -245,7 +249,7 @@ function executeGithubPush(reason = 'update', callback = null) {
     } else {
       console.log('[AUTO-SYNC] Push SUCCESS! All 3 repositories live on GitHub (pan, blo-portal, voter-portal).');
       if (stdout) {
-        const lines = stdout.trim().split('\n').filter(l => l.includes('DEPLOYING') || l.includes('FINISHED') || l.includes('->'));
+        const lines = stdout.trim().split(String.fromCharCode(10)).filter(l => l.includes('DEPLOYING') || l.includes('FINISHED') || l.includes('->'));
         lines.forEach(l => console.log('   ' + l.trim()));
       }
       if (callback) callback(null, stdout);
@@ -262,7 +266,7 @@ setInterval(() => {
   const deployScript = path.join(path.dirname(__dirname), 'deploy_tri_portals.py');
   if (fs.existsSync(deployScript) && !isPushing) {
     const { exec } = require('node:child_process');
-    exec(`python "${deployScript}" --poll`, { cwd: path.dirname(__dirname) }, (err, stdout) => {
+    exec(`${PYTHON_BIN} "${deployScript}" --poll`, { cwd: path.dirname(__dirname), env: process.env }, (err, stdout) => {
       if (stdout && stdout.includes('[AUTO-UPDATE]')) {
         console.log(`[GITHUB 5-MIN SYNC] [${new Date().toLocaleTimeString('en-IN')}]: GitHub se naye updates auto-apply ho gaye.`);
         console.log(stdout.trim());
@@ -371,12 +375,15 @@ const server = http.createServer(async (req, res) => {
     // Fetch Remote Settings from GitHub Endpoint
     if (pathname === '/api/fetch-remote-settings' && req.method === 'POST') {
       const { exec } = require('node:child_process');
-      exec('git fetch origin main && git merge origin/main --no-edit -m "merge: auto sync remote"', { cwd: __dirname }, (error, stdout, stderr) => {
+      const deployScript = path.join(path.dirname(__dirname), 'deploy_tri_portals.py');
+      const scriptToRun = fs.existsSync(deployScript) ? deployScript : path.join(__dirname, 'deploy_tri_portals.py');
+      console.log('[API SYNC] Manual trigger: Fetching all portals fresh from GitHub...');
+      exec(`${PYTHON_BIN} "${scriptToRun}" --clean`, { cwd: path.dirname(scriptToRun), env: process.env }, (error, stdout, stderr) => {
         try {
           seedDatabase();
           res.end(JSON.stringify({ 
             success: true, 
-            message: 'रिमोट सेटिंग्स (GitHub) से सफलतापूर्वक फेच व लागू कर दी गईं!',
+            message: 'GitHub से तीनों पोर्टल्स (pan, voter, blo) का 100% नवीनतम डेटा व सेटिंग्स फेच व लागू कर दी गईं!',
             output: stdout || stderr 
           }));
         } catch(e) {
