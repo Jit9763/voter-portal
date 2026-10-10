@@ -11,7 +11,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261010_2230">
+  <link rel="stylesheet" href="styles.css?v=20261010_2335">
+  <script>
+    // Automatic cache cleanup for fresh updates
+    const BUILD_VERSION = '20261010_2335';
+    if (localStorage.getItem('portal_cached_build') !== BUILD_VERSION) {
+      localStorage.removeItem('portal_tri_settings');
+      localStorage.removeItem('panchayat_admins_cache');
+      localStorage.removeItem('portal_user_overrides');
+      localStorage.removeItem('portal_user_scopes');
+      localStorage.removeItem('portal_passwords_override');
+      localStorage.removeItem('portal_custom_users');
+      localStorage.removeItem('portal_status_override');
+      localStorage.setItem('portal_cached_build', BUILD_VERSION);
+      console.log('[CACHE] Cleaned stale browser storage for version:', BUILD_VERSION);
+    }
+  </script>
 </head>
 <body>
 
@@ -1759,10 +1774,10 @@
   <div id="toastContainer" class="toast-container no-print"></div>
 
   <!-- Scripts -->
-    <script src="symbols_master.js?v=20261005_2300"></script>
-  <script src="master_directory.js?v=20261010_2230"></script>
-  <script src="master_data.js?v=20261010_2230"></script>
-  <script src="app.js?v=20261010_2230"></script>
+    <script src="symbols_master.js?v=20261010_2335"></script>
+  <script src="master_directory.js?v=20261010_2335"></script>
+  <script src="master_data.js?v=20261010_2335"></script>
+  <script src="app.js?v=20261010_2335"></script>
 
   <!-- Super Admin: Add New User Modal -->
   <div id="addUserModal" class="modal-overlay no-print" style="display:none;" onclick="if(event.target===this) closeAddUserModal()">

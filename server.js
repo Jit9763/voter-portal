@@ -778,7 +778,7 @@ const server = http.createServer(async (req, res) => {
     if (ext === '.html') {
       let htmlStr = content.toString('utf8');
       const nowTs = Date.now();
-      htmlStr = htmlStr.replace(/\.js\?v=\d+/g, `.js?v=${nowTs}`).replace(/\.css\?v=\d+/g, `.css?v=${nowTs}`);
+      htmlStr = htmlStr.replace(/(\.(?:js|css))(?:\?v=[a-zA-Z0-9_-]+)?/g, `$1?v=${nowTs}`);
       content = Buffer.from(htmlStr, 'utf8');
     }
     res.writeHead(200, {
