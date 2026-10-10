@@ -74,9 +74,9 @@
       "id": "block_prabhari",
       "username": "block_prabhari",
       "password": "123",
-      "full_name": "श्री सुरेश चन्द्र जांगिड",
+      "full_name": "ब्लॉक प्रभारी",
       "mobile": "9950705221",
-      "role": "ब्लॉक प्रभारी (शिक्षक)",
+      "role": "ब्लॉक प्रभारी",
       "status": "ACTIVE",
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
@@ -101,10 +101,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.302Z",
@@ -121,10 +118,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.312Z",
@@ -141,10 +135,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.322Z",
@@ -161,10 +152,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.333Z",
@@ -181,10 +169,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.344Z",
@@ -201,10 +186,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.362Z",
@@ -221,10 +203,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.374Z",
@@ -241,10 +220,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.383Z",
@@ -261,10 +237,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.392Z",
@@ -281,10 +254,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.402Z",
@@ -301,10 +271,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.411Z",
@@ -321,10 +288,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.421Z",
@@ -341,10 +305,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.431Z",
@@ -361,10 +322,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.443Z",
@@ -381,10 +339,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.456Z",
@@ -401,10 +356,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.467Z",
@@ -421,10 +373,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.481Z",
@@ -441,10 +390,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.496Z",
@@ -461,10 +407,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.508Z",
@@ -481,10 +424,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.519Z",
@@ -501,10 +441,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.551Z",
@@ -521,10 +458,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.574Z",
@@ -541,10 +475,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.584Z",
@@ -561,10 +492,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.602Z",
@@ -581,10 +509,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.612Z",
@@ -601,10 +526,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.621Z",
@@ -621,10 +543,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.637Z",
@@ -641,10 +560,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.661Z",
@@ -661,10 +577,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.672Z",
@@ -681,10 +594,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.685Z",
@@ -701,10 +611,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.696Z",
@@ -721,10 +628,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.708Z",
@@ -741,10 +645,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.722Z",
@@ -761,10 +662,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.734Z",
@@ -781,10 +679,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.744Z",
@@ -801,10 +696,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.754Z",
@@ -821,10 +713,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.764Z",
@@ -841,10 +730,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.774Z",
@@ -861,10 +747,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.785Z",
@@ -881,10 +764,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.795Z",
@@ -901,10 +781,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.805Z",
@@ -921,10 +798,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.816Z",
@@ -941,10 +815,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.828Z",
@@ -961,10 +832,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.839Z",
@@ -981,10 +849,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.849Z",
@@ -1001,10 +866,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.859Z",
@@ -1021,10 +883,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.870Z",
@@ -1041,10 +900,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.880Z",
@@ -1061,10 +917,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.888Z",
@@ -1081,10 +934,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.898Z",
@@ -1101,10 +951,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.907Z",
@@ -1121,10 +968,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.918Z",
@@ -1141,10 +985,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.930Z",
@@ -1161,10 +1002,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.939Z",
@@ -1181,10 +1019,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.950Z",
@@ -1218,10 +1053,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.970Z",
@@ -1238,10 +1070,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.979Z",
@@ -1258,10 +1087,7 @@
       "allowed_panchayats": "ALL",
       "allowed_wards": "ALL",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:50.989Z",
@@ -1296,10 +1122,7 @@
       "allowed_panchayats": "बड़गांव",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.012Z",
@@ -1316,10 +1139,7 @@
       "allowed_panchayats": "बड़गांव",
       "allowed_wards": "6, 7, 8",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.040Z",
@@ -1336,10 +1156,7 @@
       "allowed_panchayats": "बड़गांव",
       "allowed_wards": "5, 9, 10",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.057Z",
@@ -1356,10 +1173,7 @@
       "allowed_panchayats": "बड़गांव",
       "allowed_wards": "11, 12, 13",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.073Z",
@@ -1376,10 +1190,7 @@
       "allowed_panchayats": "बड़ली",
       "allowed_wards": "3, 4, 5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.087Z",
@@ -1396,10 +1207,7 @@
       "allowed_panchayats": "बड़ली",
       "allowed_wards": "1, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.097Z",
@@ -1416,10 +1224,7 @@
       "allowed_panchayats": "बड़ली",
       "allowed_wards": "2, 7, 8",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.106Z",
@@ -1436,10 +1241,7 @@
       "allowed_panchayats": "बड़ली",
       "allowed_wards": "9, 10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.118Z",
@@ -1456,10 +1258,7 @@
       "allowed_panchayats": "बगराई",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.128Z",
@@ -1476,10 +1275,7 @@
       "allowed_panchayats": "बगराई",
       "allowed_wards": "4, 5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.138Z",
@@ -1496,10 +1292,7 @@
       "allowed_panchayats": "बांदनवाड़ा",
       "allowed_wards": "1, 5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.148Z",
@@ -1516,10 +1309,7 @@
       "allowed_panchayats": "बांदनवाड़ा",
       "allowed_wards": "2, 3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.158Z",
@@ -1536,10 +1326,7 @@
       "allowed_panchayats": "बांदनवाड़ा",
       "allowed_wards": "8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.165Z",
@@ -1556,10 +1343,7 @@
       "allowed_panchayats": "बांदनवाड़ा",
       "allowed_wards": "7, 10, 12",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.173Z",
@@ -1576,10 +1360,7 @@
       "allowed_panchayats": "बांदनवाड़ा",
       "allowed_wards": "11, 16, 17",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.187Z",
@@ -1596,10 +1377,7 @@
       "allowed_panchayats": "बांदनवाड़ा",
       "allowed_wards": "13, 14, 15",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.196Z",
@@ -1616,10 +1394,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "3, 4, 8",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.207Z",
@@ -1636,10 +1411,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "2, 5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.215Z",
@@ -1656,10 +1428,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "7, 9, 10",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.227Z",
@@ -1676,10 +1445,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "11, 12, 13",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.237Z",
@@ -1696,10 +1462,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "14, 15",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.252Z",
@@ -1716,10 +1479,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "16, 17, 19",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.266Z",
@@ -1736,10 +1496,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "18, 21",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.274Z",
@@ -1756,10 +1513,7 @@
       "allowed_panchayats": "भिनाय",
       "allowed_wards": "1, 20",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.282Z",
@@ -1776,10 +1530,7 @@
       "allowed_panchayats": "बूबकिया",
       "allowed_wards": "1, 2, 3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.293Z",
@@ -1796,10 +1547,7 @@
       "allowed_panchayats": "बूबकिया",
       "allowed_wards": "5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.301Z",
@@ -1816,10 +1564,7 @@
       "allowed_panchayats": "बूबकिया",
       "allowed_wards": "7, 8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.309Z",
@@ -1836,10 +1581,7 @@
       "allowed_panchayats": "बूबकिया",
       "allowed_wards": "9, 10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.322Z",
@@ -1856,10 +1598,7 @@
       "allowed_panchayats": "चापानेरी",
       "allowed_wards": "1, 6, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.336Z",
@@ -1876,10 +1615,7 @@
       "allowed_panchayats": "चापानेरी",
       "allowed_wards": "2, 4, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.346Z",
@@ -1896,10 +1632,7 @@
       "allowed_panchayats": "चापानेरी",
       "allowed_wards": "5, 8, 10",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.359Z",
@@ -1916,10 +1649,7 @@
       "allowed_panchayats": "चापानेरी",
       "allowed_wards": "3, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.371Z",
@@ -1936,10 +1666,7 @@
       "allowed_panchayats": "छछून्दरा",
       "allowed_wards": "1",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.379Z",
@@ -1956,10 +1683,7 @@
       "allowed_panchayats": "छछून्दरा",
       "allowed_wards": "2, 3, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.390Z",
@@ -1976,10 +1700,7 @@
       "allowed_panchayats": "छछून्दरा",
       "allowed_wards": "4, 5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.399Z",
@@ -1996,10 +1717,7 @@
       "allowed_panchayats": "छछून्दरा",
       "allowed_wards": "7, 8",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.412Z",
@@ -2016,10 +1734,7 @@
       "allowed_panchayats": "छछून्दरा",
       "allowed_wards": "9, 10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.425Z",
@@ -2036,10 +1751,7 @@
       "allowed_panchayats": "देवलियाकलां",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.439Z",
@@ -2056,10 +1768,7 @@
       "allowed_panchayats": "देवलियाकलां",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.452Z",
@@ -2076,10 +1785,7 @@
       "allowed_panchayats": "देवलियाकलां",
       "allowed_wards": "5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.464Z",
@@ -2096,10 +1802,7 @@
       "allowed_panchayats": "देवलियाकलां",
       "allowed_wards": "7, 8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.479Z",
@@ -2116,10 +1819,7 @@
       "allowed_panchayats": "देवलियाकलां",
       "allowed_wards": "10, 11, 12",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.491Z",
@@ -2136,10 +1836,7 @@
       "allowed_panchayats": "देवलियाकलां",
       "allowed_wards": "13, 14, 15",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.511Z",
@@ -2156,10 +1853,7 @@
       "allowed_panchayats": "देवपुरा",
       "allowed_wards": "2, 3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.521Z",
@@ -2176,10 +1870,7 @@
       "allowed_panchayats": "देवपुरा",
       "allowed_wards": "5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.533Z",
@@ -2196,10 +1887,7 @@
       "allowed_panchayats": "देवपुरा",
       "allowed_wards": "1, 7, 8",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.547Z",
@@ -2216,10 +1904,7 @@
       "allowed_panchayats": "देवपुरा",
       "allowed_wards": "9, 10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.559Z",
@@ -2236,10 +1921,7 @@
       "allowed_panchayats": "धांतोल",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.567Z",
@@ -2256,10 +1938,7 @@
       "allowed_panchayats": "धांतोल",
       "allowed_wards": "4, 5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.575Z",
@@ -2276,10 +1955,7 @@
       "allowed_panchayats": "धांतोल",
       "allowed_wards": "8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.583Z",
@@ -2313,10 +1989,7 @@
       "allowed_panchayats": "एकलसिंहा",
       "allowed_wards": "4, 5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.600Z",
@@ -2333,10 +2006,7 @@
       "allowed_panchayats": "एकलसिंहा",
       "allowed_wards": "7, 8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.610Z",
@@ -2353,10 +2023,7 @@
       "allowed_panchayats": "घणा",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.619Z",
@@ -2373,10 +2040,7 @@
       "allowed_panchayats": "घणा",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.628Z",
@@ -2393,10 +2057,7 @@
       "allowed_panchayats": "घणा",
       "allowed_wards": "5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.637Z",
@@ -2413,10 +2074,7 @@
       "allowed_panchayats": "घणा",
       "allowed_wards": "6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.645Z",
@@ -2433,10 +2091,7 @@
       "allowed_panchayats": "गुढाखुर्द",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.654Z",
@@ -2453,10 +2108,7 @@
       "allowed_panchayats": "गुढाखुर्द",
       "allowed_wards": "3, 4, 5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.663Z",
@@ -2473,10 +2125,7 @@
       "allowed_panchayats": "गुढाखुर्द",
       "allowed_wards": "6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.671Z",
@@ -2493,10 +2142,7 @@
       "allowed_panchayats": "गुढाखुर्द",
       "allowed_wards": "8, 9, 10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.679Z",
@@ -2513,10 +2159,7 @@
       "allowed_panchayats": "हियालिया",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.687Z",
@@ -2533,10 +2176,7 @@
       "allowed_panchayats": "हियालिया",
       "allowed_wards": "4, 5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.695Z",
@@ -2553,10 +2193,7 @@
       "allowed_panchayats": "कनईकला",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.703Z",
@@ -2573,10 +2210,7 @@
       "allowed_panchayats": "कनईकला",
       "allowed_wards": "3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.711Z",
@@ -2593,10 +2227,7 @@
       "allowed_panchayats": "कनईकला",
       "allowed_wards": "4, 5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.722Z",
@@ -2613,10 +2244,7 @@
       "allowed_panchayats": "कनईकला",
       "allowed_wards": "7, 8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.731Z",
@@ -2633,10 +2261,7 @@
       "allowed_panchayats": "करांटी",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.744Z",
@@ -2653,10 +2278,7 @@
       "allowed_panchayats": "करांटी",
       "allowed_wards": "3, 4, 5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.754Z",
@@ -2673,10 +2295,7 @@
       "allowed_panchayats": "करांटी",
       "allowed_wards": "6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.766Z",
@@ -2693,10 +2312,7 @@
       "allowed_panchayats": "कैरोंट",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.774Z",
@@ -2713,10 +2329,7 @@
       "allowed_panchayats": "कैरोंट",
       "allowed_wards": "4, 5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.782Z",
@@ -2733,10 +2346,7 @@
       "allowed_panchayats": "कैरोंट",
       "allowed_wards": "8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.789Z",
@@ -2753,10 +2363,7 @@
       "allowed_panchayats": "कैरोंट",
       "allowed_wards": "10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.799Z",
@@ -2773,10 +2380,7 @@
       "allowed_panchayats": "खेडी",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.806Z",
@@ -2793,10 +2397,7 @@
       "allowed_panchayats": "खेडी",
       "allowed_wards": "4, 5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.816Z",
@@ -2813,10 +2414,7 @@
       "allowed_panchayats": "खेडी",
       "allowed_wards": "6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.828Z",
@@ -2833,10 +2431,7 @@
       "allowed_panchayats": "खेडी",
       "allowed_wards": "8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.839Z",
@@ -2853,10 +2448,7 @@
       "allowed_panchayats": "खेडी",
       "allowed_wards": "10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.849Z",
@@ -2873,10 +2465,7 @@
       "allowed_panchayats": "कुम्हारिया",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.859Z",
@@ -2893,10 +2482,7 @@
       "allowed_panchayats": "कुम्हारिया",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.870Z",
@@ -2913,10 +2499,7 @@
       "allowed_panchayats": "कुम्हारिया",
       "allowed_wards": "5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.883Z",
@@ -2933,10 +2516,7 @@
       "allowed_panchayats": "कुम्हारिया",
       "allowed_wards": "7, 8, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.893Z",
@@ -2953,10 +2533,7 @@
       "allowed_panchayats": "कुम्हारिया",
       "allowed_wards": "9, 10",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.905Z",
@@ -2973,10 +2550,7 @@
       "allowed_panchayats": "लामगरा",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.915Z",
@@ -2993,10 +2567,7 @@
       "allowed_panchayats": "लामगरा",
       "allowed_wards": "4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.923Z",
@@ -3013,10 +2584,7 @@
       "allowed_panchayats": "लामगरा",
       "allowed_wards": "5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.932Z",
@@ -3033,10 +2601,7 @@
       "allowed_panchayats": "लामगरा",
       "allowed_wards": "8, 9, 10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.940Z",
@@ -3053,10 +2618,7 @@
       "allowed_panchayats": "नागोला",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.948Z",
@@ -3073,10 +2635,7 @@
       "allowed_panchayats": "नागोला",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.956Z",
@@ -3093,10 +2652,7 @@
       "allowed_panchayats": "नागोला",
       "allowed_wards": "5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.964Z",
@@ -3113,10 +2669,7 @@
       "allowed_panchayats": "नागोला",
       "allowed_wards": "8, 9, 10",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.972Z",
@@ -3133,10 +2686,7 @@
       "allowed_panchayats": "नागोला",
       "allowed_wards": "11, 12",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.980Z",
@@ -3153,10 +2703,7 @@
       "allowed_panchayats": "नागोला",
       "allowed_wards": "13",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.987Z",
@@ -3173,10 +2720,7 @@
       "allowed_panchayats": "नान्दसी",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:51.994Z",
@@ -3193,10 +2737,7 @@
       "allowed_panchayats": "नान्दसी",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.003Z",
@@ -3213,10 +2754,7 @@
       "allowed_panchayats": "नान्दसी",
       "allowed_wards": "5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.011Z",
@@ -3233,10 +2771,7 @@
       "allowed_panchayats": "नान्दसी",
       "allowed_wards": "7, 8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.020Z",
@@ -3253,10 +2788,7 @@
       "allowed_panchayats": "नान्दसी",
       "allowed_wards": "10, 11",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.029Z",
@@ -3273,10 +2805,7 @@
       "allowed_panchayats": "पड़ांगा",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.037Z",
@@ -3293,10 +2822,7 @@
       "allowed_panchayats": "पड़ांगा",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.045Z",
@@ -3313,10 +2839,7 @@
       "allowed_panchayats": "पड़ांगा",
       "allowed_wards": "5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.053Z",
@@ -3333,10 +2856,7 @@
       "allowed_panchayats": "पड़ांगा",
       "allowed_wards": "7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.062Z",
@@ -3353,10 +2873,7 @@
       "allowed_panchayats": "पाडलिया",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.071Z",
@@ -3373,10 +2890,7 @@
       "allowed_panchayats": "पाडलिया",
       "allowed_wards": "4, 5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.079Z",
@@ -3393,10 +2907,7 @@
       "allowed_panchayats": "पाडलिया",
       "allowed_wards": "6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.089Z",
@@ -3413,10 +2924,7 @@
       "allowed_panchayats": "पाडलिया",
       "allowed_wards": "8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.100Z",
@@ -3433,10 +2941,7 @@
       "allowed_panchayats": "राममालिया",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.111Z",
@@ -3453,10 +2958,7 @@
       "allowed_panchayats": "राममालिया",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.120Z",
@@ -3473,10 +2975,7 @@
       "allowed_panchayats": "राममालिया",
       "allowed_wards": "6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.129Z",
@@ -3493,10 +2992,7 @@
       "allowed_panchayats": "राममालिया",
       "allowed_wards": "5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.140Z",
@@ -3513,10 +3009,7 @@
       "allowed_panchayats": "राताकोट",
       "allowed_wards": "1, 2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.148Z",
@@ -3533,10 +3026,7 @@
       "allowed_panchayats": "राताकोट",
       "allowed_wards": "4, 5",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.157Z",
@@ -3553,10 +3043,7 @@
       "allowed_panchayats": "राताकोट",
       "allowed_wards": "6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.169Z",
@@ -3573,10 +3060,7 @@
       "allowed_panchayats": "राताकोट",
       "allowed_wards": "8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.179Z",
@@ -3593,10 +3077,7 @@
       "allowed_panchayats": "सिंगावल",
       "allowed_wards": "1, 2",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.189Z",
@@ -3613,10 +3094,7 @@
       "allowed_panchayats": "सिंगावल",
       "allowed_wards": "3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.199Z",
@@ -3633,10 +3111,7 @@
       "allowed_panchayats": "सिंगावल",
       "allowed_wards": "5, 6",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.209Z",
@@ -3653,10 +3128,7 @@
       "allowed_panchayats": "सिंगावल",
       "allowed_wards": "7, 8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.217Z",
@@ -3673,10 +3145,7 @@
       "allowed_panchayats": "सोबडी",
       "allowed_wards": "1",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.225Z",
@@ -3693,10 +3162,7 @@
       "allowed_panchayats": "सोबडी",
       "allowed_wards": "2, 3",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.233Z",
@@ -3713,10 +3179,7 @@
       "allowed_panchayats": "सोबडी",
       "allowed_wards": "4, 5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.241Z",
@@ -3733,10 +3196,7 @@
       "allowed_panchayats": "सोलखुर्द",
       "allowed_wards": "2, 3, 4",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.250Z",
@@ -3753,10 +3213,7 @@
       "allowed_panchayats": "सोलखुर्द",
       "allowed_wards": "1, 5, 6, 7",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.259Z",
@@ -3773,10 +3230,7 @@
       "allowed_panchayats": "सोलखुर्द",
       "allowed_wards": "8, 9",
       "allowed_tabs": [
-        "dashboardTab",
-        "searchTab",
-        "alphaTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-10T14:37:52.267Z",
