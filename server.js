@@ -506,7 +506,7 @@ const server = http.createServer(async (req, res) => {
           }
         }
 
-        if (!user || (user.password !== password.trim() && user.password.toLowerCase() !== password.trim().toLowerCase() && password.trim() !== '123' && password.trim().toUpperCase() !== 'BHINAI123')) {
+        if (!user || (user.password !== password.trim() && user.password.toLowerCase() !== password.trim().toLowerCase())) {
           res.writeHead(401);
           res.end(JSON.stringify({ success: false, error: 'अमान्य यूजर आईडी अथवा पासवर्ड!' }));
           return;

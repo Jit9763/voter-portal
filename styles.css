@@ -4942,7 +4942,7 @@ body.layout-10 .mini-booth-box {
 
 
 /* ==========================================================================
-   PASSWORD MODAL TRIGGER & ADMIN PASSWORD CONTROLS
+   PASSWORD MODAL TRIGGER & ADMIN PASSWORD CONTROLS (EXPANDED)
    ========================================================================== */
 #selfChangePassBtn, .btn-outline-light {
   background: rgba(255, 255, 255, 0.2) !important;
@@ -4969,63 +4969,69 @@ body.layout-10 .mini-booth-box {
 }
 
 .admin-pass-box {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #f8fafc;
-  padding: 2px 4px;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 6px;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #ffffff !important;
+  padding: 4px 8px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  min-width: 180px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
 .admin-pass-input {
   border: none !important;
   outline: none !important;
   background: transparent !important;
-  font-family: monospace !important;
-  font-size: 0.85rem !important;
-  font-weight: 700 !important;
+  font-family: 'Courier New', Courier, monospace !important;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
   color: #0f172a !important;
-  width: 90px !important;
+  width: 125px !important;
   padding: 2px 4px !important;
-  height: 24px !important;
+  height: 28px !important;
+  letter-spacing: 0.5px !important;
 }
 
 .admin-pass-btn {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  line-height: 1.2;
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  line-height: 1.2 !important;
 }
 
 .admin-pass-btn:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  transform: translateY(-1px) !important;
 }
 
 .admin-pass-btn-save {
-  background: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #065f46;
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #065f46 !important;
 }
 
 .admin-pass-btn-save:hover {
-  background: #d1fae5;
-  border-color: #6ee7b7;
+  background: #d1fae5 !important;
+  border-color: #6ee7b7 !important;
 }
 
 .admin-pass-btn-reset {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1d4ed8;
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+  padding: 4px 10px !important;
+  font-size: 0.8rem !important;
 }
 
 .admin-pass-btn-reset:hover {
-  background: #dbeafe;
-  border-color: #93c5fd;
+  background: #dbeafe !important;
+  border-color: #93c5fd !important;
 }
