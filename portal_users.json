@@ -5,7 +5,7 @@
     {
       "id": "admin",
       "username": "admin",
-      "password": "bhinai2026",
+      "password": "admin2026",
       "full_name": "मुख्य व्यवस्थापक (Super Admin)",
       "mobile": "7023293283",
       "role": "SUPER_ADMIN",
@@ -29,7 +29,7 @@
     {
       "id": "incharge",
       "username": "incharge",
-      "password": "bhinai2026",
+      "password": "incharge2026",
       "full_name": "ब्लॉक इनचार्ज (Incharge)",
       "mobile": "7023293283",
       "role": "INCHARGE",
@@ -46,7 +46,7 @@
     {
       "id": "vyavasthapak",
       "username": "vyavasthapak",
-      "password": "bhinai2026",
+      "password": "vyavastha2026",
       "full_name": "व्यवस्थापक (Vyavasthapak)",
       "mobile": "9950705221",
       "role": "VYAVASTHAPAK",
@@ -63,7 +63,7 @@
     {
       "id": "block_prabhari",
       "username": "block_prabhari",
-      "password": "bhinai2026",
+      "password": "BHINAI123",
       "full_name": "ब्लॉक प्रभारी",
       "mobile": "9950705221",
       "role": "ब्लॉक प्रभारी",

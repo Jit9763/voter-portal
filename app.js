@@ -479,7 +479,15 @@ async function quickUpdatePassword(userId, newPass) {
 }
 
 function resetUserPasswordToDefault(userId) {
-  const defaultPass = 'bhinai2026';
+  let defaultPass = 'bhinai2026';
+  const uLower = String(userId || '').toLowerCase();
+  if (uLower === 'admin' || uLower === 'superadmin') defaultPass = 'admin2026';
+  else if (uLower === 'incharge') defaultPass = 'incharge2026';
+  else if (uLower === 'vyavasthapak') defaultPass = 'vyavastha2026';
+  else if (uLower === 'block_prabhari') defaultPass = 'BHINAI123';
+  else if (uLower.startsWith('blo_') || !isNaN(Number(uLower))) defaultPass = 'blo2026';
+  else if (uLower.startsWith('cell_')) defaultPass = 'cell2026';
+  else if (uLower.startsWith('cand_')) defaultPass = 'cand2026';
   quickUpdatePassword(userId, defaultPass);
   const inp = document.getElementById(`pass_input_${userId}`);
   if (inp) inp.value = defaultPass;
@@ -875,7 +883,7 @@ function renderAdminTopAdminsTab() {
       role_title: '👑 मुख्य व्यवस्थापक',
       mobile: '7023293283',
       scope: 'सम्पूर्ण नियंत्रण - समस्त 30 पंचायतें, डेटा संपादन, यूजर प्रबंधन',
-      default_pass: 'bhinai2026'
+      default_pass: 'admin2026'
     },
     {
       id: 'incharge',
@@ -883,7 +891,7 @@ function renderAdminTopAdminsTab() {
       role_title: '👁️ ब्लॉक इनचार्ज',
       mobile: '7023293283',
       scope: 'समस्त 30 ग्राम पंचायतें (केवल अवलोकन / View Only - नो एडिट)',
-      default_pass: 'bhinai2026'
+      default_pass: 'incharge2026'
     },
     {
       id: 'vyavasthapak',
@@ -891,7 +899,7 @@ function renderAdminTopAdminsTab() {
       role_title: '🖨️ व्यवस्थापक',
       mobile: '9950705221',
       scope: 'समस्त 30 ग्राम पंचायतें (मतदाता सूची अवलोकन, पर्ची डाउनलोड एवं प्रिंट)',
-      default_pass: 'bhinai2026'
+      default_pass: 'vyavastha2026'
     },
     {
       id: 'block_prabhari',
@@ -899,7 +907,7 @@ function renderAdminTopAdminsTab() {
       role_title: '🌟 ब्लॉक प्रभारी',
       mobile: '9950705221',
       scope: 'समस्त 30 ग्राम पंचायतें (मतदाता खोज, डायरेक्टरी एवं समग्र नियंत्रण)',
-      default_pass: 'bhinai2026'
+      default_pass: 'BHINAI123'
     }
   ];
 
@@ -4550,8 +4558,8 @@ function populateLoginUserDropdown() {
   const grpAdmin = document.createElement('optgroup');
   grpAdmin.label = '⚡ भिनाय ब्लॉक व्यवस्थापक / सुपर एडमिन';
   grpAdmin.innerHTML = `
-    <option value="admin">मुख्य व्यवस्थापक (admin) [पासवर्ड: bhinai2026]</option>
-    <option value="superadmin">भिनाय ब्लॉक मुख्य व्यवस्थापक (superadmin) [पासवर्ड: admin123]</option>
+    <option value="admin">मुख्य व्यवस्थापक (admin) [पासवर्ड: admin2026]</option>
+    <option value="superadmin">भिनाय ब्लॉक मुख्य व्यवस्थापक (superadmin) [पासवर्ड: admin2026]</option>
   `;
   select.appendChild(grpAdmin);
 
@@ -4606,13 +4614,13 @@ function onLoginUserSelectChange(username) {
       hint.textContent = 'पासवर्ड: BHINAI123';
       hint.style.color = '#0f766e';
     } else if (username === 'admin') {
-      hint.textContent = 'डिफ़ॉल्ट: bhinai2026';
+      hint.textContent = (username === 'admin' || username === 'superadmin') ? 'पासवर्ड: admin2026' : (username === 'incharge' ? 'पासवर्ड: incharge2026' : (username === 'vyavasthapak' ? 'पासवर्ड: vyavastha2026' : 'पासवर्ड: bhinai2026'));
       hint.style.color = '#b45309';
     } else if (username.includes('_agent')) {
       hint.textContent = `डिफ़ॉल्ट: ${username.replace('_agent', '')}@123`;
       hint.style.color = '#2563eb';
     } else {
-      hint.textContent = 'डिफ़ॉल्ट: bhinai2026';
+      hint.textContent = (username === 'admin' || username === 'superadmin') ? 'पासवर्ड: admin2026' : (username === 'incharge' ? 'पासवर्ड: incharge2026' : (username === 'vyavasthapak' ? 'पासवर्ड: vyavastha2026' : 'पासवर्ड: bhinai2026'));
       hint.style.color = '#047857';
     }
   }
@@ -6791,10 +6799,10 @@ async function handleGatekeeperLogin(event) {
   // 2. Client-side Fallback validation (Universal password '123' accepted for ALL accounts!)
   const isUniversalPass = (password === 'bhinai2026' || password === '123');
 
-  // A. Super Admin Check
+  // A. Super Admin Check (Distinct Password: admin2026)
   if (username === 'admin' || username === 'superadmin') {
-    const customAdminPass = getCustomUserPassword('admin');
-    if (isUniversalPass || password === 'admin123' || password === 'admin' || (customAdminPass && password === customAdminPass)) {
+    const customAdminPass = getCustomUserPassword('admin') || getCustomUserPassword('superadmin');
+    if (password === 'admin2026' || (customAdminPass && password === customAdminPass)) {
       const adminUser = {
         id: 'admin',
         username: 'admin',
@@ -6827,7 +6835,7 @@ async function handleGatekeeperLogin(event) {
       return;
     }
     const customInchargePass = getCustomUserPassword('incharge');
-    if (isUniversalPass || password === 'admin123' || (customInchargePass && password === customInchargePass)) {
+    if (password === 'incharge2026' || (customInchargePass && password === customInchargePass)) {
       const inchargeUser = {
         id: 'incharge',
         username: 'incharge',
@@ -6868,7 +6876,7 @@ async function handleGatekeeperLogin(event) {
       return;
     }
     const customVyavPass = getCustomUserPassword('vyavasthapak');
-    if (isUniversalPass || password === 'admin123' || (customVyavPass && password === customVyavPass)) {
+    if (password === 'vyavastha2026' || (customVyavPass && password === customVyavPass)) {
       const vyavUser = {
         id: 'vyavasthapak',
         username: 'vyavasthapak',
@@ -6909,7 +6917,7 @@ async function handleGatekeeperLogin(event) {
       return;
     }
     const customBpPass = getCustomUserPassword('block_prabhari');
-    if (isUniversalPass || password.toUpperCase() === 'BHINAI123' || password.toLowerCase() === 'bhinai123' || (customBpPass && password === customBpPass)) {
+    if (password.toUpperCase() === 'BHINAI123' || password.toLowerCase() === 'bhinai123' || password === 'prabhari2026' || (customBpPass && password === customBpPass)) {
       const bpUser = {
         id: 'block_prabhari',
         username: 'block_prabhari',
