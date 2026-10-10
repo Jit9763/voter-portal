@@ -481,17 +481,46 @@ async function quickUpdatePassword(userId, newPass) {
 function resetUserPasswordToDefault(userId) {
   let defaultPass = 'bhinai2026';
   const uLower = String(userId || '').toLowerCase();
-  if (uLower === 'admin' || uLower === 'superadmin') defaultPass = 'admin2026';
-  else if (uLower === 'incharge') defaultPass = 'incharge2026';
-  else if (uLower === 'vyavasthapak') defaultPass = 'vyavastha2026';
-  else if (uLower === 'block_prabhari') defaultPass = 'BHINAI123';
-  else if (uLower.startsWith('blo_') || !isNaN(Number(uLower))) defaultPass = 'blo2026';
-  else if (uLower.startsWith('cell_')) defaultPass = 'cell2026';
-  else if (uLower.startsWith('cand_')) defaultPass = 'cand2026';
+  
+  if (uLower === 'admin' || uLower === 'superadmin') {
+    defaultPass = 'admin2026';
+  } else if (uLower === 'incharge') {
+    defaultPass = 'incharge2026';
+  } else if (uLower === 'vyavasthapak') {
+    defaultPass = 'vyavastha2026';
+  } else if (uLower === 'block_prabhari') {
+    defaultPass = 'BHINAI123';
+  } else {
+    // Check master directory for exact personnel or BLO password
+    const dir = getMasterDirectory();
+    if (dir) {
+      const blo = (dir.blo_list || []).find(b => 
+        (b.id && String(b.id).toLowerCase() === uLower) ||
+        (b.username && String(b.username).toLowerCase() === uLower) ||
+        (`blo_${b.booth_no}`.toLowerCase() === uLower) ||
+        (String(b.booth_no) === uLower)
+      );
+      if (blo && blo.password) {
+        defaultPass = blo.password;
+      } else {
+        const cell = (dir.cell_personnel || []).find(c => 
+          (c.id && String(c.id).toLowerCase() === uLower) ||
+          (c.username && String(c.username).toLowerCase() === uLower)
+        );
+        if (cell && cell.password) {
+          defaultPass = cell.password;
+        } else if (uLower.startsWith('cand_')) {
+          const cNum = uLower.replace(/[^0-9]/g, '') || '1';
+          defaultPass = `cand${cNum}@2026`;
+        }
+      }
+    }
+  }
+
   quickUpdatePassword(userId, defaultPass);
   const inp = document.getElementById(`pass_input_${userId}`);
   if (inp) inp.value = defaultPass;
-  showToast(`🔑 पासवर्ड डिफ़ॉल्ट '${defaultPass}' पर रीसेट कर दिया गया! (${userId})`);
+  showToast(`🔑 व्यक्तिगत पासवर्ड '${defaultPass}' पर रीसेट किया गया! (${userId})`);
   if (typeof activeHubSubTab !== 'undefined') {
     if (activeHubSubTab === 'cell') renderAdminCellTab();
     else if (activeHubSubTab === 'blo') renderAdminBloTab();
