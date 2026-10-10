@@ -748,8 +748,19 @@ const server = http.createServer(async (req, res) => {
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
   try {
-    const content = fs.readFileSync(filePath);
-    res.writeHead(200, { 'Content-Type': contentType });
+    let content = fs.readFileSync(filePath);
+    if (ext === '.html') {
+      let htmlStr = content.toString('utf8');
+      const nowTs = Date.now();
+      htmlStr = htmlStr.replace(/\.js\?v=\d+/g, `.js?v=${nowTs}`).replace(/\.css\?v=\d+/g, `.css?v=${nowTs}`);
+      content = Buffer.from(htmlStr, 'utf8');
+    }
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     res.end(content);
   } catch (e) {
     res.writeHead(500);
