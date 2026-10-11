@@ -186,14 +186,18 @@ function exportToJson() {
     fs.writeFileSync(JSON_PATH, JSON.stringify(payload, null, 2), 'utf8');
     setTimeout(() => { isInternalExport = false; }, 800);
 
-    const altDir = __dirname.includes('panchyt order') 
-      ? 'C:\\Users\\jiten\\Desktop\\panchayat chunav\\voter_portal'
-      : 'C:\\Users\\jiten\\Desktop\\panchyt order\\voter_portal';
-    if (fs.existsSync(altDir)) {
-      try {
-        fs.writeFileSync(path.join(altDir, 'portal_users.json'), JSON.stringify(payload, null, 2), 'utf8');
-      } catch(e) {}
-    }
+    // Synchronously copy updated portal_users.json to sibling repos (blo-portal and voter-portal)
+    const siblingRepos = [
+      'C:\\Users\\jiten\\Documents\\GitHub\\blo-portal',
+      'C:\\Users\\jiten\\Documents\\GitHub\\voter-portal'
+    ];
+    siblingRepos.forEach(sDir => {
+      if (fs.existsSync(sDir)) {
+        try {
+          fs.writeFileSync(path.join(sDir, 'portal_users.json'), JSON.stringify(payload, null, 2), 'utf8');
+        } catch(_) {}
+      }
+    });
     if (typeof scheduleAutoPushToGithub === 'function') {
       scheduleAutoPushToGithub('database_json_export');
     }
@@ -925,11 +929,12 @@ const server = http.createServer(async (req, res) => {
   const isCompressible = ['.html', '.css', '.js', '.json', '.svg', '.txt'].includes(ext);
 
   try {
+    const stat = fs.statSync(filePath);
     let cached = !isHtmlOrJson ? staticCache.get(filePath) : null;
-    if (!cached) {
+    if (!cached || cached.mtimeMs !== stat.mtimeMs) {
       const rawBuffer = fs.readFileSync(filePath);
       const gzipBuffer = isCompressible ? zlib.gzipSync(rawBuffer, { level: 6 }) : null;
-      cached = { rawBuffer, gzipBuffer };
+      cached = { rawBuffer, gzipBuffer, mtimeMs: stat.mtimeMs };
       if (!isHtmlOrJson && (ext === '.js' || ext === '.css')) {
         staticCache.set(filePath, cached);
       }

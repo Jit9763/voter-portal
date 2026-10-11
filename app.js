@@ -1445,7 +1445,7 @@ async function handleSaveCellSubmit(event) {
   setCustomUserPassword(cId, pass);
 
   closeAddEditCellModal();
-  if (typeof renderBloPassTable === 'function') renderBloPassTable();
+  if (typeof renderBloPassTable === 'function') if (typeof renderBloPassTable === 'function') renderBloPassTable();
   showToast(`✅ प्रकोष्ठ कार्मिक '${name}' सफलतापूर्वक सुरक्षित!`);
 }
 
@@ -1460,7 +1460,7 @@ function deleteCellPersonnel(cellId, cellName) {
   localStorage.setItem('portal_custom_cell_personnel', JSON.stringify(filtered));
   setCustomUserStatus(cellId, 'INACTIVE');
 
-  if (typeof renderBloPassTable === 'function') renderBloPassTable();
+  if (typeof renderBloPassTable === 'function') if (typeof renderBloPassTable === 'function') renderBloPassTable();
   showToast(`🗑️ कार्मिक '${cellName || cellId}' हटा दिया गया!`);
 }
 
@@ -1776,7 +1776,7 @@ async function adminUpdateUserScope(userId, scopeVal) {
   }
 
   showToast(`✅ '${userId}' का अधिकार सेट: ${scopeVal === 'ALL_30_GP' || scopeVal === 'SEARCH_30_GP' ? 'समस्त 30 ग्रा.पं. वोटर सर्च' : (scopeVal === 'PANCHAYAT' ? 'पूरी ग्राम पंचायत' : 'केवल बूथ/डायरेक्टरी')}`);
-  if (typeof renderBloPassTable === 'function') renderBloPassTable();
+  if (typeof renderBloPassTable === 'function') if (typeof renderBloPassTable === 'function') renderBloPassTable();
 }
 
 
@@ -2327,9 +2327,12 @@ function syncCurrentUserWithConfiguredUsers() {
 
     if (prevSnapshot !== newSnapshot) {
       const sk = getSessionStorageKey();
-      if (localStorage.getItem(sk)) localStorage.setItem(sk, JSON.stringify(State.currentUser));
-      if (sessionStorage.getItem(sk)) sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
+      localStorage.setItem(sk, JSON.stringify(State.currentUser));
+      sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
       enforceGatekeeperState();
+      if (typeof showToast === 'function') {
+        showToast('🔔 आपकी अनुमतियाँ और टैब लाइव अपडेट हो गए हैं!');
+      }
     }
   }
 }
@@ -2511,6 +2514,12 @@ function enforceGatekeeperState() {
       State.activeTab = 'searchTab';
       switchTab('searchTab');
     }
+  } else {
+    // When allowed on blo-portal or pan, ensure directory tab section inline style is cleared so it displays cleanly!
+    const dirSec = document.getElementById('directoryTab');
+    if (dirSec && allowedTabs.includes('directoryTab')) {
+      dirSec.style.display = '';
+    }
   }
 
   // Ensure candidate profile tab is visible if allowed
@@ -2546,7 +2555,7 @@ function enforceGatekeeperState() {
   const isVoterRepo = (window.PORTAL_TYPE === 'voter') || 
                       (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal'));
 
-  if (isVoterRepo && isCandidateUser) {
+  if (isVoterRepo && isCandUser) {
     ['layoutCard10', 'layoutCard12', 'layoutCard15', 'layoutCard18', 'layoutCard20'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
@@ -4807,7 +4816,7 @@ function handleCreateUser(e) {
   showToast(`नया यूजर '${username}' जोड़ा गया।`);
 
   // Sync to Google Sheet Apps Script if connected
-  postToAppsScript({
+  if (typeof postToAppsScript === 'function') postToAppsScript({
     action: 'addUser',
     userData: newUser,
     adminUsername: State.currentUser.username
@@ -4844,7 +4853,7 @@ function confirmPasswordChange() {
     closeChangePasswordModal();
     showToast(`'${username}' का पासवर्ड सफलतापूर्वक बदला गया!`);
 
-    postToAppsScript({
+    if (typeof postToAppsScript === 'function') postToAppsScript({
       action: 'updatePassword',
       username: username,
       newPassword: newPassword,
@@ -4870,7 +4879,7 @@ function promptChangeScope(username) {
   renderSuperAdminUsers();
   showToast(`'${username}' के अधिकार अपडेट कर दिए गए!`);
 
-  postToAppsScript({
+  if (typeof postToAppsScript === 'function') postToAppsScript({
     action: 'updateUserScope',
     username: username,
     assignedPanchayats: newGp.trim(),
@@ -5345,7 +5354,7 @@ function onAlphaBoothChanged() {
   // Filter alpha voters by booth's wards
   const wards = targetBooth.wards;
   State.alphaFilteredVoters = State.voters.filter(v => wards.includes(Number(v.ward_no)));
-  renderAlphaVotersTable(State.alphaFilteredVoters);
+  renderAlphabeticalList();
 }
 
 
@@ -6157,7 +6166,7 @@ async function updateUserField(userId, field, value) {
   } catch(e) {}
 
   await saveAdminUserToServer(u);
-  if (typeof renderBloPassTable === 'function') renderBloPassTable();
+  if (typeof renderBloPassTable === 'function') if (typeof renderBloPassTable === 'function') renderBloPassTable();
   showToast('परिवर्तन सफलतापूर्वक सुरक्षित!');
 }
 
@@ -6174,14 +6183,14 @@ async function toggleUserStatus(userId, newStatus) {
     await saveAdminUserToServer(u);
   }
   if (typeof renderAdminControlTab === 'function') renderAdminControlTab();
-  if (typeof renderBloPassTable === 'function') renderBloPassTable();
+  if (typeof renderBloPassTable === 'function') if (typeof renderBloPassTable === 'function') renderBloPassTable();
   showToast(`खाता स्थिति '${userId}': ${newStatus === 'ACTIVE' ? '🟢 सक्रिय (Active)' : '🔴 निष्क्रिय (Inactive)'}`);
 }
 
 async function toggleUserTab(userId, tabName, isChecked) {
   const u = findOrInitAdminUser(userId);
   if (!u) return;
-  if (tabName === 'directoryTab' && (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || String(userId).startsWith('cand_') || u.candidate_mode === 'user_edit')) {
+  if (tabName === 'directoryTab' && isCandidateUser(u)) {
     u.allowed_tabs = (u.allowed_tabs || []).filter(t => t !== 'directoryTab');
     return;
   }
@@ -6239,7 +6248,7 @@ async function toggleUserTab(userId, tabName, isChecked) {
   if (typeof renderAdminCellTab === 'function') renderAdminCellTab();
   if (typeof renderAdminBloTab === 'function') renderAdminBloTab();
   if (typeof renderAdminControlTab === 'function') renderAdminControlTab();
-  if (typeof renderBloPassTable === 'function') renderBloPassTable();
+  if (typeof renderBloPassTable === 'function') if (typeof renderBloPassTable === 'function') renderBloPassTable();
 
   const tabHiNames = {
     searchTab: 'मतदाता खोज',
@@ -6278,24 +6287,55 @@ function broadcastAdminUpdate(payload) {
 }
 
 function startLivePermissionSyncWatcher() {
-  // A. BroadcastChannel cross-tab instant sync
+  // A. BroadcastChannel cross-tab instant sync (0ms live propagation)
   try {
     if (window.BroadcastChannel) {
       const bc = new BroadcastChannel('panchayat_admin_sync');
-      bc.onmessage = () => {
+      bc.onmessage = (ev) => {
+        if (ev && ev.data && ev.data.userId && ev.data.allowed_tabs && State.currentUser) {
+          const curId = String(State.currentUser.id || State.currentUser.username || '').toLowerCase();
+          if (curId === String(ev.data.userId).toLowerCase()) {
+            State.currentUser.allowed_tabs = [...ev.data.allowed_tabs];
+            const sk = getSessionStorageKey();
+            localStorage.setItem(sk, JSON.stringify(State.currentUser));
+            sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
+            enforceGatekeeperState();
+            if (typeof showToast === 'function') {
+              showToast('🔔 आपकी अनुमतियाँ और टैब तुरंत अपडेट हो गए हैं!');
+            }
+          }
+        }
         loadAdminUsersList(true);
       };
     }
   } catch(e) {}
 
-  // B. Storage event sync for multi-tab
+  // B. Storage event sync for multi-tab across windows
   window.addEventListener('storage', (ev) => {
-    if (ev.key === 'panchayat_last_admin_sync' || ev.key === 'portal_admin_users_overrides') {
+    if (ev.key === 'panchayat_last_admin_sync') {
+      try {
+        const payload = JSON.parse(ev.newValue || '{}');
+        if (payload.userId && payload.allowed_tabs && State.currentUser) {
+          const curId = String(State.currentUser.id || State.currentUser.username || '').toLowerCase();
+          if (curId === String(payload.userId).toLowerCase()) {
+            State.currentUser.allowed_tabs = [...payload.allowed_tabs];
+            const sk = getSessionStorageKey();
+            localStorage.setItem(sk, JSON.stringify(State.currentUser));
+            sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
+            enforceGatekeeperState();
+            if (typeof showToast === 'function') {
+              showToast('🔔 आपकी अनुमतियाँ और टैब तुरंत अपडेट हो गए हैं!');
+            }
+          }
+        }
+      } catch(e) {}
+      loadAdminUsersList(true);
+    } else if (ev.key === 'portal_admin_users_overrides') {
       loadAdminUsersList(true);
     }
   });
 
-  // C. Tab focus / visibility change (instantly refresh permissions when returning to tab)
+  // C. Tab focus / visibility change (instantly refresh permissions when returning to tab without waiting for 45s)
   window.addEventListener('focus', () => {
     loadAdminUsersList(true);
   });
@@ -6305,8 +6345,7 @@ function startLivePermissionSyncWatcher() {
     }
   });
 
-  // D. Background live sync safety loop every 45 seconds (cross-tab sync is already handled instantly via BroadcastChannel & storage events)
-  // D. Background live sync safety loop every 45 seconds to keep performance ultra-fast
+  // D. Background live sync safety loop every 45 seconds (requested by user to keep performance high)
   setInterval(async () => {
     if (document.visibilityState === 'hidden') return;
     try {
@@ -7359,7 +7398,7 @@ async function adminPromptChangePass(userId, name) {
     uInState.password = trimmed;
     try { localStorage.setItem('portal_admin_users_overrides', JSON.stringify(State.adminControlUsers)); } catch(e) {}
   }
-  renderBloPassTable();
+  if (typeof renderBloPassTable === 'function') renderBloPassTable();
   if (typeof renderAdminControlTab === 'function') renderAdminControlTab();
 
   try {
