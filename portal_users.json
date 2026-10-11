@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "last_updated": "2026-10-11T15:18:06.897Z",
+  "last_updated": "2026-10-11T15:18:53.865Z",
   "users": [
     {
       "id": "cand_sarpanch",
@@ -322,7 +322,7 @@
       ],
       "candidate_mode": "admin_locked",
       "created_at": "2026-10-11T15:17:41.258Z",
-      "updated_at": "2026-10-11T15:18:06.891Z",
+      "updated_at": "2026-10-11T15:18:53.861Z",
       "can_print": true,
       "can_download": true,
       "can_search": true,
