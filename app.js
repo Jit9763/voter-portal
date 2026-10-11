@@ -6306,11 +6306,13 @@ function startLivePermissionSyncWatcher() {
   });
 
   // D. Background live sync safety loop every 45 seconds (cross-tab sync is already handled instantly via BroadcastChannel & storage events)
+  // D. Background live sync safety loop every 45 seconds to keep performance ultra-fast
   setInterval(async () => {
+    if (document.visibilityState === 'hidden') return;
     try {
       await loadAdminUsersList(false);
     } catch(e) {}
-  }, 2000);
+  }, 45000);
 }
 
 function togglePasswordVisibility(inputId, btn) {
