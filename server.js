@@ -144,7 +144,7 @@ function exportToJson() {
     const users = rawUsers.map(u => {
       let tabs = [];
       try { tabs = JSON.parse(u.allowed_tabs); } catch(e) { tabs = ['searchTab']; }
-      const isCand = (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || (u.id && String(u.id).startsWith('cand_')) || u.username === 'sarpanch' || u.candidate_mode === 'user_edit') && u.role !== 'SUPER_ADMIN';
+      const isCand = (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || (u.id && String(u.id).startsWith('cand_')) || u.username === 'sarpanch') && u.role !== 'SUPER_ADMIN' && u.role !== 'BLO' && !String(u.role).includes('बी.एल.ओ') && !String(u.role).includes('प्रकोष्ठ') && !String(u.id).startsWith('cell_') && !String(u.id).startsWith('blo_');
       if (isCand && Array.isArray(tabs)) {
         tabs = tabs.filter(t => t !== 'directoryTab');
       }
@@ -689,7 +689,7 @@ const server = http.createServer(async (req, res) => {
         let parsedTabs = Array.isArray(u.allowed_tabs)
           ? u.allowed_tabs
           : (typeof u.allowed_tabs === 'string' ? (()=>{ try { return JSON.parse(u.allowed_tabs); } catch(e) { return ['searchTab']; } })() : ['searchTab']);
-        const isCandUser = (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || userId.startsWith('cand_') || usernameStr === 'sarpanch' || u.candidate_mode === 'user_edit') && u.role !== 'SUPER_ADMIN';
+        const isCandUser = (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || userId.startsWith('cand_') || usernameStr === 'sarpanch') && u.role !== 'SUPER_ADMIN' && u.role !== 'BLO' && !String(u.role).includes('बी.एल.ओ') && !String(u.role).includes('प्रकोष्ठ') && !userId.startsWith('cell_') && !userId.startsWith('blo_');
         if (isCandUser && Array.isArray(parsedTabs)) {
           parsedTabs = parsedTabs.filter(t => t !== 'directoryTab');
         }

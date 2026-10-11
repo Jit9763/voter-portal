@@ -2295,7 +2295,7 @@ function syncCurrentUserWithConfiguredUsers() {
       try { parsedTabs = JSON.parse(parsedTabs); } catch(e) { parsedTabs = parsedTabs.split(',').map(s=>s.trim()); }
     }
     if (Array.isArray(parsedTabs)) {
-      const isCand = State.currentUser && (State.currentUser.role === 'CANDIDATE' || State.currentUser.role === 'प्रत्याशी' || State.currentUser.type === 'CANDIDATE' || (State.currentUser.id && String(State.currentUser.id).startsWith('cand_')) || State.currentUser.candidate_mode === 'user_edit');
+      const isCand = isCandidateUser(State.currentUser);
       const isVoter = (typeof getPortalContext === 'function' && getPortalContext() === 'voter') || (window.PORTAL_TYPE === 'voter');
       if (isCand || isVoter) {
         parsedTabs = parsedTabs.filter(t => t !== 'directoryTab');
@@ -2409,6 +2409,26 @@ function initSession() {
   enforceGatekeeperState();
 }
 
+function isCandidateUser(u) {
+  if (!u) return false;
+  const role = String(u.role || '').toUpperCase();
+  // Administrative roles are NEVER candidate users
+  if (role === 'SUPER_ADMIN' || role === 'ADMIN' || role === 'INCHARGE' || role === 'VYAVASTHAPAK' || role === 'BLOCK_PRABHARI') return false;
+  // BLO and Cell personnel are election staff controlled by Superadmin - NEVER candidate users
+  if (role === 'BLO' || role.includes('बी.एल.ओ') || role.includes('BLO') || String(u.id || '').toLowerCase().startsWith('blo_')) return false;
+  if (role === 'CELL_MEMBER' || role === 'CELL' || role.includes('प्रकोष्ठ') || String(u.id || '').toLowerCase().startsWith('cell_')) return false;
+
+  const uId = String(u.id || u.username || '').toLowerCase();
+  if (uId.startsWith('cand_') || uId === 'sarpanch') return true;
+  if (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || u.type === 'CANDIDATE' || u.category === 'CANDIDATE') return true;
+  
+  // On voter portal ONLY, standard users act as candidate
+  if (typeof getPortalContext === 'function' && getPortalContext() === 'voter') {
+    return true;
+  }
+  return false;
+}
+
 function enforceGatekeeperState() {
   const gatekeeper = document.getElementById('welcomeGatekeeper');
   const mainApp = document.getElementById('mainPortalApp');
@@ -2440,12 +2460,12 @@ function enforceGatekeeperState() {
   }
 
   // Candidate Detection
-  const isCandidateUser = (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || u.type === 'CANDIDATE' || u.category === 'CANDIDATE' || (u.id && String(u.id).startsWith('cand_')) || u.candidate_mode === 'user_edit' || u.candidate_mode === 'active' || u.candidate_mode === true);
+  const isCandUser = isCandidateUser(u);
 
   // Candidate Profile Nav Tab
   const candidateNavTab = document.getElementById('candidateNavTab');
   if (candidateNavTab) {
-    candidateNavTab.style.display = (isSuperAdmin || isCandidateUser) ? 'flex' : 'none';
+    candidateNavTab.style.display = (isSuperAdmin || isCandUser) ? 'flex' : 'none';
   }
 
   // Enforce Allowed Tabs (Super Admin configuration has priority)
@@ -2466,7 +2486,7 @@ function enforceGatekeeperState() {
   } else if (isVyavasthapak) {
     // Vyavasthapak default view, download & bulk/single slip print rights for all 30 GPs
     allowedTabs = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab'];
-  } else if (isCandidateUser) {
+  } else if (isCandUser) {
     allowedTabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
   } else if (u.role === 'BLO') {
     allowedTabs = ['searchTab'];
@@ -2474,11 +2494,13 @@ function enforceGatekeeperState() {
     allowedTabs = ['searchTab', 'directoryTab'];
   }
 
-  // STRICT SECURITY: Candidate users and voter portal must NEVER see or receive Ward Directory
+  // STRICT SECURITY RULE:
+  // 1. On voter-portal repo or for candidate users, Ward Directory is strictly prohibited.
+  // 2. On blo-portal and pan repos, Super Admin has full control: if Super Admin grants directoryTab in allowed_tabs, it MUST BE VISIBLE and active!
   const isVoterContext = (window.PORTAL_TYPE === 'voter') || 
                          (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal')) ||
                          (typeof getPortalContext === 'function' && getPortalContext() === 'voter');
-  if (isCandidateUser || isVoterContext) {
+  if (isCandUser || isVoterContext) {
     allowedTabs = allowedTabs.filter(t => t !== 'directoryTab');
     document.querySelectorAll('.nav-tab[data-tab="directoryTab"], .bottom-nav-item[data-tab="directoryTab"]').forEach(el => {
       el.style.display = 'none';
@@ -2493,7 +2515,7 @@ function enforceGatekeeperState() {
 
   // Ensure candidate profile tab is visible if allowed
   if (candidateNavTab) {
-    candidateNavTab.style.display = (isSuperAdmin || (isCandidateUser && allowedTabs.includes('candidateProfileTab'))) ? 'flex' : 'none';
+    candidateNavTab.style.display = (isSuperAdmin || (isCandUser && allowedTabs.includes('candidateProfileTab'))) ? 'flex' : 'none';
   }
 
   document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -2633,7 +2655,7 @@ function updateUserScopeDisplay() {
 // ==========================================================================
 function switchTab(tabId) {
   const curU = State.currentUser;
-  const isCand = curU && (curU.role === 'CANDIDATE' || curU.role === 'प्रत्याशी' || curU.type === 'CANDIDATE' || curU.category === 'CANDIDATE' || (curU.id && String(curU.id).startsWith('cand_')) || curU.candidate_mode === 'user_edit' || curU.candidate_mode === 'active' || curU.candidate_mode === true);
+  const isCand = isCandidateUser(curU);
   const isVoter = (window.PORTAL_TYPE === 'voter') || 
                   (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal')) ||
                   (typeof getPortalContext === 'function' && getPortalContext() === 'voter');
@@ -5895,7 +5917,7 @@ async function loadAdminUsersList(force = false) {
       const data = await jsonRes.json();
       if (data && Array.isArray(data.users)) {
         State.adminControlUsers = data.users.map(u => ({
-          ...u,
+          ...sanitizeCand(u),
           candidate: (data.candidates && data.candidates[u.id || u.username]) || null
         }));
         syncCurrentUserWithConfiguredUsers();
@@ -6850,7 +6872,7 @@ let activeDirGpBooth = 'ALL';
 
 function initDirectoryTab() {
   const curU = State.currentUser;
-  const isCand = curU && (curU.role === 'CANDIDATE' || curU.role === 'प्रत्याशी' || curU.type === 'CANDIDATE' || curU.category === 'CANDIDATE' || (curU.id && String(curU.id).startsWith('cand_')) || curU.candidate_mode === 'user_edit' || curU.candidate_mode === 'active' || curU.candidate_mode === true);
+  const isCand = isCandidateUser(curU);
   const isVoter = (window.PORTAL_TYPE === 'voter') || 
                   (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal')) ||
                   (typeof getPortalContext === 'function' && getPortalContext() === 'voter');
