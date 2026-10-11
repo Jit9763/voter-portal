@@ -940,14 +940,14 @@ const server = http.createServer(async (req, res) => {
         'Content-Type': contentType,
         'Content-Encoding': 'gzip',
         'Vary': 'Accept-Encoding',
-        'Cache-Control': isHtmlOrJson ? 'no-cache, must-revalidate' : 'public, max-age=3600',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Content-Length': cached.gzipBuffer.length
       });
       res.end(cached.gzipBuffer);
     } else {
       res.writeHead(200, {
         'Content-Type': contentType,
-        'Cache-Control': isHtmlOrJson ? 'no-cache, must-revalidate' : 'public, max-age=3600',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Content-Length': cached.rawBuffer.length
       });
       res.end(cached.rawBuffer);

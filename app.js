@@ -2281,7 +2281,7 @@ function syncCurrentUserWithConfiguredUsers() {
       return;
     }
     const prevSnapshot = JSON.stringify({
-      tabs: State.currentUser.allowed_tabs,
+      tabs: Array.isArray(State.currentUser.allowed_tabs) ? [...State.currentUser.allowed_tabs] : State.currentUser.allowed_tabs,
       gp: State.currentUser.allowed_panchayats,
       wards: State.currentUser.allowed_wards,
       cp: State.currentUser.can_print,
@@ -5890,13 +5890,21 @@ async function initAdminControlTab() {
 
 async function loadAdminUsersList(force = false) {
   const bust = Date.now();
+  const sanitizeUserTabs = u => {
+    if (!u) return u;
+    if (typeof isCandidateUser === 'function' && isCandidateUser(u) && Array.isArray(u.allowed_tabs)) {
+      u.allowed_tabs = u.allowed_tabs.filter(t => t !== 'directoryTab');
+    }
+    return u;
+  };
+
   // 1. Try Node.js + SQLite API (with explicit cache-busting & no-store)
   try {
     const res = await fetch(`/api/users?_t=${bust}`, { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       if (data && data.success && Array.isArray(data.users)) {
-        State.adminControlUsers = data.users;
+        State.adminControlUsers = data.users.map(sanitizeUserTabs);
         syncCurrentUserWithConfiguredUsers();
         return;
       }
@@ -5917,7 +5925,7 @@ async function loadAdminUsersList(force = false) {
       const data = await jsonRes.json();
       if (data && Array.isArray(data.users)) {
         State.adminControlUsers = data.users.map(u => ({
-          ...sanitizeCand(u),
+          ...sanitizeUserTabs(u),
           candidate: (data.candidates && data.candidates[u.id || u.username]) || null
         }));
         syncCurrentUserWithConfiguredUsers();
@@ -6299,11 +6307,10 @@ function startLivePermissionSyncWatcher() {
 
   // D. Background live sync safety loop every 45 seconds (cross-tab sync is already handled instantly via BroadcastChannel & storage events)
   setInterval(async () => {
-    if (document.visibilityState === 'hidden') return;
     try {
       await loadAdminUsersList(false);
     } catch(e) {}
-  }, 4000);
+  }, 2000);
 }
 
 function togglePasswordVisibility(inputId, btn) {
