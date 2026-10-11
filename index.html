@@ -153,11 +153,7 @@
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
             मत पर्ची डाउनलोड (9/12/15)
           </button>
-          <button class="nav-tab" data-tab="directoryTab" onclick="switchTab('directoryTab')">
-            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
-            वार्डवार सूची (Directory)
-          </button>
-                    <button class="nav-tab" data-tab="candidateProfileTab" id="candidateNavTab" onclick="switchTab('candidateProfileTab')">
+          <button class="nav-tab" data-tab="candidateProfileTab" id="candidateNavTab" onclick="switchTab('candidateProfileTab')">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span>👤 प्रत्याशी प्रोफाइल</span>
           </button>
@@ -547,90 +543,7 @@
       <!-- ==============================================
            TAB 2: WARD-WISE VOTER DIRECTORY
            ============================================== -->
-            <!-- ==============================================================
-           TAB: ELECTION DIRECTORY & BLO / CELL MANAGEMENT (चुनाव डायरेक्टरी)
-           ============================================================== -->
-      <section id="directoryTab" class="tab-pane">
-        <div class="card directory-card">
-          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-            <div>
-              <span class="gatekeeper-badge" style="background:#f0fdf4; color:#15803d; border-color:#bbf7d0;">📞 आधिकारिक चुनाव डायरेक्टरी</span>
-              <h2 class="section-title mt-1">चुनाव डायरेक्टरी एवं BLO / प्रकोष्ठ प्रबंधन</h2>
-              <p class="section-subtitle">समस्त 126 बी.एल.ओ. (प्रगणक), 13 चुनाव प्रकोष्ठों के अधिकारी/कर्मचारी एवं ब्लॉक स्तरीय अधिकारियों की डायरेक्टरी, वन-क्लिक व्हाट्सएप, कॉल, पासवर्ड नियंत्रण एवं एक्सेस अधिकार।</p>
-            </div>
-            <div class="d-flex gap-2 flex-wrap" id="adminDirectoryActions" style="display:none;">
-              <button class="btn btn-sm btn-success" onclick="openAddBloModal()">
-                <span>➕ नया BLO जोड़ें</span>
-              </button>
-              <button class="btn btn-sm btn-primary" onclick="openAddCellModal()">
-                <span>➕ प्रकोष्ठ कार्मिक जोड़ें</span>
-              </button>
-              <button class="btn btn-sm btn-outline-primary" onclick="openAddOfficerModal()">
-                <span>➕ अधिकारी जोड़ें</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Stats Badges Row -->
-          <div class="directory-stats-row d-flex gap-2 flex-wrap mb-3">
-            <div class="stat-pill active" onclick="filterDirectoryType('ALL')" id="pillAll">
-              <span>समस्त संपर्क</span> <strong id="dirCountAll">662</strong>
-            </div>
-            <div class="stat-pill" onclick="filterDirectoryType('PATWARI')" id="pillPatwari">
-              <span>🏛️ पटवारी</span> <strong id="dirCountPatwari">49</strong>
-            </div>
-            <div class="stat-pill" onclick="filterDirectoryType('SUPERVISOR')" id="pillSupervisor">
-              <span>👮 सुपरवाइजर</span> <strong id="dirCountSupervisor">98</strong>
-            </div>
-            <div class="stat-pill" onclick="filterDirectoryType('BLO')" id="pillBlo">
-              <span>📍 बी.एल.ओ.</span> <strong id="dirCountBlo">126</strong>
-            </div>
-            <div class="stat-pill" onclick="filterDirectoryType('PEEO')" id="pillPeeo">
-              <span>🎓 पीईईओ / संस्था प्रधान</span> <strong id="dirCountPeeo">49</strong>
-            </div>
-            <div class="stat-pill" onclick="filterDirectoryType('STAFF')" id="pillStaff">
-              <span>👨‍🏫 पुरुष कार्मिक</span> <strong id="dirCountStaff">307</strong>
-            </div>
-            <div class="stat-pill" onclick="filterDirectoryType('CELL')" id="pillCell">
-              <span>🏢 प्रकोष्ठ</span> <strong id="dirCountCell">29</strong>
-            </div>
-            <div class="stat-pill" onclick="filterDirectoryType('OFFICER')" id="pillOfficer">
-              <span>⚖️ प्रशासनिक अधिकारी</span> <strong id="dirCountOfficer">4</strong>
-            </div>
-          </div>
-
-          <!-- Unified Search & Filter Toolbar -->
-          <div class="card p-3 mb-3" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
-            <div class="d-flex gap-2 flex-wrap">
-              <div class="search-input-wrapper flex-1" style="min-width:240px;">
-                <input type="text" id="dirUnifiedSearchInput" class="form-input" placeholder="🔍 नाम, मोबाइल, स्कूल, पटवार मंडल, बूथ क्र. से खोजें..." oninput="filterDirectoryList()">
-              </div>
-              <select id="dirCategoryFilterSelect" class="form-select" style="max-width:240px; font-weight:700; color:#1e3a8a;" onchange="onDirCategorySelectChanged(this.value)">
-                <option value="ALL">🌟 समस्त संवर्ग (सभी 662 संपर्क)</option>
-                <option value="PATWARI">🏛️ पटवारी (Patwari - 49)</option>
-                <option value="SUPERVISOR">👮 सुपरवाइजर (Supervisor - 98)</option>
-                <option value="BLO">📍 बी.एल.ओ. (BLO / प्रगणक - 116 बूथ)</option>
-                <option value="PEEO">🎓 पीईईओ / संस्था प्रधान (PEEO - 49)</option>
-                <option value="STAFF">👨‍🏫 पुरुष कार्मिक (Staff - 307)</option>
-                <option value="CELL">🏢 चुनाव प्रकोष्ठ (Election Cell - 29)</option>
-                <option value="OFFICER">⚖️ प्रशासनिक अधिकारी (Officers - 4)</option>
-              </select>
-              <select id="dirGpBoothFilterSelect" class="form-select" style="max-width:260px; font-weight:700; color:#047857;" onchange="onDirGpBoothFilterChanged(this.value)">
-                <option value="ALL">🌍 समस्त पंचायतें व बूथ (All 30 Panchayats)</option>
-                <!-- Populated dynamically -->
-              </select>
-              <button type="button" class="btn btn-outline-secondary" onclick="clearDirectoryFilters()">रिफ्रेश</button>
-            </div>
-          </div>
-
-          <!-- Directory Cards / Table Container -->
-          <div id="directoryListContainer">
-            <!-- Dynamically populated contacts -->
-          </div>
-        </div>
-      </section>
-
-      <!-- ==============================================
+            <!-- ==============================================
            TAB: DASHBOARD & STATS (ACTIVE HOMEPAGE)
            ============================================== -->
       <section id="dashboardTab" class="tab-pane active">
@@ -1454,9 +1367,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
         <span>पर्ची प्रिंट</span>
       </button>
-      <button class="bottom-nav-item" data-tab="directoryTab" onclick="switchTab('directoryTab')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
-        <span>नामावली</span>
+      <button class="bottom-nav-item" data-tab="candidateProfileTab" onclick="switchTab('candidateProfileTab')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>प्रोफाइल</span>
       </button>
     </div>
   </nav>
@@ -1513,7 +1426,6 @@
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="searchTab" checked> 🔍 मतदाता खोज</label>
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="alphaTab"> 🔤 वर्णमाला सूची</label>
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="bulkSlipTab"> 🖨️ मतदाता पर्ची</label>
-            <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="directoryTab"> 📋 वार्डवार सूची</label>
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="candidateProfileTab"> 👤 प्रत्याशी प्रोफाइल</label>
           </div>
         </div>

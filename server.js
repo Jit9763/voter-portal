@@ -141,14 +141,22 @@ seedDatabase();
 function exportToJson() {
   try {
     const rawUsers = db.prepare('SELECT * FROM users').all();
-    const users = rawUsers.map(u => ({
-      ...u,
-      can_print: (u.can_print !== undefined && u.can_print !== null) ? Boolean(u.can_print) : true,
-      can_download: (u.can_download !== undefined && u.can_download !== null) ? Boolean(u.can_download) : true,
-      can_search: (u.can_search !== undefined && u.can_search !== null) ? Boolean(u.can_search) : true,
-      can_view: (u.can_view !== undefined && u.can_view !== null) ? Boolean(u.can_view) : true,
-      allowed_tabs: (() => { try { return JSON.parse(u.allowed_tabs); } catch(e) { return ['searchTab']; } })()
-    }));
+    const users = rawUsers.map(u => {
+      let tabs = [];
+      try { tabs = JSON.parse(u.allowed_tabs); } catch(e) { tabs = ['searchTab']; }
+      const isCand = (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || (u.id && String(u.id).startsWith('cand_')) || u.username === 'sarpanch' || u.candidate_mode === 'user_edit') && u.role !== 'SUPER_ADMIN';
+      if (isCand && Array.isArray(tabs)) {
+        tabs = tabs.filter(t => t !== 'directoryTab');
+      }
+      return {
+        ...u,
+        can_print: (u.can_print !== undefined && u.can_print !== null) ? Boolean(u.can_print) : true,
+        can_download: (u.can_download !== undefined && u.can_download !== null) ? Boolean(u.can_download) : true,
+        can_search: (u.can_search !== undefined && u.can_search !== null) ? Boolean(u.can_search) : true,
+        can_view: (u.can_view !== undefined && u.can_view !== null) ? Boolean(u.can_view) : true,
+        allowed_tabs: tabs
+      };
+    });
 
     const rawCandidates = db.prepare('SELECT * FROM candidates').all();
     const candidates = {};
@@ -297,7 +305,7 @@ function executeGithubPush(reason = 'update', callback = null) {
 
     allRepos.forEach(rDir => {
       const rName = path.basename(rDir);
-      const cmd = `"${gitPath}\\git.exe" add portal_settings.json portal_users.json app.js && ("${gitPath}\\git.exe" diff --staged --quiet || "${gitPath}\\git.exe" commit -m "${commitMsg}") && "${gitPath}\\git.exe" pull --rebase origin main && "${gitPath}\\git.exe" push origin main`;
+      const cmd = `"${gitPath}\\git.exe" add portal_settings.json portal_users.json app.js index.html && ("${gitPath}\\git.exe" diff --staged --quiet || "${gitPath}\\git.exe" commit -m "${commitMsg}") && "${gitPath}\\git.exe" pull --rebase origin main && "${gitPath}\\git.exe" push origin main`;
       
       exec(cmd, { cwd: rDir }, (gErr, gStdout, gStderr) => {
         completed++;
@@ -678,9 +686,14 @@ const server = http.createServer(async (req, res) => {
 
         const userId = toStr(u.id || u.username).trim().toLowerCase().replace(/\s+/g, '_');
         const usernameStr = toStr(u.username).trim();
-        const tabsJson = Array.isArray(u.allowed_tabs)
-          ? JSON.stringify(u.allowed_tabs)
-          : (typeof u.allowed_tabs === 'string' ? u.allowed_tabs : JSON.stringify(['searchTab']));
+        let parsedTabs = Array.isArray(u.allowed_tabs)
+          ? u.allowed_tabs
+          : (typeof u.allowed_tabs === 'string' ? (()=>{ try { return JSON.parse(u.allowed_tabs); } catch(e) { return ['searchTab']; } })() : ['searchTab']);
+        const isCandUser = (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || userId.startsWith('cand_') || usernameStr === 'sarpanch' || u.candidate_mode === 'user_edit') && u.role !== 'SUPER_ADMIN';
+        if (isCandUser && Array.isArray(parsedTabs)) {
+          parsedTabs = parsedTabs.filter(t => t !== 'directoryTab');
+        }
+        const tabsJson = JSON.stringify(parsedTabs);
 
         const existing = db.prepare('SELECT * FROM users WHERE id = ? OR username = ?').get(userId, usernameStr);
         const passwordToUse = toStr((u.password && String(u.password).trim()) || (existing ? existing.password : '123'));

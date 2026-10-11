@@ -2295,6 +2295,11 @@ function syncCurrentUserWithConfiguredUsers() {
       try { parsedTabs = JSON.parse(parsedTabs); } catch(e) { parsedTabs = parsedTabs.split(',').map(s=>s.trim()); }
     }
     if (Array.isArray(parsedTabs)) {
+      const isCand = State.currentUser && (State.currentUser.role === 'CANDIDATE' || State.currentUser.role === 'प्रत्याशी' || State.currentUser.type === 'CANDIDATE' || (State.currentUser.id && String(State.currentUser.id).startsWith('cand_')) || State.currentUser.candidate_mode === 'user_edit');
+      const isVoter = (typeof getPortalContext === 'function' && getPortalContext() === 'voter') || (window.PORTAL_TYPE === 'voter');
+      if (isCand || isVoter) {
+        parsedTabs = parsedTabs.filter(t => t !== 'directoryTab');
+      }
       State.currentUser.allowed_tabs = parsedTabs;
     }
     if (matched.allowed_panchayats) {
@@ -2368,6 +2373,9 @@ function initSession() {
             if (!u.allowed_tabs || !Array.isArray(u.allowed_tabs) || u.allowed_tabs.length === 0) {
               u.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
             }
+          }
+          if (Array.isArray(u.allowed_tabs)) {
+            u.allowed_tabs = u.allowed_tabs.filter(t => t !== 'directoryTab');
           }
           State.currentUser = u;
         } else {
@@ -2464,6 +2472,23 @@ function enforceGatekeeperState() {
     allowedTabs = ['searchTab'];
   } else if (u.role === 'CELL_MEMBER' || u.role === 'CELL' || (u.id && String(u.id).startsWith('cell_'))) {
     allowedTabs = ['searchTab', 'directoryTab'];
+  }
+
+  // STRICT SECURITY: Candidate users and voter portal must NEVER see or receive Ward Directory
+  const isVoterContext = (window.PORTAL_TYPE === 'voter') || 
+                         (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal')) ||
+                         (typeof getPortalContext === 'function' && getPortalContext() === 'voter');
+  if (isCandidateUser || isVoterContext) {
+    allowedTabs = allowedTabs.filter(t => t !== 'directoryTab');
+    document.querySelectorAll('.nav-tab[data-tab="directoryTab"], .bottom-nav-item[data-tab="directoryTab"]').forEach(el => {
+      el.style.display = 'none';
+    });
+    const dirSec = document.getElementById('directoryTab');
+    if (dirSec) dirSec.style.display = 'none';
+    if (State.activeTab === 'directoryTab') {
+      State.activeTab = 'searchTab';
+      switchTab('searchTab');
+    }
   }
 
   // Ensure candidate profile tab is visible if allowed
@@ -2607,6 +2632,14 @@ function updateUserScopeDisplay() {
 // Tab Navigation (Desktop & Mobile)
 // ==========================================================================
 function switchTab(tabId) {
+  const curU = State.currentUser;
+  const isCand = curU && (curU.role === 'CANDIDATE' || curU.role === 'प्रत्याशी' || curU.type === 'CANDIDATE' || curU.category === 'CANDIDATE' || (curU.id && String(curU.id).startsWith('cand_')) || curU.candidate_mode === 'user_edit' || curU.candidate_mode === 'active' || curU.candidate_mode === true);
+  const isVoter = (window.PORTAL_TYPE === 'voter') || 
+                  (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal')) ||
+                  (typeof getPortalContext === 'function' && getPortalContext() === 'voter');
+  if (tabId === 'directoryTab' && (isCand || isVoter)) {
+    tabId = 'searchTab';
+  }
   State.activeTab = tabId;
   document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
@@ -5994,7 +6027,7 @@ function renderAdminControlTab() {
           <label style="font-size:0.72rem; cursor:pointer;"><input type="checkbox" ${allowedTabs.includes('searchTab') ? 'checked' : ''} onchange="toggleUserTab('${uId}', 'searchTab', this.checked)"> खोज</label>
           <label style="font-size:0.72rem; cursor:pointer;"><input type="checkbox" ${allowedTabs.includes('alphaTab') ? 'checked' : ''} onchange="toggleUserTab('${uId}', 'alphaTab', this.checked)"> वर्णमाला</label>
           <label style="font-size:0.72rem; cursor:pointer;"><input type="checkbox" ${allowedTabs.includes('bulkSlipTab') ? 'checked' : ''} onchange="toggleUserTab('${uId}', 'bulkSlipTab', this.checked)"> पर्ची</label>
-          <label style="font-size:0.72rem; cursor:pointer;"><input type="checkbox" ${allowedTabs.includes('directoryTab') ? 'checked' : ''} onchange="toggleUserTab('${uId}', 'directoryTab', this.checked)"> वार्ड</label>
+          ${(u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || String(uId).startsWith('cand_') || u.candidate_mode === 'user_edit') ? '' : `<label style="font-size:0.72rem; cursor:pointer;"><input type="checkbox" ${allowedTabs.includes('directoryTab') ? 'checked' : ''} onchange="toggleUserTab('${uId}', 'directoryTab', this.checked)"> वार्ड</label>`}
           <label style="font-size:0.72rem; cursor:pointer;"><input type="checkbox" ${allowedTabs.includes('candidateProfileTab') ? 'checked' : ''} onchange="toggleUserTab('${uId}', 'candidateProfileTab', this.checked)"> प्रोफाइल</label>
         </div>
       </td>
@@ -6118,6 +6151,10 @@ async function toggleUserStatus(userId, newStatus) {
 async function toggleUserTab(userId, tabName, isChecked) {
   const u = findOrInitAdminUser(userId);
   if (!u) return;
+  if (tabName === 'directoryTab' && (u.role === 'CANDIDATE' || u.role === 'प्रत्याशी' || String(userId).startsWith('cand_') || u.candidate_mode === 'user_edit')) {
+    u.allowed_tabs = (u.allowed_tabs || []).filter(t => t !== 'directoryTab');
+    return;
+  }
 
   if (!Array.isArray(u.allowed_tabs)) {
     try {
@@ -6812,6 +6849,15 @@ let activeDirCategory = 'ALL';
 let activeDirGpBooth = 'ALL';
 
 function initDirectoryTab() {
+  const curU = State.currentUser;
+  const isCand = curU && (curU.role === 'CANDIDATE' || curU.role === 'प्रत्याशी' || curU.type === 'CANDIDATE' || curU.category === 'CANDIDATE' || (curU.id && String(curU.id).startsWith('cand_')) || curU.candidate_mode === 'user_edit' || curU.candidate_mode === 'active' || curU.candidate_mode === true);
+  const isVoter = (window.PORTAL_TYPE === 'voter') || 
+                  (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal')) ||
+                  (typeof getPortalContext === 'function' && getPortalContext() === 'voter');
+  if (isCand || isVoter) {
+    switchTab('searchTab');
+    return;
+  }
   const dir = getMasterDirectory();
   if (!dir) return;
 
@@ -7616,7 +7662,9 @@ async function handleGatekeeperLogin(event) {
         panchayat: candMatch.allowed_panchayats || candMatch.panchayat || candMatch.assigned_panchayats || '',
         allowed_panchayats: candMatch.allowed_panchayats || candMatch.panchayat || candMatch.assigned_panchayats || '',
         allowed_wards: candMatch.allowed_wards || candMatch.ward || candMatch.assigned_wards || 'ALL',
-        allowed_tabs: (Array.isArray(candMatch.allowed_tabs) && candMatch.allowed_tabs.length > 0) ? candMatch.allowed_tabs : ['searchTab'],
+        allowed_tabs: (Array.isArray(candMatch.allowed_tabs) && candMatch.allowed_tabs.length > 0)
+          ? candMatch.allowed_tabs.filter(t => t !== 'directoryTab')
+          : ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
         candidate_mode: 'user_edit'
       };
       State.currentUser = candUser;
