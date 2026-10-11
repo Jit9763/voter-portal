@@ -5852,7 +5852,12 @@ async function loadAdminUsersList(force = false) {
 
   // 2. Try portal_users.json (with explicit cache-busting & no-store)
   try {
-    const jsonRes = await fetch(`portal_users.json?_t=${bust}`, { cache: 'no-store' });
+    const isMaster = window.location.hostname === 'localhost' || window.location.pathname.includes('/pan');
+    const targetUrl = !isMaster ? `https://jit9763.github.io/pan/portal_users.json?_t=${bust}` : `portal_users.json?_t=${bust}`;
+    let jsonRes = await fetch(targetUrl, { cache: 'no-store' });
+    if (!jsonRes.ok && !isMaster) {
+      jsonRes = await fetch(`portal_users.json?_t=${bust}`, { cache: 'no-store' });
+    }
     if (jsonRes.ok) {
       const data = await jsonRes.json();
       if (data && Array.isArray(data.users)) {
@@ -6239,7 +6244,7 @@ function startLivePermissionSyncWatcher() {
     try {
       await loadAdminUsersList(false);
     } catch(e) {}
-  }, 45000);
+  }, 4000);
 }
 
 function togglePasswordVisibility(inputId, btn) {
