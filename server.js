@@ -961,7 +961,8 @@ const server = http.createServer(async (req, res) => {
   }
 
   // =========================================================================
-  // HIGH-SPEED STATIC FILE SERVING WITH GZIP COMPRESSION & MEMORY CACHE
+  // =========================================================================
+  // HIGH-SPEED STATIC FILE SERVING WITH GZIP COMPRESSION & ZERO-CACHE HOT RELOAD
   // =========================================================================
   let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
   if (safePath === '/' || safePath === '\\') safePath = '/index.html';
@@ -973,8 +974,34 @@ const server = http.createServer(async (req, res) => {
 
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-  const isHtmlOrJson = (ext === '.html' || ext === '.json');
   const acceptGzip = Boolean(req.headers['accept-encoding'] && req.headers['accept-encoding'].includes('gzip'));
+
+  // DYNAMIC ZERO-CACHE FOR HTML: Injects live timestamp into every JS/CSS request so user NEVER needs hard refresh
+  if (ext === '.html') {
+    try {
+      let html = fs.readFileSync(filePath, 'utf8');
+      const liveTs = Date.now();
+      html = html.replace(/(app\.js|styles\.css|master_directory\.js|symbols_master\.js)\?v=[^"'\s>]+/g, `$1?v=${liveTs}`);
+      const rawBuffer = Buffer.from(html, 'utf8');
+      const gzipBuffer = acceptGzip ? zlib.gzipSync(rawBuffer, { level: 6 }) : null;
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store',
+        ...(gzipBuffer ? { 'Content-Encoding': 'gzip', 'Content-Length': gzipBuffer.length } : { 'Content-Length': rawBuffer.length })
+      });
+      res.end(gzipBuffer || rawBuffer);
+      return;
+    } catch (err) {
+      res.writeHead(500);
+      res.end('Error serving dynamic HTML: ' + err.message);
+      return;
+    }
+  }
+
+  const isHtmlOrJson = (ext === '.html' || ext === '.json');
   const isCompressible = ['.html', '.css', '.js', '.json', '.svg', '.txt'].includes(ext);
 
   try {
