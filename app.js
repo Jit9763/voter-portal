@@ -6164,8 +6164,10 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
           <div class="candidate-banner-time">📅 मतदान दिनांक: <strong>${electionDate}</strong> | ⏰ समय: <strong>${electionTime}</strong></div>
         </div>
         <div class="candidate-banner-symbol-col">
-          ${cSymbolSvg}
-          <div class="candidate-banner-symbol-label">चुनाव चिन्ह: <strong>${cSymbolName}</strong></div>
+          <div class="candidate-symbol-box">
+            ${cSymbolSvg}
+          </div>
+          <div class="candidate-banner-symbol-label">चुनाव चिन्ह:<br><strong>${cSymbolName}</strong></div>
         </div>
       </div>
 

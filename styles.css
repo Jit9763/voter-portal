@@ -3737,32 +3737,47 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4px 3px;
-  border: 2px solid #d97706;
-  border-radius: 5px;
-  background: #ffffff;
   text-align: center;
   box-sizing: border-box;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-.candidate-banner-symbol-col svg,
-.candidate-banner-symbol-col img {
-  width: 44px;
-  height: 44px;
-  max-width: 46px;
-  max-height: 46px;
+.candidate-symbol-box {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  border: 2px solid #d97706;
+  border-radius: 6px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.candidate-symbol-box svg,
+.candidate-symbol-box img {
+  width: 100%;
+  height: 100%;
+  max-width: 42px;
+  max-height: 42px;
   object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }
 
 .candidate-banner-symbol-label {
-  font-size: 5.8pt;
+  font-size: 5.6pt;
   font-weight: 800;
   color: #9a3412;
   text-align: center;
-  margin-top: 2px;
+  margin-top: 3px;
   line-height: 1.15;
   word-break: break-word;
+  max-width: 66px;
 }
 
 /* PERFORATION DIVIDER CUT LINE (SLIM & CLEAN) */
@@ -4009,8 +4024,8 @@ html, body {
   .printing-bulk.theme-bw .candidate-banner-slogan {
     color: #000000 !important;
   }
-  .theme-bw .candidate-banner-symbol-col,
-  .printing-bulk.theme-bw .candidate-banner-symbol-col {
+  .theme-bw .candidate-symbol-box,
+  .printing-bulk.theme-bw .candidate-symbol-box {
     border: 1.5px solid #000000 !important;
     background: #ffffff !important;
   }
