@@ -3644,7 +3644,7 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 6px 7px;
+  padding: 4px 6px;
   background: #fffdf5;
   border-bottom: 1px solid #cbd5e1;
   box-sizing: border-box;
@@ -3652,20 +3652,20 @@ html, body {
 
 .candidate-banner-main-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 5px;
+  gap: 4px;
   width: 100%;
 }
 
 .candidate-banner-photo-col {
-  width: 74px;
-  height: 82px;
-  min-width: 74px;
-  min-height: 82px;
+  width: 56px;
+  height: 62px;
+  min-width: 56px;
+  min-height: 62px;
   flex-shrink: 0;
   border: 2px solid #b45309;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
   background: #1e293b;
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
@@ -3685,25 +3685,28 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  height: 82px;
-  padding: 0 3px;
+  justify-content: center;
+  gap: 2px;
+  height: 62px;
+  padding: 0 2px;
 }
 
 .candidate-banner-header {
-  font-size: 5.8pt;
+  font-size: 5.4pt;
   color: #b45309;
   font-weight: 800;
   letter-spacing: 0.2px;
   white-space: nowrap;
+  line-height: 1;
 }
 
 .candidate-banner-name {
-  font-size: 12pt;
+  font-size: 11.5pt;
   font-weight: 900;
   color: #b91c1c;
   margin: 0;
-  line-height: 1.15;
+  line-height: 1.1;
+  white-space: nowrap;
   text-shadow: 0.2px 0.2px 0px rgba(0,0,0,0.12);
 }
 
@@ -3711,23 +3714,17 @@ html, body {
   display: inline-block;
   background: #dc2626;
   color: #ffffff;
-  font-size: 7.5pt;
+  font-size: 6.8pt;
   font-weight: 800;
-  padding: 2px 7px;
+  padding: 1px 6px;
   border-radius: 3px;
   letter-spacing: 0.2px;
-}
-
-.candidate-banner-gp {
-  font-size: 6.8pt;
-  font-weight: 700;
-  color: #1e3a8a;
   line-height: 1.2;
 }
 
 .candidate-banner-symbol-col {
-  width: 74px;
-  min-width: 74px;
+  width: 56px;
+  min-width: 56px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -3738,13 +3735,13 @@ html, body {
 }
 
 .candidate-symbol-box {
-  width: 74px;
-  height: 82px;
-  min-width: 74px;
-  min-height: 82px;
+  width: 56px;
+  height: 62px;
+  min-width: 56px;
+  min-height: 62px;
   flex-shrink: 0;
   border: 2px solid #b45309;
-  border-radius: 5px;
+  border-radius: 4px;
   background: #ffffff;
   display: flex;
   align-items: center;
@@ -3769,29 +3766,49 @@ html, body {
 }
 
 .candidate-banner-symbol-label {
-  font-size: 6.2pt;
+  font-size: 5.6pt;
   font-weight: 800;
   color: #9a3412;
   text-align: center;
-  margin-top: 2px;
-  line-height: 1.15;
+  margin-top: 1px;
+  line-height: 1.05;
   word-break: break-word;
-  max-width: 74px;
+  max-width: 56px;
+}
+
+.candidate-banner-gp {
+  font-size: 6.2pt;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-align: center;
+  white-space: nowrap;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.candidate-banner-time {
+  font-size: 5.4pt;
+  font-weight: 700;
+  color: #047857;
+  text-align: center;
+  white-space: nowrap;
+  margin-top: 1px;
+  line-height: 1.15;
 }
 
 .candidate-banner-slogan {
   width: 100%;
   box-sizing: border-box;
-  font-size: 7.6pt;
+  font-size: 6.8pt;
   font-weight: 800;
   color: #b91c1c;
-  line-height: 1.35;
+  line-height: 1.25;
   text-align: center;
   background: #fffbeb;
-  border: 1.5px dashed #f59e0b;
-  border-radius: 4px;
-  padding: 5px 6px;
-  margin-top: 5px;
+  border: 1px dashed #f59e0b;
+  border-radius: 3px;
+  padding: 2.5px 4px;
+  margin-top: 2px;
   white-space: normal;
 }
 
@@ -5326,38 +5343,38 @@ body.layout-9 .candidate-banner-top,
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  padding: 5px 6px !important;
+  padding: 4px 6px !important;
 }
 
 body.layout-9 .candidate-banner-main-row,
 .printing-bulk.layout-9 .candidate-banner-main-row {
   display: flex !important;
-  align-items: flex-start !important;
+  align-items: center !important;
   justify-content: space-between !important;
-  gap: 5px !important;
+  gap: 4px !important;
   width: 100% !important;
 }
 
 body.layout-9 .candidate-banner-photo-col,
 .printing-bulk.layout-9 .candidate-banner-photo-col {
-  width: 72px !important;
-  height: 80px !important;
-  min-width: 72px !important;
-  min-height: 80px !important;
+  width: 56px !important;
+  height: 62px !important;
+  min-width: 56px !important;
+  min-height: 62px !important;
 }
 
 body.layout-9 .candidate-banner-symbol-col,
 .printing-bulk.layout-9 .candidate-banner-symbol-col {
-  width: 72px !important;
-  min-width: 72px !important;
+  width: 56px !important;
+  min-width: 56px !important;
 }
 
 body.layout-9 .candidate-symbol-box,
 .printing-bulk.layout-9 .candidate-symbol-box {
-  width: 72px !important;
-  height: 80px !important;
-  min-width: 72px !important;
-  min-height: 80px !important;
+  width: 56px !important;
+  height: 62px !important;
+  min-width: 56px !important;
+  min-height: 62px !important;
   padding: 1px !important;
 }
 
@@ -5379,14 +5396,15 @@ body.layout-9 .candidate-custom-symbol-img,
 
 body.layout-9 .candidate-banner-info-col,
 .printing-bulk.layout-9 .candidate-banner-info-col {
-  height: 80px !important;
+  height: 62px !important;
   padding: 0 2px !important;
 }
 
 body.layout-9 .candidate-banner-header,
 .printing-bulk.layout-9 .candidate-banner-header {
-  font-size: 5.8pt !important;
+  font-size: 5.4pt !important;
   white-space: nowrap !important;
+  line-height: 1 !important;
 }
 
 body.layout-9 .candidate-banner-name,
@@ -5394,54 +5412,50 @@ body.layout-9 .candidate-banner-name,
   font-size: 11.5pt !important;
   font-weight: 900 !important;
   margin: 0 !important;
-  line-height: 1.15 !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
 }
 
 body.layout-9 .candidate-banner-post,
 .printing-bulk.layout-9 .candidate-banner-post {
-  font-size: 7.5pt !important;
-  padding: 1.5px 7px !important;
+  font-size: 6.8pt !important;
+  padding: 1px 6px !important;
+  line-height: 1.2 !important;
 }
 
 body.layout-9 .candidate-banner-gp,
 .printing-bulk.layout-9 .candidate-banner-gp {
   font-size: 6.2pt !important;
-  line-height: 1.25 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  margin-top: 2px !important;
+  line-height: 1.2 !important;
 }
 
-body.layout-9 .candidate-banner-gp div,
-.printing-bulk.layout-9 .candidate-banner-gp div {
+body.layout-9 .candidate-banner-time,
+.printing-bulk.layout-9 .candidate-banner-time {
+  font-size: 5.4pt !important;
+  font-weight: 700 !important;
+  color: #047857 !important;
+  text-align: center !important;
   white-space: nowrap !important;
+  margin-top: 1px !important;
+  line-height: 1.15 !important;
 }
 
 body.layout-9 .candidate-banner-symbol-label,
 .printing-bulk.layout-9 .candidate-banner-symbol-label {
-  font-size: 6.2pt !important;
-  max-width: 72px !important;
-}
-
-body.layout-9 .candidate-banner-datetime,
-.printing-bulk.layout-9 .candidate-banner-datetime {
-  width: 100% !important;
-  background: #ecfdf5 !important;
-  border: 1px solid #10b981 !important;
-  border-radius: 3px !important;
-  padding: 2.5px 4px !important;
-  font-size: 5.8pt !important;
-  font-weight: 800 !important;
-  color: #047857 !important;
-  text-align: center !important;
-  box-sizing: border-box !important;
-  margin: 3px 0 0 0 !important;
-  white-space: nowrap !important;
+  font-size: 5.6pt !important;
+  max-width: 56px !important;
+  line-height: 1.05 !important;
 }
 
 body.layout-9 .candidate-banner-slogan,
 .printing-bulk.layout-9 .candidate-banner-slogan {
-  font-size: 7.2pt !important;
-  line-height: 1.3 !important;
-  padding: 3.5px 4px !important;
-  margin-top: 3px !important;
+  font-size: 6.8pt !important;
+  line-height: 1.25 !important;
+  padding: 2.5px 4px !important;
+  margin-top: 2px !important;
 }
 
 /* PERFORATION CUTTING DIVIDER PUSHED DOWN DIRECTLY ABOVE VOTER SLIP */
