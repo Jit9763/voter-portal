@@ -227,8 +227,9 @@ function exportToJson() {
         } catch(_) {}
       }
     });
-    // User requested: Only push when PUSH_PORTAL.bat is explicitly run!
-    // if (typeof scheduleAutoPushToGithub === 'function') { scheduleAutoPushToGithub('database_json_export'); }
+    if (typeof scheduleAutoPushToGithub === 'function') {
+      scheduleAutoPushToGithub('database_json_export');
+    }
   } catch (err) {
     console.error('JSON export error:', err);
   }
@@ -327,9 +328,44 @@ function executeGithubPush(reason = 'update', callback = null) {
       return false;
     });
 
-    const syncFiles = ['portal_users.json', 'portal_settings.json', 'app.js', 'index.html', 'styles.css'];
+    // Generate fresh build / deploy version
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const deployId = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 
-    // 1. Copy updated files to blo-portal and voter-portal
+    const versionPayload = {
+      deploy_version: deployId,
+      timestamp: Date.now(),
+      last_deploy: now.toISOString()
+    };
+
+    const allRepos = [__dirname, ...otherRepos];
+
+    // Write version.json to all repos
+    allRepos.forEach(rDir => {
+      try {
+        fs.writeFileSync(path.join(rDir, 'version.json'), JSON.stringify(versionPayload, null, 2), 'utf8');
+      } catch(_) {}
+    });
+
+    // Update cache busters & deploy version in each portal's dedicated index.html
+    allRepos.forEach(rDir => {
+      const idxPath = path.join(rDir, 'index.html');
+      if (fs.existsSync(idxPath)) {
+        try {
+          let html = fs.readFileSync(idxPath, 'utf8');
+          html = html.replace(/app\.js\?v=[^'"]+/g, `app.js?v=${deployId}`);
+          html = html.replace(/styles\.css\?v=[^'"]+/g, `styles.css?v=${deployId}`);
+          html = html.replace(/symbols_master\.js\?v=[^'"]+/g, `symbols_master.js?v=${deployId}`);
+          html = html.replace(/master_directory\.js\?v=[^'"]+/g, `master_directory.js?v=${deployId}`);
+          html = html.replace(/window\.PORTAL_DEPLOY_VERSION\s*=\s*["'][^"']+["']/g, `window.PORTAL_DEPLOY_VERSION = "${deployId}"`);
+          fs.writeFileSync(idxPath, html, 'utf8');
+        } catch(_) {}
+      }
+    });
+
+    // Copy shared files (preserving dedicated index.html)
+    const syncFiles = ['portal_users.json', 'portal_settings.json', 'app.js', 'styles.css', 'master_directory.js', 'symbols_master.js', 'version.json'];
     otherRepos.forEach(rDir => {
       syncFiles.forEach(f => {
         const s = path.join(__dirname, f);
@@ -368,7 +404,8 @@ function executeGithubPush(reason = 'update', callback = null) {
     });
   };
 
-  let deployScript = path.join(path.dirname(__dirname), 'deploy_tri_portals.py');
+  let deployScript = 'c:\\Users\\jiten\\OneDrive\\Desktop\\New folder\\sync_and_deploy.py';
+  if (!fs.existsSync(deployScript)) deployScript = path.join(path.dirname(__dirname), 'deploy_tri_portals.py');
   if (!fs.existsSync(deployScript)) deployScript = path.join(__dirname, 'deploy_tri_portals.py');
   if (!fs.existsSync(deployScript)) deployScript = 'C:\\Users\\jiten\\Desktop\\panchayat chunav\\deploy_tri_portals.py';
   if (!fs.existsSync(deployScript)) deployScript = 'C:\\Users\\jiten\\Desktop\\panchyt order\\deploy_tri_portals.py';
