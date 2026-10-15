@@ -21,12 +21,37 @@ echo.
 set "PATH=%USERPROFILE%\nodejs;C:\Users\jiten\AppData\Local\GitHubDesktop\app-3.6.7\resources\app\git\cmd;%PATH%"
 
 :: 2. Target GitHub pan repository directory
-set "PORTAL_DIR=C:\Users\jiten\Documents\GitHub\pan"
-if not exist "!PORTAL_DIR!\server.js" (
-    if exist "C:\Users\jiten\Desktop\panchayat chunav\voter_portal\server.js" (
-        set "PORTAL_DIR=C:\Users\jiten\Desktop\panchayat chunav\voter_portal"
-    )
+set "PORTAL_DIR=%~dp0"
+if "%PORTAL_DIR:~-1%"=="\" set "PORTAL_DIR=%PORTAL_DIR:~0,-1%"
+
+if exist "!PORTAL_DIR!\server.js" goto DIR_FOUND
+if exist "%USERPROFILE%\OneDrive\Documents\GitHub\pan\server.js" (
+    set "PORTAL_DIR=%USERPROFILE%\OneDrive\Documents\GitHub\pan"
+    goto DIR_FOUND
 )
+if exist "C:\Users\jiten\OneDrive\Documents\GitHub\pan\server.js" (
+    set "PORTAL_DIR=C:\Users\jiten\OneDrive\Documents\GitHub\pan"
+    goto DIR_FOUND
+)
+if exist "%USERPROFILE%\Documents\GitHub\pan\server.js" (
+    set "PORTAL_DIR=%USERPROFILE%\Documents\GitHub\pan"
+    goto DIR_FOUND
+)
+if exist "C:\Users\jiten\Documents\GitHub\pan\server.js" (
+    set "PORTAL_DIR=C:\Users\jiten\Documents\GitHub\pan"
+    goto DIR_FOUND
+)
+if exist "C:\Users\jiten\Desktop\panchayat chunav\voter_portal\server.js" (
+    set "PORTAL_DIR=C:\Users\jiten\Desktop\panchayat chunav\voter_portal"
+    goto DIR_FOUND
+)
+
+echo [ERROR] Panchayat Portal server.js nahi mila!
+echo Checked path: !PORTAL_DIR!
+pause
+exit /b 1
+
+:DIR_FOUND
 cd /d "!PORTAL_DIR!"
 
 :: 3. Safe Pull & Diff Check before starting (prevents any clash with other PCs)

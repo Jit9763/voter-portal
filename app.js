@@ -1325,7 +1325,7 @@ function populateGpFilterDropdowns() {
     gpGroup.label = '🏛️ ग्राम पंचायत चुनें (30 Panchayats)';
     allowedGps.forEach(gp => {
       const opt = document.createElement('option');
-      opt.value = 'GP:' + gp.name_hi;
+      opt.value = 'GP_' + gp.name_hi;
       opt.textContent = `🏛️ ग्रा.पं. ${gp.name_hi} (${gp.code || ''})`;
       gpGroup.appendChild(opt);
     });
@@ -2078,7 +2078,10 @@ async function ensurePanchayatVotersLoaded(gpCode) {
   if (loadedGps.has(gp.code)) return;
 
   try {
-    const res = await fetch(`data/${gp.name_en}.json`);
+    let res = await fetch(`data/${gp.name_en}.json`);
+    if (!res.ok) {
+      res = await fetch(`data/${gp.name_en.toUpperCase()}.json`);
+    }
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -7085,8 +7088,8 @@ function renderDirectoryList() {
   // 2. Filter by GP or Booth
   let selectedGpName = '';
   let selectedBoothNo = '';
-  if (activeDirGpBooth.startsWith('GP_')) {
-    selectedGpName = activeDirGpBooth.replace('GP_', '');
+  if (activeDirGpBooth.startsWith('GP_') || activeDirGpBooth.startsWith('GP:')) {
+    selectedGpName = activeDirGpBooth.replace(/^(GP_|GP:)/, '');
   } else if (activeDirGpBooth.startsWith('BOOTH_')) {
     selectedBoothNo = activeDirGpBooth.replace('BOOTH_', '');
     // Find GP for this booth
