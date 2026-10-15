@@ -3739,7 +3739,7 @@ function renderModalCandidateSlip(voter) {
           modalSymbolSvg = customUrl;
         } else {
           const safeSrc = customUrl.replace(/"/g, '&quot;');
-          modalSymbolSvg = `<img src="${safeSrc}" alt="${cand.symbol_name || 'चुनाव चिन्ह'}" class="candidate-custom-symbol-img" style="max-width:44px; max-height:44px; width:auto; height:auto; object-fit:contain; display:block; margin:0 auto;" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/identicon/svg?seed=symbol';">`;
+          modalSymbolSvg = `<img src="${safeSrc}" alt="${cand.symbol_name || 'चुनाव चिन्ह'}" class="candidate-custom-symbol-img" style="width:100%; height:100%; max-width:100%; max-height:100%; object-fit:contain; display:block; margin:0 auto;" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/identicon/svg?seed=symbol';">`;
         }
       } else {
         const symObj = symbols.find(s => s.id === cand.symbol_icon || (cand.symbol_name && s.name_hi.includes(cand.symbol_name))) || symbols[0];
@@ -6139,7 +6139,7 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
       cSymbolSvg = cCustomSymbolUrl;
     } else {
       const safeSrc = cCustomSymbolUrl.replace(/"/g, '&quot;');
-      cSymbolSvg = `<img src="${safeSrc}" alt="${cSymbolName}" class="candidate-custom-symbol-img" style="max-width:44px; max-height:44px; width:auto; height:auto; object-fit:contain; display:block; margin:0 auto;" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/identicon/svg?seed=symbol';">`;
+      cSymbolSvg = `<img src="${safeSrc}" alt="${cSymbolName}" class="candidate-custom-symbol-img" style="width:100%; height:100%; max-width:100%; max-height:100%; object-fit:contain; display:block; margin:0 auto;" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/identicon/svg?seed=symbol';">`;
     }
   } else if (!cSymbolSvg) {
     cSymbolSvg = (window.OFFICIAL_ELECTION_SYMBOLS && window.OFFICIAL_ELECTION_SYMBOLS[0].svg);
@@ -6163,7 +6163,7 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
               <span class="candidate-banner-post">${cPost} प्रत्याशी</span>
             </div>
             <div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong> ${cWard ? `• वार्ड नं.: ${cWard}` : ''}</div>
-            <div class="candidate-banner-time">📅 मतदान: <strong>${electionDate}</strong> | ⏰ <strong>${electionTime}</strong></div>
+            
           </div>
           <div class="candidate-banner-symbol-col">
             <div class="candidate-symbol-box">
@@ -6306,7 +6306,7 @@ window.buildOfficialSlipHtml = function(voter, layout, theme) {
           candSymbolSvg = customUrl;
         } else {
           const safeSrc = customUrl.replace(/"/g, '&quot;');
-          candSymbolSvg = `<img src="${safeSrc}" alt="${cand.symbol_name || 'चुनाव चिन्ह'}" class="candidate-custom-symbol-img" style="max-width:44px; max-height:44px; width:auto; height:auto; object-fit:contain; display:block; margin:0 auto;" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/identicon/svg?seed=symbol';">`;
+          candSymbolSvg = `<img src="${safeSrc}" alt="${cand.symbol_name || 'चुनाव चिन्ह'}" class="candidate-custom-symbol-img" style="width:100%; height:100%; max-width:100%; max-height:100%; object-fit:contain; display:block; margin:0 auto;" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/identicon/svg?seed=symbol';">`;
         }
       } else {
         const symObj = symbols.find(s => s.id === cand.symbol_icon || (cand.symbol_name && s.name_hi.includes(cand.symbol_name))) || symbols[0];
