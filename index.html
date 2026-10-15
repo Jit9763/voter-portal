@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <script>window.PORTAL_TYPE = "pan"; window.PORTAL_DEPLOY_VERSION = "20261016_012604";</script>
+  <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261016_030558";</script>
   <script>
     // Instant Session Persistence: Prevent login screen flicker on refresh
     (function() {
@@ -26,7 +26,6 @@
 
   <script id="autoLiveUpdater">
   // DEDICATED GITHUB DEPLOYMENT DETECTOR (NO LOOPING / NO LOGIN FLICKER)
-  // Only updates when a new build is pushed to GitHub via PUSH_PORTAL.bat!
   (function() {
     var currentVer = window.PORTAL_DEPLOY_VERSION || null;
 
@@ -50,9 +49,8 @@
         }
       } catch(e) {}
     }
-
-    // Check periodically at 60s and when returning to the tab
-    setInterval(checkDeploymentUpdate, 60000);
+    checkDeploymentUpdate();
+    setInterval(checkDeploymentUpdate, 15000);
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible') checkDeploymentUpdate();
     });
@@ -69,7 +67,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261016_012604">
+  <link rel="stylesheet" href="styles.css?v=20261016_030558">
 </head>
 <body>
 
@@ -98,6 +96,7 @@
         </div>
       </div>
 
+      <!-- Login Card -->
             <!-- Login Card -->
       <div class="gatekeeper-card" style="max-width:480px;">
         <div class="gatekeeper-card-header">
@@ -110,19 +109,13 @@
 
         <!-- Simplified Unified Login Form -->
         <form id="gatekeeperLoginForm" onsubmit="handleGatekeeperLogin(event)" style="margin-top:12px;">
-          <input type="hidden" id="gatekeeperUsername" value="admin">
-
-          <!-- SINGLE DROPDOWN: पद चुनें -->
+          <!-- DIRECT USER ID INPUT -->
           <div class="form-group mb-3">
-            <label for="panAdminSelect" style="font-size:0.9rem; color:#0f172a; font-weight:700;">
-              <strong>1. अधिकृत पद चुनें *:</strong>
-            </label>
-            <select id="panAdminSelect" class="form-select" onchange="document.getElementById('gatekeeperUsername').value = this.value; document.getElementById('gatekeeperPassword').focus();" style="font-weight:700; cursor:pointer; font-size:0.95rem; height:44px; border:2px solid #cbd5e1; background:#ffffff; color:#0f172a;">
-              <option value="admin">👑 मुख्य व्यवस्थापक (Super Admin - पूर्ण नियंत्रण)</option>
-              <option value="incharge">👁️ ब्लॉक इनचार्ज (Incharge - केवल अवलोकन/All Tabs View)</option>
-              <option value="vyavasthapak">🖨️ व्यवस्थापक (Vyavasthapak - प्रिंट व डाउनलोड)</option>
-              <option value="block_prabhari">🌟 ब्लॉक प्रभारी</option>
-            </select>
+            <label for="gatekeeperUsername" style="font-size:0.9rem; color:#0f172a; font-weight:700;"><strong>यूजर आईडी (User ID) *:</strong></label>
+            <div class="input-with-icon">
+              <span class="input-icon">👤</span>
+              <input type="text" id="gatekeeperUsername" class="form-input" placeholder="यूजर आईडी दर्ज करें (उदा. cand_gp01, blo_1)" required autocomplete="username" style="font-weight:700; height:44px; background:#ffffff; color:#0f172a; border:1.5px solid #cbd5e1;">
+            </div>
           </div>
 
           <!-- PASSWORD FIELD -->
@@ -146,7 +139,7 @@
           <div id="gatekeeperError" class="alert-error" style="display:none; margin-bottom:12px;"></div>
 
           <button type="submit" class="btn btn-login-submit btn-block" style="height:44px; font-size:1rem; font-weight:700;">
-            <span>मास्टर एडमिन पोर्टल में प्रवेश करें (Login)</span>
+            <span>मतदाता पोर्टल में प्रवेश करें (Login & Access)</span>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </form>
@@ -1679,7 +1672,6 @@
               <option value="वार्ड पंच">वार्ड पंच (Ward Panch)</option>
               <option value="उपसरपंच">उपसरपंच (Up-Sarpanch)</option>
               <option value="पंचायत समिति सदस्य">पंचायत समिति सदस्य (PS Member)</option>
-              <option value="जिला परिषद सदस्य">जिला परिषद सदस्य (ZP Member)</option>
               <option value="चुनाव अभिकर्ता / एजेंट">चुनाव अभिकर्ता / एजेंट (Agent)</option>
             </select>
           </div>
@@ -1960,10 +1952,10 @@
   <div id="toastContainer" class="toast-container no-print"></div>
 
   <!-- Scripts -->
-    <script src="symbols_master.js?v=20261016_012604"></script>
-  <script src="master_directory.js?v=20261016_012604"></script>
-  <script src="master_data.js?v=1791547927"></script>
-  <script src="app.js?v=20261016_012604"></script>
+    <script src="symbols_master.js?v=20261016_030558"></script>
+  <script src="master_directory.js?v=20261016_030558"></script>
+  <script src="master_data.js?v=20261016_012604"></script>
+  <script src="app.js?v=20261016_030558"></script>
 
   <!-- Super Admin: Add New User Modal -->
   <div id="addUserModal" class="modal-overlay no-print" style="display:none;" onclick="if(event.target===this) closeAddUserModal()">
