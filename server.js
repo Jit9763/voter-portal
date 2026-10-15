@@ -377,7 +377,6 @@ function executeGithubPush(reason = 'update', callback = null) {
     });
 
     // 2. Commit and push on all repositories without clash using git add -A
-    const allRepos = [__dirname, ...otherRepos];
     let completed = 0;
 
     allRepos.forEach(rDir => {
@@ -452,6 +451,14 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
 
     // Version & Heartbeat Endpoint (For Instant Live Permission Sync across tabs)
+        // Server Graceful Restart Endpoint
+    if (pathname === '/api/restart-server' && req.method === 'POST') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: 'Server restarting...' }));
+      setTimeout(() => { process.exit(0); }, 400);
+      return;
+    }
+
     if (pathname === '/api/version' && req.method === 'GET') {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
       res.end(JSON.stringify({
