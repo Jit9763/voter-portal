@@ -3641,7 +3641,7 @@ html, body {
 /* Upper Section: Candidate Color Campaign Banner (Grand & Prominent) */
 .candidate-banner-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 5px 8px;
   background: #fffdf5;
@@ -3655,10 +3655,11 @@ html, body {
   height: 68px;
   flex-shrink: 0;
   border: 2px solid #b45309;
-  border-radius: 5px;
+  border-radius: 6px;
   overflow: hidden;
   background: #f1f5f9;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-sizing: border-box;
 }
 
 .candidate-banner-photo-col img {
@@ -3730,31 +3731,32 @@ html, body {
 }
 
 .candidate-banner-symbol-col {
-  width: 66px;
-  min-width: 66px;
+  width: 58px;
+  min-width: 58px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
   box-sizing: border-box;
 }
 
 .candidate-symbol-box {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  min-height: 48px;
-  border: 2px solid #d97706;
+  width: 58px;
+  height: 68px;
+  min-width: 58px;
+  min-height: 68px;
+  flex-shrink: 0;
+  border: 2px solid #b45309;
   border-radius: 6px;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: 4px;
   box-sizing: border-box;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   overflow: hidden;
 }
 
@@ -3762,22 +3764,22 @@ html, body {
 .candidate-symbol-box img {
   width: 100%;
   height: 100%;
-  max-width: 42px;
-  max-height: 42px;
+  max-width: 48px;
+  max-height: 56px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
 }
 
 .candidate-banner-symbol-label {
-  font-size: 5.6pt;
+  font-size: 5.8pt;
   font-weight: 800;
   color: #9a3412;
   text-align: center;
   margin-top: 3px;
   line-height: 1.15;
   word-break: break-word;
-  max-width: 66px;
+  max-width: 58px;
 }
 
 /* PERFORATION DIVIDER CUT LINE (SLIM & CLEAN) */
