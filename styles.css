@@ -3652,7 +3652,7 @@ html, body {
 
 .candidate-banner-main-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start !important;
   justify-content: space-between;
   gap: 4px;
   width: 100%;
@@ -5349,7 +5349,7 @@ body.layout-9 .candidate-banner-top,
 body.layout-9 .candidate-banner-main-row,
 .printing-bulk.layout-9 .candidate-banner-main-row {
   display: flex !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   justify-content: space-between !important;
   gap: 4px !important;
   width: 100% !important;
