@@ -1,3 +1,16 @@
+// Auto-respawn with --experimental-sqlite if flag is missing
+if (!process.execArgv.includes('--experimental-sqlite')) {
+  try {
+    const { spawn } = require('child_process');
+    const child = spawn(process.execPath, ['--experimental-sqlite', ...process.execArgv, ...process.argv.slice(1)], {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+    child.on('exit', (code) => process.exit(code || 0));
+    return;
+  } catch(e) {}
+}
+
 /**
  * Panchayat Voter Portal - Standalone High-Speed Node.js + SQLite/JSON Server
  * Provides ultra-fast authentication, real-time user management & candidate slip profiles.
@@ -190,7 +203,6 @@ function exportToJson() {
       const key2 = c.user_id.startsWith('cand_') ? c.user_id.replace('cand_', '') : ('cand_' + c.user_id);
       candidates[key1] = pickBestCand(candidates[key1], candObj);
       candidates[key2] = pickBestCand(candidates[key2], candObj);
-    });
     });
 
     const payload = {
