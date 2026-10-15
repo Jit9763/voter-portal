@@ -721,17 +721,21 @@
           <form id="candidateProfileForm" onsubmit="handleSaveCandidateProfile(event)" class="candidate-form-grid">
             <!-- Left Column: Photo & Symbol -->
             <div class="candidate-form-col-left">
-              <div class="form-group photo-upload-box">
+                            <div class="form-group photo-upload-box">
                 <label><strong>📸 प्रत्याशी की रंगीन फोटो (Color Photo) *:</strong></label>
                 <div class="photo-preview-container">
                   <img id="candidatePhotoPreview" src="https://api.dicebear.com/7.x/identicon/svg?seed=candidate" alt="प्रत्याशी फोटो" class="candidate-preview-img">
-                  <div class="photo-upload-overlay">
-                    <label for="candidatePhotoInput" class="btn btn-sm btn-primary">📁 फोटो अपलोड करें</label>
-                    <input type="file" id="candidatePhotoInput" accept="image/*" style="display:none;" onchange="onCandidatePhotoSelected(event)">
-                    <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="clearCandidatePhoto()">फोटो हटाएं</button>
-                  </div>
                 </div>
-                <small class="text-muted" style="display:block; margin-top:6px; font-size:0.75rem;">मतदाता पर्ची पर यह फोटो <strong>पूरी तरह रंगीन (Color)</strong> मुद्रित होगी।</small>
+                <div class="photo-controls-group">
+                  <label for="candidatePhotoInput" id="candidatePhotoBrowseBtn" class="btn btn-sm btn-primary" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; font-weight:700; width:100%; max-width:180px; cursor:pointer;">
+                    📁 फोटो चुनें / बदलें
+                  </label>
+                  <input type="file" id="candidatePhotoInput" accept="image/*" style="display:none;" onchange="onCandidatePhotoSelected(event)">
+                  <button type="button" id="candidatePhotoRemoveBtn" class="btn btn-xs btn-outline-danger" onclick="clearCandidatePhoto()" style="display:none; font-size:0.75rem; border-radius:15px; padding:2px 12px;">
+                    ❌ फोटो हटाएं
+                  </button>
+                </div>
+                <small class="text-muted" style="display:block; margin-top:6px; font-size:0.75rem; text-align:center;">मतदाता पर्ची पर यह फोटो <strong>पूरी तरह रंगीन (Color)</strong> मुद्रित होगी।</small>
               </div>
 
               <!-- Symbol Picker Box -->
@@ -741,21 +745,43 @@
                   <div id="currentSymbolSvgWrapper" class="symbol-svg-wrapper">
                     <!-- SVG gets inserted here -->
                   </div>
-                  <div>
+                  <div style="flex:1;">
                     <h4 id="currentSymbolNameText" style="margin:0; font-size:1.15rem; color:#1e293b; font-weight:800;">उगता सूरज</h4>
-                    <span style="font-size:0.75rem; color:#64748b;">मानक चुनाव प्रतीक</span>
+                    <span id="symbolCategoryBadge" class="badge" style="background:#e0f2fe; color:#0369a1; font-size:0.72rem;">मानक चुनाव प्रतीक</span>
                   </div>
                 </div>
 
-                <div class="symbol-select-dropdown-wrapper mt-2">
-                  <select id="candidateSymbolSelect" class="form-select" onchange="onCandidateSymbolChanged(this.value)" style="font-weight:700; cursor:pointer;">
-                    <!-- Populated dynamically from OFFICIAL_ELECTION_SYMBOLS -->
-                  </select>
+                <!-- Mode Selector: Standard vs Custom Upload -->
+                <div class="symbol-mode-toggle mt-2" style="display:flex; gap:8px;">
+                  <button type="button" id="btnModeStandardSymbol" class="btn btn-xs btn-primary" onclick="setSymbolMode('standard')" style="font-weight:700;">
+                    📋 अधिकृत 50+ चिन्ह
+                  </button>
+                  <label for="candidateCustomSymbolInput" id="btnModeCustomSymbol" class="btn btn-xs btn-outline-secondary" style="font-weight:700; cursor:pointer; margin:0; display:inline-flex; align-items:center; gap:4px;">
+                    📁 कस्टम चिन्ह अपलोड
+                  </label>
+                  <input type="file" id="candidateCustomSymbolInput" accept="image/*" style="display:none;" onchange="onCustomSymbolSelected(event)">
                 </div>
 
-                <!-- Symbol Quick Visual Grid -->
-                <div class="symbol-mini-grid mt-2" id="symbolMiniGrid">
-                  <!-- Rendered dynamically -->
+                <!-- Custom Symbol Name Input (Visible when custom symbol active) -->
+                <div id="customSymbolNameGroup" class="mt-2" style="display:none;">
+                  <label for="candidateCustomSymbolNameInput" style="font-size:0.8rem; font-weight:700; color:#b45309;">
+                    कस्टम चुनाव चिन्ह का नाम लिखें *:
+                  </label>
+                  <input type="text" id="candidateCustomSymbolNameInput" class="form-input form-input-sm" placeholder="उदा. बल्ला / ट्रेक्टर / कप-प्लेट" style="font-weight:700;" oninput="onCustomSymbolNameChanged(this.value)">
+                  <small class="text-muted" style="font-size:0.72rem;">यह नाम आपकी मतदाता पर्ची पर चिन्ह के नीचे प्रिंट होगा।</small>
+                </div>
+
+                <div id="standardSymbolControlsGroup">
+                  <div class="symbol-select-dropdown-wrapper mt-2">
+                    <select id="candidateSymbolSelect" class="form-select" onchange="onCandidateSymbolChanged(this.value)" style="font-weight:700; cursor:pointer;">
+                      <!-- Populated dynamically from OFFICIAL_ELECTION_SYMBOLS -->
+                    </select>
+                  </div>
+
+                  <!-- Symbol Quick Visual Grid -->
+                  <div class="symbol-mini-grid mt-2" id="symbolMiniGrid">
+                    <!-- Rendered dynamically -->
+                  </div>
                 </div>
               </div>
             </div>

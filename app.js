@@ -3612,11 +3612,18 @@ function renderModalCandidateSlip(voter) {
 
   if (canUseCandidateSlip && cand && cand.candidate_name) {
     const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
-    const symObj = symbols.find(s => s.id === cand.symbol_icon || s.name_hi.includes(cand.symbol_name)) || symbols[0];
+    let modalSymbolSvg = '';
+    if (cand.custom_symbol_url) {
+      modalSymbolSvg = `<img src="${cand.custom_symbol_url}" alt="${cand.symbol_name || 'चुनाव चिन्ह'}" class="candidate-custom-symbol-img" style="max-width:100%; max-height:100%; object-fit:contain; display:block; margin:0 auto;">`;
+    } else {
+      const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
+      const symObj = symbols.find(s => s.id === cand.symbol_icon || s.name_hi.includes(cand.symbol_name)) || symbols[0];
+      modalSymbolSvg = symObj ? symObj.svg : '';
+    }
     
     container.innerHTML = buildDetachableCandidateSlipHtml(voter, {
       ...cand,
-      symbol_svg: symObj ? symObj.svg : ''
+      symbol_svg: modalSymbolSvg
     });
   } else {
     // Exact Image 2 official format for modal preview as well
@@ -5365,7 +5372,7 @@ function onAlphaBoothChanged() {
 // CANDIDATE PROFILE & OFFICIAL ELECTION SYMBOL ENGINE
 // ==========================================================================
 
-function initCandidateProfileTab() {
+async function initCandidateProfileTab() {
   const gpSelect = document.getElementById('candidateGpSelect');
   const u = State.currentUser;
   const isSuper = (u && (u.role === 'SUPER_ADMIN' || u.role === 'admin'));
@@ -5393,17 +5400,39 @@ function initCandidateProfileTab() {
   // Populate Symbols dropdown and mini-grid
   populateSymbolControls();
 
-  // Populate with existing candidate details if available
   if (!u) return;
 
-  // Check if candidate profile exists
+  // Retrieve candidate profile from:
+  // 1. State.currentCandidate
+  // 2. localStorage
+  // 3. portalUsers.candidates
+  // 4. /api/candidate endpoint
   let cand = State.currentCandidate;
+  const uKey = u.id || u.username;
   if (!cand) {
-    const cached = localStorage.getItem('candidate_profile_' + (u.id || u.username));
-    if (cached) {
-      try { cand = JSON.parse(cached); State.currentCandidate = cand; } catch(e) {}
-    }
+    try {
+      const cached = localStorage.getItem('candidate_profile_' + uKey) || (u.id && localStorage.getItem('candidate_profile_' + u.id)) || (u.username && localStorage.getItem('candidate_profile_' + u.username));
+      if (cached) cand = JSON.parse(cached);
+    } catch(e) {}
   }
+  if (!cand && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+    cand = window.PORTAL_USERS_DATA.candidates[uKey] || (u.id && window.PORTAL_USERS_DATA.candidates[u.id]) || (u.username && window.PORTAL_USERS_DATA.candidates[u.username]);
+  }
+  if (!cand || !cand.candidate_name) {
+    try {
+      const res = await fetch('/api/candidate/' + encodeURIComponent(uKey));
+      if (res.ok) {
+        const d = await res.json();
+        if (d && d.candidate) {
+          cand = d.candidate;
+          State.currentCandidate = cand;
+          localStorage.setItem('candidate_profile_' + uKey, JSON.stringify(cand));
+        }
+      }
+    } catch(e) {}
+  }
+
+  if (cand) State.currentCandidate = cand;
 
   const nameInput = document.getElementById('candidateNameInput');
   const mobileInput = document.getElementById('candidateMobileInput');
@@ -5411,18 +5440,29 @@ function initCandidateProfileTab() {
   const sloganText = document.getElementById('candidateSloganTextarea');
   const photoPreview = document.getElementById('candidatePhotoPreview');
   const showBannerCheck = document.getElementById('candidateShowBannerSlip');
+  const electionDateInput = document.getElementById('candidateElectionDateInput');
   const electionTimeInput = document.getElementById('candidateElectionTimeInput');
+  const browseBtn = document.getElementById('candidatePhotoBrowseBtn');
+  const removeBtn = document.getElementById('candidatePhotoRemoveBtn');
 
   if (cand) {
     if (nameInput) nameInput.value = cand.candidate_name || '';
     if (mobileInput) mobileInput.value = cand.mobile || u.mobile || '';
     if (postSelect) postSelect.value = cand.post || 'सरपंच';
     if (gpSelect && cand.panchayat) gpSelect.value = cand.panchayat;
-    const electionDateInput = document.getElementById('candidateElectionDateInput');
     if (electionDateInput) electionDateInput.value = cand.election_date || '15 अक्टूबर 2026';
     if (electionTimeInput) electionTimeInput.value = cand.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक';
     if (sloganText) sloganText.value = cand.slogan || '';
-    if (photoPreview && cand.photo_url) photoPreview.src = cand.photo_url;
+    
+    // Photo restore
+    if (photoPreview && cand.photo_url) {
+      photoPreview.src = cand.photo_url;
+      if (!cand.photo_url.includes('dicebear')) {
+        if (browseBtn) browseBtn.innerHTML = '📁 फोटो बदलें (Change Photo)';
+        if (removeBtn) removeBtn.style.display = 'inline-block';
+      }
+    }
+    
     if (showBannerCheck) showBannerCheck.checked = (cand.show_banner_on_slip !== false);
 
     onCandidatePostChanged(cand.post || 'सरपंच');
@@ -5430,18 +5470,35 @@ function initCandidateProfileTab() {
       const wardSelect = document.getElementById('candidateWardSelect');
       if (wardSelect) wardSelect.value = cand.ward;
     }
-    if (cand.symbol_name) onCandidateSymbolChanged(cand.symbol_name);
+
+    // Custom Symbol restore
+    if (cand.custom_symbol_url || cand.symbol_icon === 'custom') {
+      State.customSymbolUrl = cand.custom_symbol_url;
+      setSymbolMode('custom');
+      const wrapper = document.getElementById('currentSymbolSvgWrapper');
+      if (wrapper && cand.custom_symbol_url) {
+        wrapper.innerHTML = `<img src="${cand.custom_symbol_url}" alt="कस्टम चिन्ह" style="max-width:100%; max-height:100%; object-fit:contain; display:block;">`;
+      }
+      const customNameInput = document.getElementById('candidateCustomSymbolNameInput');
+      if (customNameInput) customNameInput.value = cand.symbol_name || 'कस्टम चिन्ह';
+      const nameText = document.getElementById('currentSymbolNameText');
+      if (nameText) nameText.textContent = cand.symbol_name || 'कस्टम चिन्ह';
+    } else {
+      setSymbolMode('standard');
+      if (cand.symbol_icon) onCandidateSymbolChanged(cand.symbol_icon);
+      else if (cand.symbol_name) onCandidateSymbolChanged(cand.symbol_name);
+    }
   } else {
     // Default prefill
     if (nameInput) nameInput.value = u.full_name || '';
     if (mobileInput) mobileInput.value = u.mobile || '';
-    const electionDateInput = document.getElementById('candidateElectionDateInput');
     if (electionDateInput) electionDateInput.value = '15 अक्टूबर 2026';
     if (electionTimeInput) electionTimeInput.value = 'प्रातः 7:00 बजे से सायं 5:00 बजे तक';
     if (gpSelect && u.allowed_panchayats && u.allowed_panchayats !== 'ALL') {
       gpSelect.value = u.allowed_panchayats;
     }
     applySloganPreset(1);
+    setSymbolMode('standard');
   }
 
   renderLiveSpecimenSlip();
@@ -5547,22 +5604,175 @@ function onCandidateWardChanged(w) {
   renderLiveSpecimenSlip();
 }
 
-function onCandidatePhotoSelected(event) {
+// Image compression helper using HTML5 Canvas
+// Shrinks raw photos/symbols from 2-5MB down to ~15-30KB Base64 data URL
+function compressCandidateImage(file, maxWidth, maxHeight, quality = 0.82, isPng = false) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!isPng) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const mime = isPng ? 'image/png' : 'image/jpeg';
+        resolve(canvas.toDataURL(mime, quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function onCandidatePhotoSelected(event) {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = e => {
+  try {
+    showToast('⏳ फोटो लोड व कंप्रेस की जा रही है...');
+    // Compress photo to max 400x480 (~25-35KB JPEG)
+    const compressedDataUrl = await compressCandidateImage(file, 400, 480, 0.82, false);
     const preview = document.getElementById('candidatePhotoPreview');
-    if (preview) preview.src = e.target.result;
+    if (preview) preview.src = compressedDataUrl;
+
+    const browseBtn = document.getElementById('candidatePhotoBrowseBtn');
+    if (browseBtn) browseBtn.innerHTML = '📁 फोटो बदलें (Change Photo)';
+    const removeBtn = document.getElementById('candidatePhotoRemoveBtn');
+    if (removeBtn) removeBtn.style.display = 'inline-block';
+
     renderLiveSpecimenSlip();
-  };
-  reader.readAsDataURL(file);
+    showToast('✅ फोटो सफलता पूर्वक लोड हुई!');
+  } catch (err) {
+    console.error('Photo compress error:', err);
+    const reader = new FileReader();
+    reader.onload = e => {
+      const preview = document.getElementById('candidatePhotoPreview');
+      if (preview) preview.src = e.target.result;
+      renderLiveSpecimenSlip();
+    };
+    reader.readAsDataURL(file);
+  }
 }
 
 function clearCandidatePhoto() {
   const preview = document.getElementById('candidatePhotoPreview');
   if (preview) preview.src = 'https://api.dicebear.com/7.x/identicon/svg?seed=candidate';
+  const browseBtn = document.getElementById('candidatePhotoBrowseBtn');
+  if (browseBtn) browseBtn.innerHTML = '📁 फोटो चुनें (Choose Photo)';
+  const removeBtn = document.getElementById('candidatePhotoRemoveBtn');
+  if (removeBtn) removeBtn.style.display = 'none';
+  const inp = document.getElementById('candidatePhotoInput');
+  if (inp) inp.value = '';
+  renderLiveSpecimenSlip();
+}
+
+function setSymbolMode(mode) {
+  State.symbolMode = mode;
+  const standardSection = document.getElementById('standardSymbolSection');
+  const customSection = document.getElementById('customSymbolSection');
+  const btnStandard = document.getElementById('btnSymbolModeStandard');
+  const btnCustom = document.getElementById('btnSymbolModeCustom');
+
+  if (mode === 'custom') {
+    if (standardSection) standardSection.style.display = 'none';
+    if (customSection) customSection.style.display = 'block';
+    if (btnStandard) btnStandard.classList.remove('active');
+    if (btnCustom) btnCustom.classList.add('active');
+
+    const wrapper = document.getElementById('currentSymbolSvgWrapper');
+    const nameText = document.getElementById('currentSymbolNameText');
+    const customNameInput = document.getElementById('candidateCustomSymbolNameInput');
+    const customName = (customNameInput ? customNameInput.value : '').trim() || 'कस्टम चिन्ह';
+
+    if (State.customSymbolUrl && wrapper) {
+      wrapper.innerHTML = `<img src="${State.customSymbolUrl}" alt="कस्टम चिन्ह" style="max-width:100%; max-height:100%; object-fit:contain; display:block;">`;
+    }
+    if (nameText) nameText.textContent = customName;
+  } else {
+    if (standardSection) standardSection.style.display = 'block';
+    if (customSection) customSection.style.display = 'none';
+    if (btnStandard) btnStandard.classList.add('active');
+    if (btnCustom) btnCustom.classList.remove('active');
+
+    const select = document.getElementById('candidateSymbolSelect');
+    if (select && select.value) {
+      onCandidateSymbolChanged(select.value);
+    }
+  }
+  renderLiveSpecimenSlip();
+}
+
+async function onCustomSymbolSelected(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  try {
+    showToast('⏳ कस्टम चुनाव चिन्ह प्रोसेस किया जा रहा है...');
+    // Compress symbol to max 240x240 PNG to preserve transparency (~10-20KB)
+    const compressedUrl = await compressCandidateImage(file, 240, 240, 0.9, true);
+    State.customSymbolUrl = compressedUrl;
+
+    const wrapper = document.getElementById('currentSymbolSvgWrapper');
+    if (wrapper) {
+      wrapper.innerHTML = `<img src="${compressedUrl}" alt="कस्टम चिन्ह" style="max-width:100%; max-height:100%; object-fit:contain; display:block;">`;
+    }
+
+    // Auto-detect symbol name from filename if not set
+    const nameInput = document.getElementById('candidateCustomSymbolNameInput');
+    if (nameInput && (!nameInput.value || nameInput.value.trim() === 'कस्टम चिन्ह' || nameInput.value.trim() === '')) {
+      const rawName = file.name.replace(/\.[^/.]+$/, "").replace(/[_\-\d]/g, " ").trim();
+      if (rawName) nameInput.value = rawName;
+    }
+
+    const customName = (nameInput ? nameInput.value : '').trim() || 'कस्टम चिन्ह';
+    const nameText = document.getElementById('currentSymbolNameText');
+    if (nameText) nameText.textContent = customName;
+
+    const browseBtn = document.getElementById('candidateCustomSymbolBrowseBtn');
+    if (browseBtn) browseBtn.innerHTML = '📁 चुनाव चिन्ह बदलें';
+    const removeBtn = document.getElementById('candidateCustomSymbolRemoveBtn');
+    if (removeBtn) removeBtn.style.display = 'inline-block';
+
+    renderLiveSpecimenSlip();
+    showToast('✅ कस्टम चुनाव चिन्ह सफलतापूर्वक लोड हुआ!');
+  } catch (err) {
+    console.error('Custom symbol error:', err);
+    showToast('चुनाव चिन्ह लोड करने में समस्या: ' + err.message);
+  }
+}
+
+function clearCustomSymbol() {
+  State.customSymbolUrl = null;
+  const inp = document.getElementById('candidateCustomSymbolInput');
+  if (inp) inp.value = '';
+  const nameInp = document.getElementById('candidateCustomSymbolNameInput');
+  if (nameInp) nameInp.value = '';
+  const browseBtn = document.getElementById('candidateCustomSymbolBrowseBtn');
+  if (browseBtn) browseBtn.innerHTML = '📁 चुनाव चिन्ह फाइल चुनें (PNG/JPG)';
+  const removeBtn = document.getElementById('candidateCustomSymbolRemoveBtn');
+  if (removeBtn) removeBtn.style.display = 'none';
+
+  setSymbolMode('standard');
+}
+
+function onCustomSymbolNameChanged(val) {
+  const nameText = document.getElementById('currentSymbolNameText');
+  if (nameText) nameText.textContent = (val || '').trim() || 'कस्टम चिन्ह';
   renderLiveSpecimenSlip();
 }
 
@@ -5600,13 +5810,26 @@ async function handleSaveCandidateProfile(event) {
   const photoEl = document.getElementById('candidatePhotoPreview');
   const photoUrl = photoEl ? photoEl.src : '';
 
-  const symbolSelect = document.getElementById('candidateSymbolSelect');
-  const symbolId = symbolSelect ? symbolSelect.value : 'sun';
-  const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
-  const symObj = symbols.find(s => s.id === symbolId) || symbols[0];
+  let symbolName = '';
+  let symbolIcon = '';
+  let customSymbolUrl = '';
 
+  if (State.symbolMode === 'custom' && State.customSymbolUrl) {
+    customSymbolUrl = State.customSymbolUrl;
+    symbolIcon = 'custom';
+    symbolName = (document.getElementById('candidateCustomSymbolNameInput')?.value || '').trim() || 'कस्टम चिन्ह';
+  } else {
+    const symbolSelect = document.getElementById('candidateSymbolSelect');
+    const symbolId = symbolSelect ? symbolSelect.value : 'sun';
+    const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
+    const symObj = symbols.find(s => s.id === symbolId) || symbols[0];
+    symbolIcon = symObj.id;
+    symbolName = symObj.name_hi;
+  }
+
+  const uKey = u.id || u.username;
   const profileData = {
-    user_id: u.id || u.username,
+    user_id: uKey,
     candidate_name: name,
     mobile: mobile,
     post: post,
@@ -5614,8 +5837,9 @@ async function handleSaveCandidateProfile(event) {
     ward: ward,
     election_date: electionDate,
     election_time: electionTime,
-    symbol_name: symObj.name_hi,
-    symbol_icon: symObj.id,
+    symbol_name: symbolName,
+    symbol_icon: symbolIcon,
+    custom_symbol_url: customSymbolUrl,
     photo_url: photoUrl,
     slogan: slogan,
     show_banner_on_slip: showBanner,
@@ -5623,19 +5847,27 @@ async function handleSaveCandidateProfile(event) {
   };
 
   State.currentCandidate = profileData;
-  localStorage.setItem('candidate_profile_' + (u.id || u.username), JSON.stringify(profileData));
+  localStorage.setItem('candidate_profile_' + uKey, JSON.stringify(profileData));
+  if (u.id) localStorage.setItem('candidate_profile_' + u.id, JSON.stringify(profileData));
+  if (u.username) localStorage.setItem('candidate_profile_' + u.username, JSON.stringify(profileData));
 
-  // Try saving to Node server
+  // Sync to in-memory PORTAL_USERS_DATA
+  if (window.PORTAL_USERS_DATA) {
+    if (!window.PORTAL_USERS_DATA.candidates) window.PORTAL_USERS_DATA.candidates = {};
+    window.PORTAL_USERS_DATA.candidates[uKey] = profileData;
+  }
+
+  // Save to SQLite & portal_users.json on server
   try {
-    const res = await fetch('/api/candidate/' + encodeURIComponent(u.id || u.username), {
+    const res = await fetch('/api/candidate/' + encodeURIComponent(uKey), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(profileData)
     });
     if (res.ok) {
-      showToast('✅ प्रत्याशी प्रोफाइल एवं चुनाव चिन्ह सर्वर पर सुरक्षित!');
+      showToast('✅ प्रत्याशी प्रोफाइल, फोटो एवं चुनाव चिन्ह डेटाबेस में सुरक्षित!');
     } else {
-      showToast('✅ प्रत्याशी प्रोफाइल लोकल सुरक्षित!');
+      showToast('✅ प्रत्याशी प्रोफाइल सुरक्षित!');
     }
   } catch (e) {
     showToast('✅ प्रत्याशी प्रोफाइल सुरक्षित!');
@@ -5644,7 +5876,6 @@ async function handleSaveCandidateProfile(event) {
   renderLiveSpecimenSlip();
 }
 
-// Live specimen render for the Candidate Tab
 function renderLiveSpecimenSlip() {
   const container = document.getElementById('liveSpecimenSlipContainer');
   if (!container) return;
@@ -5658,10 +5889,22 @@ function renderLiveSpecimenSlip() {
   const slogan = document.getElementById('candidateSloganTextarea') ? document.getElementById('candidateSloganTextarea').value : '।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।';
   const photo = document.getElementById('candidatePhotoPreview') ? document.getElementById('candidatePhotoPreview').src : 'https://api.dicebear.com/7.x/identicon/svg?seed=candidate';
 
-  const symbolSelect = document.getElementById('candidateSymbolSelect');
-  const symbolId = symbolSelect ? symbolSelect.value : 'sun';
-  const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
-  const symObj = symbols.find(s => s.id === symbolId) || symbols[0];
+  let symbolSvg = '';
+  let symbolName = '';
+  let customSymbolUrl = '';
+
+  if (State.symbolMode === 'custom' && State.customSymbolUrl) {
+    customSymbolUrl = State.customSymbolUrl;
+    symbolName = (document.getElementById('candidateCustomSymbolNameInput')?.value || '').trim() || 'कस्टम चिन्ह';
+    symbolSvg = `<img src="${customSymbolUrl}" alt="${symbolName}" class="candidate-custom-symbol-img" style="max-width:100%; max-height:100%; object-fit:contain; display:block; margin:0 auto;">`;
+  } else {
+    const symbolSelect = document.getElementById('candidateSymbolSelect');
+    const symbolId = symbolSelect ? symbolSelect.value : 'sun';
+    const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
+    const symObj = symbols.find(s => s.id === symbolId) || symbols[0];
+    symbolSvg = symObj.svg;
+    symbolName = symObj.name_hi;
+  }
 
   const dummyVoter = {
     serial_no: 104,
@@ -5687,8 +5930,9 @@ function renderLiveSpecimenSlip() {
     ward: ward,
     election_date: electionDate,
     election_time: electionTime,
-    symbol_name: symObj.name_hi,
-    symbol_svg: symObj.svg,
+    symbol_name: symbolName,
+    symbol_svg: symbolSvg,
+    custom_symbol_url: customSymbolUrl,
     photo_url: photo,
     slogan: slogan
   });
@@ -5717,7 +5961,14 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
   const cGp = candidateData.panchayat || voter.gram_panchayat;
   const cWard = candidateData.ward || voter.ward_no;
   const cSymbolName = candidateData.symbol_name || 'उगता सूरज';
-  const cSymbolSvg = candidateData.symbol_svg || (window.OFFICIAL_ELECTION_SYMBOLS && window.OFFICIAL_ELECTION_SYMBOLS[0].svg);
+  
+  let cSymbolSvg = candidateData.symbol_svg;
+  if (candidateData.custom_symbol_url) {
+    cSymbolSvg = `<img src="${candidateData.custom_symbol_url}" alt="${cSymbolName}" class="candidate-custom-symbol-img" style="max-width:100%; max-height:100%; object-fit:contain; display:block; margin:0 auto;">`;
+  } else if (!cSymbolSvg) {
+    cSymbolSvg = (window.OFFICIAL_ELECTION_SYMBOLS && window.OFFICIAL_ELECTION_SYMBOLS[0].svg);
+  }
+
   const cPhoto = candidateData.photo_url || 'https://api.dicebear.com/7.x/identicon/svg?seed=candidate';
   const cSlogan = (candidateData.slogan || 'अपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।').replace(/\n/g, '<br>');
 
@@ -5735,12 +5986,14 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
             <span class="candidate-banner-post">${cPost} प्रत्याशी</span>
           </div>
           <div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong> ${cWard ? `• वार्ड नं.: ${cWard}` : ''}</div>
-          <div class="candidate-banner-time" style="font-size:0.72rem; font-weight:700; color:#1e293b; background:#fef3c7; border:1px solid #f59e0b; border-radius:4px; padding:2px 6px; margin:3px 0; display:inline-block;">📅 मतदान दिनांक: <strong>${electionDate}</strong> | ⏰ समय: <strong>${electionTime}</strong></div>
+          <!-- BICH ME: CANDIDATE APPEAL / SLOGAN -->
           <div class="candidate-banner-slogan">${cSlogan}</div>
+          <!-- NICHE: VOTING DATE & TIME -->
+          <div class="candidate-banner-time">📅 मतदान दिनांक: <strong>${electionDate}</strong> | ⏰ समय: <strong>${electionTime}</strong></div>
         </div>
         <div class="candidate-banner-symbol-col">
           ${cSymbolSvg}
-          <div class="candidate-banner-symbol-label">${cSymbolName.split(' ')[0]}</div>
+          <div class="candidate-banner-symbol-label">चुनाव चिन्ह: <strong>${cSymbolName.split(' ')[0]}</strong></div>
         </div>
       </div>
 
@@ -5877,11 +6130,17 @@ window.buildOfficialSlipHtml = function(voter, layout, theme) {
     }
     if (cand && (cand.show_banner_on_slip !== false)) {
       const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
-      const symObj = symbols.find(s => s.id === cand.symbol_icon || (cand.symbol_name && s.name_hi.includes(cand.symbol_name))) || symbols[0];
+      let candSymbolSvg = '';
+      if (cand.custom_symbol_url) {
+        candSymbolSvg = `<img src="${cand.custom_symbol_url}" alt="${cand.symbol_name || 'चुनाव चिन्ह'}" class="candidate-custom-symbol-img" style="max-width:100%; max-height:100%; object-fit:contain; display:block; margin:0 auto;">`;
+      } else {
+        const symObj = symbols.find(s => s.id === cand.symbol_icon || (cand.symbol_name && s.name_hi.includes(cand.symbol_name))) || symbols[0];
+        candSymbolSvg = (symObj && symObj.svg) ? symObj.svg : (cand.symbol_svg || '');
+      }
       return buildDetachableCandidateSlipHtml(voter, {
         ...cand,
         candidate_name: cand.candidate_name || State.currentUser.full_name || 'उम्मीदवार',
-        symbol_svg: (symObj && symObj.svg) ? symObj.svg : (cand.symbol_svg || '')
+        symbol_svg: candSymbolSvg
       });
     }
   }
@@ -7750,6 +8009,9 @@ async function handleGatekeeperLogin(event) {
         try {
           candProfile = JSON.parse(localStorage.getItem('candidate_profile_' + candUser.id) || localStorage.getItem('candidate_profile_' + candUser.username) || 'null');
         } catch(e) {}
+      }
+      if (!candProfile && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+        candProfile = window.PORTAL_USERS_DATA.candidates[candUser.id] || window.PORTAL_USERS_DATA.candidates[candUser.username];
       }
       if (!candProfile) {
         candProfile = {
