@@ -6162,7 +6162,10 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
             <div>
               <span class="candidate-banner-post">${cPost} प्रत्याशी</span>
             </div>
-            <div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong> ${cWard ? `• वार्ड नं.: ${cWard}` : ''}</div>
+            <div class="candidate-banner-gp">
+              <div>ग्राम पंचायत: <strong>${cGp}</strong></div>
+              ${cWard ? `<div>वार्ड नं.: <strong>${cWard}</strong></div>` : ''}
+            </div>
             
           </div>
           <div class="candidate-banner-symbol-col">
@@ -6171,6 +6174,10 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
             </div>
             <div class="candidate-banner-symbol-label">चुनाव चिन्ह:<br><strong>${cSymbolName}</strong></div>
           </div>
+        </div>
+        <!-- FULL-WIDTH VOTING DATE & TIME BANNER -->
+        <div class="candidate-banner-datetime">
+          🗓️ मतदान: <strong>${electionDate}</strong> | ⏰ समय: <strong>${electionTime}</strong>
         </div>
         <!-- FULL-WIDTH CANDIDATE APPEAL (SPANS ENTIRE BOX FROM LEFT TO RIGHT) -->
         <div class="candidate-banner-slogan">${cSlogan}</div>
