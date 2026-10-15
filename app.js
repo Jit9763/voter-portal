@@ -2516,7 +2516,7 @@ function enforceGatekeeperState() {
   // Candidate Profile Nav Tab
   const candidateNavTab = document.getElementById('candidateNavTab');
   if (candidateNavTab) {
-    candidateNavTab.style.display = (isSuperAdmin || isCandUser) ? 'flex' : 'none';
+    candidateNavTab.style.display = isCandUser ? 'flex' : 'none';
   }
 
   // Enforce Allowed Tabs (Super Admin configuration has priority)
@@ -2527,7 +2527,7 @@ function enforceGatekeeperState() {
   }
 
   if (isSuperAdmin) {
-    allowedTabs = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab', 'candidateProfileTab', 'adminControlTab', 'settingsTab'];
+    allowedTabs = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab', 'adminControlTab', 'settingsTab'];
   } else if (Array.isArray(userConfiguredTabs) && userConfiguredTabs.length > 0) {
     // If Admin explicitly assigned custom tabs to this user, ALWAYS RESPECT IT!
     allowedTabs = userConfiguredTabs;
@@ -2572,7 +2572,7 @@ function enforceGatekeeperState() {
 
   // Ensure candidate profile tab is visible if allowed
   if (candidateNavTab) {
-    candidateNavTab.style.display = (isSuperAdmin || (isCandUser && allowedTabs.includes('candidateProfileTab'))) ? 'flex' : 'none';
+    candidateNavTab.style.display = (isCandUser && allowedTabs.includes('candidateProfileTab')) ? 'flex' : 'none';
   }
 
   document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -2580,8 +2580,12 @@ function enforceGatekeeperState() {
     if (tabId === 'adminControlTab' || tabId === 'settingsTab') {
       tab.style.display = isSuperAdmin ? 'flex' : 'none';
     } else {
-      const isAllowed = isSuperAdmin || allowedTabs.includes(tabId);
-      tab.style.display = isAllowed ? 'flex' : 'none';
+      if (tabId === 'candidateProfileTab') {
+        tab.style.display = (isCandUser && allowedTabs.includes('candidateProfileTab')) ? 'flex' : 'none';
+      } else {
+        const isAllowed = isSuperAdmin || allowedTabs.includes(tabId);
+        tab.style.display = isAllowed ? 'flex' : 'none';
+      }
     }
   });
 
@@ -6148,27 +6152,28 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
     <div class="candidate-slip-card">
       <!-- 1. TOP SECTION: CANDIDATE CAMPAIGN BANNER (FULL COLOR) -->
       <div class="candidate-banner-top">
-        <div class="candidate-banner-photo-col">
-          <img src="${cPhoto}" alt="${cName}" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=candidate'">
-        </div>
-        <div class="candidate-banner-info-col">
-          <div class="candidate-banner-header">।। श्री गणेशाय नमः ।।</div>
-          <div class="candidate-banner-name">${cName}</div>
-          <div>
-            <span class="candidate-banner-post">${cPost} प्रत्याशी</span>
+        <div class="candidate-banner-main-row">
+          <div class="candidate-banner-photo-col">
+            <img src="${cPhoto}" alt="${cName}" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=candidate'">
           </div>
-          <div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong> ${cWard ? `• वार्ड नं.: ${cWard}` : ''}</div>
-          <!-- BICH ME: CANDIDATE APPEAL / SLOGAN -->
-          <div class="candidate-banner-slogan">${cSlogan}</div>
-          <!-- NICHE: VOTING DATE & TIME -->
-          <div class="candidate-banner-time">📅 मतदान दिनांक: <strong>${electionDate}</strong> | ⏰ समय: <strong>${electionTime}</strong></div>
-        </div>
-        <div class="candidate-banner-symbol-col">
-          <div class="candidate-symbol-box">
-            ${cSymbolSvg}
+          <div class="candidate-banner-info-col">
+            <div class="candidate-banner-header">।। श्री गणेशाय नमः ।।</div>
+            <div class="candidate-banner-name">${cName}</div>
+            <div>
+              <span class="candidate-banner-post">${cPost} प्रत्याशी</span>
+            </div>
+            <div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong> ${cWard ? `• वार्ड नं.: ${cWard}` : ''}</div>
+            <div class="candidate-banner-time">📅 मतदान: <strong>${electionDate}</strong> | ⏰ <strong>${electionTime}</strong></div>
           </div>
-          <div class="candidate-banner-symbol-label">चुनाव चिन्ह:<br><strong>${cSymbolName}</strong></div>
+          <div class="candidate-banner-symbol-col">
+            <div class="candidate-symbol-box">
+              ${cSymbolSvg}
+            </div>
+            <div class="candidate-banner-symbol-label">चुनाव चिन्ह:<br><strong>${cSymbolName}</strong></div>
+          </div>
         </div>
+        <!-- FULL-WIDTH CANDIDATE APPEAL (SPANS ENTIRE BOX FROM LEFT TO RIGHT) -->
+        <div class="candidate-banner-slogan">${cSlogan}</div>
       </div>
 
       <!-- 2. PERFORATION CUTTING DIVIDER (SLIM & COMPACT) -->
