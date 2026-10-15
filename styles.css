@@ -3733,37 +3733,46 @@ html, body {
 }
 
 .candidate-custom-symbol-img {
-  max-width: 48px;
-  max-height: 48px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 .candidate-banner-symbol-col {
-  width: 50px;
+  width: 58px;
+  min-width: 58px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: 3px 2px;
   border: 1.5px solid #d97706;
   border-radius: 4px;
   background: #ffffff;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .candidate-banner-symbol-col svg {
   width: 36px;
   height: 36px;
+  max-width: 38px;
+  max-height: 38px;
 }
 
 .candidate-banner-symbol-label {
-  font-size: 5.2pt;
+  font-size: 5.4pt;
   font-weight: 800;
   color: #9a3412;
   text-align: center;
-  margin-top: 1px;
+  margin-top: 2px;
+  line-height: 1.15;
+  word-break: break-word;
 }
 
 /* PERFORATION DIVIDER CUT LINE */

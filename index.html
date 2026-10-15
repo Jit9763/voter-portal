@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <script>window.PORTAL_TYPE = "voter";</script>
+  <script>window.PORTAL_TYPE = "pan";</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -54,13 +54,19 @@
 
         <!-- Simplified Unified Login Form -->
         <form id="gatekeeperLoginForm" onsubmit="handleGatekeeperLogin(event)" style="margin-top:12px;">
-          <!-- DIRECT USER ID INPUT -->
+          <input type="hidden" id="gatekeeperUsername" value="admin">
+
+          <!-- SINGLE DROPDOWN: पद चुनें -->
           <div class="form-group mb-3">
-            <label for="gatekeeperUsername" style="font-size:0.9rem; color:#0f172a; font-weight:700;"><strong>यूजर आईडी (User ID) *:</strong></label>
-            <div class="input-with-icon">
-              <span class="input-icon">👤</span>
-              <input type="text" id="gatekeeperUsername" class="form-input" placeholder="यूजर आईडी दर्ज करें (उदा. cand_gp01, blo_1)" required autocomplete="username" style="font-weight:700; height:44px; background:#ffffff; color:#0f172a; border:1.5px solid #cbd5e1;">
-            </div>
+            <label for="panAdminSelect" style="font-size:0.9rem; color:#0f172a; font-weight:700;">
+              <strong>1. अधिकृत पद चुनें *:</strong>
+            </label>
+            <select id="panAdminSelect" class="form-select" onchange="document.getElementById('gatekeeperUsername').value = this.value; document.getElementById('gatekeeperPassword').focus();" style="font-weight:700; cursor:pointer; font-size:0.95rem; height:44px; border:2px solid #cbd5e1; background:#ffffff; color:#0f172a;">
+              <option value="admin">👑 मुख्य व्यवस्थापक (Super Admin - पूर्ण नियंत्रण)</option>
+              <option value="incharge">👁️ ब्लॉक इनचार्ज (Incharge - केवल अवलोकन/All Tabs View)</option>
+              <option value="vyavasthapak">🖨️ व्यवस्थापक (Vyavasthapak - प्रिंट व डाउनलोड)</option>
+              <option value="block_prabhari">🌟 ब्लॉक प्रभारी</option>
+            </select>
           </div>
 
           <!-- PASSWORD FIELD -->
@@ -84,7 +90,7 @@
           <div id="gatekeeperError" class="alert-error" style="display:none; margin-bottom:12px;"></div>
 
           <button type="submit" class="btn btn-login-submit btn-block" style="height:44px; font-size:1rem; font-weight:700;">
-            <span>मतदाता पोर्टल में प्रवेश करें (Login & Access)</span>
+            <span>मास्टर एडमिन पोर्टल में प्रवेश करें (Login)</span>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </form>
@@ -153,7 +159,11 @@
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
             मत पर्ची डाउनलोड (9/12/15)
           </button>
-          <button class="nav-tab" data-tab="candidateProfileTab" id="candidateNavTab" onclick="switchTab('candidateProfileTab')">
+          <button class="nav-tab" data-tab="directoryTab" onclick="switchTab('directoryTab')">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
+            वार्डवार सूची (Directory)
+          </button>
+                    <button class="nav-tab" data-tab="candidateProfileTab" id="candidateNavTab" onclick="switchTab('candidateProfileTab')">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span>👤 प्रत्याशी प्रोफाइल</span>
           </button>
@@ -543,7 +553,90 @@
       <!-- ==============================================
            TAB 2: WARD-WISE VOTER DIRECTORY
            ============================================== -->
-            <!-- ==============================================
+            <!-- ==============================================================
+           TAB: ELECTION DIRECTORY & BLO / CELL MANAGEMENT (चुनाव डायरेक्टरी)
+           ============================================================== -->
+      <section id="directoryTab" class="tab-pane">
+        <div class="card directory-card">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div>
+              <span class="gatekeeper-badge" style="background:#f0fdf4; color:#15803d; border-color:#bbf7d0;">📞 आधिकारिक चुनाव डायरेक्टरी</span>
+              <h2 class="section-title mt-1">चुनाव डायरेक्टरी एवं BLO / प्रकोष्ठ प्रबंधन</h2>
+              <p class="section-subtitle">समस्त 126 बी.एल.ओ. (प्रगणक), 13 चुनाव प्रकोष्ठों के अधिकारी/कर्मचारी एवं ब्लॉक स्तरीय अधिकारियों की डायरेक्टरी, वन-क्लिक व्हाट्सएप, कॉल, पासवर्ड नियंत्रण एवं एक्सेस अधिकार।</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap" id="adminDirectoryActions" style="display:none;">
+              <button class="btn btn-sm btn-success" onclick="openAddBloModal()">
+                <span>➕ नया BLO जोड़ें</span>
+              </button>
+              <button class="btn btn-sm btn-primary" onclick="openAddCellModal()">
+                <span>➕ प्रकोष्ठ कार्मिक जोड़ें</span>
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="openAddOfficerModal()">
+                <span>➕ अधिकारी जोड़ें</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Badges Row -->
+          <div class="directory-stats-row d-flex gap-2 flex-wrap mb-3">
+            <div class="stat-pill active" onclick="filterDirectoryType('ALL')" id="pillAll">
+              <span>समस्त संपर्क</span> <strong id="dirCountAll">662</strong>
+            </div>
+            <div class="stat-pill" onclick="filterDirectoryType('PATWARI')" id="pillPatwari">
+              <span>🏛️ पटवारी</span> <strong id="dirCountPatwari">49</strong>
+            </div>
+            <div class="stat-pill" onclick="filterDirectoryType('SUPERVISOR')" id="pillSupervisor">
+              <span>👮 सुपरवाइजर</span> <strong id="dirCountSupervisor">98</strong>
+            </div>
+            <div class="stat-pill" onclick="filterDirectoryType('BLO')" id="pillBlo">
+              <span>📍 बी.एल.ओ.</span> <strong id="dirCountBlo">126</strong>
+            </div>
+            <div class="stat-pill" onclick="filterDirectoryType('PEEO')" id="pillPeeo">
+              <span>🎓 पीईईओ / संस्था प्रधान</span> <strong id="dirCountPeeo">49</strong>
+            </div>
+            <div class="stat-pill" onclick="filterDirectoryType('STAFF')" id="pillStaff">
+              <span>👨‍🏫 पुरुष कार्मिक</span> <strong id="dirCountStaff">307</strong>
+            </div>
+            <div class="stat-pill" onclick="filterDirectoryType('CELL')" id="pillCell">
+              <span>🏢 प्रकोष्ठ</span> <strong id="dirCountCell">29</strong>
+            </div>
+            <div class="stat-pill" onclick="filterDirectoryType('OFFICER')" id="pillOfficer">
+              <span>⚖️ प्रशासनिक अधिकारी</span> <strong id="dirCountOfficer">4</strong>
+            </div>
+          </div>
+
+          <!-- Unified Search & Filter Toolbar -->
+          <div class="card p-3 mb-3" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+            <div class="d-flex gap-2 flex-wrap">
+              <div class="search-input-wrapper flex-1" style="min-width:240px;">
+                <input type="text" id="dirUnifiedSearchInput" class="form-input" placeholder="🔍 नाम, मोबाइल, स्कूल, पटवार मंडल, बूथ क्र. से खोजें..." oninput="filterDirectoryList()">
+              </div>
+              <select id="dirCategoryFilterSelect" class="form-select" style="max-width:240px; font-weight:700; color:#1e3a8a;" onchange="onDirCategorySelectChanged(this.value)">
+                <option value="ALL">🌟 समस्त संवर्ग (सभी 662 संपर्क)</option>
+                <option value="PATWARI">🏛️ पटवारी (Patwari - 49)</option>
+                <option value="SUPERVISOR">👮 सुपरवाइजर (Supervisor - 98)</option>
+                <option value="BLO">📍 बी.एल.ओ. (BLO / प्रगणक - 116 बूथ)</option>
+                <option value="PEEO">🎓 पीईईओ / संस्था प्रधान (PEEO - 49)</option>
+                <option value="STAFF">👨‍🏫 पुरुष कार्मिक (Staff - 307)</option>
+                <option value="CELL">🏢 चुनाव प्रकोष्ठ (Election Cell - 29)</option>
+                <option value="OFFICER">⚖️ प्रशासनिक अधिकारी (Officers - 4)</option>
+              </select>
+              <select id="dirGpBoothFilterSelect" class="form-select" style="max-width:260px; font-weight:700; color:#047857;" onchange="onDirGpBoothFilterChanged(this.value)">
+                <option value="ALL">🌍 समस्त पंचायतें व बूथ (All 30 Panchayats)</option>
+                <!-- Populated dynamically -->
+              </select>
+              <button type="button" class="btn btn-outline-secondary" onclick="clearDirectoryFilters()">रिफ्रेश</button>
+            </div>
+          </div>
+
+          <!-- Directory Cards / Table Container -->
+          <div id="directoryListContainer">
+            <!-- Dynamically populated contacts -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================
            TAB: DASHBOARD & STATS (ACTIVE HOMEPAGE)
            ============================================== -->
       <section id="dashboardTab" class="tab-pane active">
@@ -1254,6 +1347,23 @@
       </div>
 
       <div class="modal-body">
+        <!-- TOOLBAR: TOGGLE OFFICIAL VS CANDIDATE SLIP + SUPERADMIN CANDIDATE SELECTOR -->
+        <div id="voterSlipModalToolbar" class="no-print" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px; padding:8px 12px; background:#f1f5f9; border-radius:6px; border:1px solid #cbd5e1;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.8rem; font-weight:700; color:#1e293b;">पर्ची प्रारूप (Slip Format):</span>
+            <div class="btn-group btn-group-sm">
+              <button type="button" id="btnSlipModeOfficial" class="btn btn-xs btn-outline-primary" onclick="setSlipModalViewMode('official')" style="font-weight:700; padding:3px 10px;">📋 आधिकारिक पर्ची (Official)</button>
+              <button type="button" id="btnSlipModeCandidate" class="btn btn-xs btn-outline-primary active" onclick="setSlipModalViewMode('candidate')" style="font-weight:700; padding:3px 10px;">🗳️ प्रत्याशी प्रचार पर्ची (Candidate)</button>
+            </div>
+          </div>
+          <div id="superadminCandidatePickerWrap" style="display:none; align-items:center; gap:6px;">
+            <span style="font-size:0.75rem; font-weight:700; color:#475569;">प्रत्याशी चुनें:</span>
+            <select id="superadminCandidatePicker" class="form-select form-select-sm" onchange="onSuperadminCandidatePickerChanged(this.value)" style="font-size:0.75rem; font-weight:600; padding:2px 8px; border-radius:4px; max-width:240px;">
+              <!-- Populated dynamically with candidates -->
+            </select>
+          </div>
+        </div>
+
         <!-- THE ACTUAL PRINTABLE VOTER SLIP -->
         <div id="printableVoterSlip" class="official-voter-slip">
           <!-- Top Header -->
@@ -1393,9 +1503,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
         <span>पर्ची प्रिंट</span>
       </button>
-      <button class="bottom-nav-item" data-tab="candidateProfileTab" onclick="switchTab('candidateProfileTab')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span>प्रोफाइल</span>
+      <button class="bottom-nav-item" data-tab="directoryTab" onclick="switchTab('directoryTab')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
+        <span>नामावली</span>
       </button>
     </div>
   </nav>
@@ -1452,6 +1562,7 @@
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="searchTab" checked> 🔍 मतदाता खोज</label>
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="alphaTab"> 🔤 वर्णमाला सूची</label>
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="bulkSlipTab"> 🖨️ मतदाता पर्ची</label>
+            <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="directoryTab"> 📋 वार्डवार सूची</label>
             <label style="cursor:pointer;"><input type="checkbox" name="newUserTabs" value="candidateProfileTab"> 👤 प्रत्याशी प्रोफाइल</label>
           </div>
         </div>
@@ -1527,23 +1638,60 @@
           </div>
         </div>
 
-        <!-- ELECTION SYMBOL SELECTION & PREVIEW -->
+        <!-- ELECTION SYMBOL SELECTION & PREVIEW (SUPERADMIN FULL CONTROL: STANDARD + CUSTOM) -->
         <div class="card p-3 mt-3" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">
-          <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
             <label class="mb-0" style="font-weight:700; color:#1e293b;">🗳️ चुनाव चिन्ह (Election Symbol) *:</label>
-            <div id="adminCandSymbolBadge" style="display:flex; align-items:center; gap:6px; background:#eff6ff; padding:3px 8px; border-radius:6px; border:1px solid #bfdbfe;">
-              <span id="adminCandSymbolPreviewSvg" style="display:inline-flex; width:22px; height:22px;"></span>
+            <div id="adminCandSymbolBadge" style="display:flex; align-items:center; gap:6px; background:#eff6ff; padding:4px 10px; border-radius:6px; border:1.5px solid #3b82f6;">
+              <span id="adminCandSymbolPreviewSvg" style="display:inline-flex; width:26px; height:26px; align-items:center; justify-content:center;"></span>
               <span id="adminCandSymbolPreviewName" style="font-weight:800; font-size:0.85rem; color:#1e40af;">उगता सूरज</span>
             </div>
           </div>
-          <div class="row-2col">
-            <div class="form-group">
+
+          <!-- Mode Toggle: Standard vs Custom Symbol -->
+          <div class="d-flex gap-2 mb-2">
+            <button type="button" id="adminBtnSymbolStandard" class="btn btn-xs btn-outline-primary active" onclick="setAdminSymbolMode('standard')" style="font-weight:700;">
+              ⚡ 50+ अधिकृत चिन्ह (Standard)
+            </button>
+            <button type="button" id="adminBtnSymbolCustom" class="btn btn-xs btn-outline-primary" onclick="setAdminSymbolMode('custom')" style="font-weight:700;">
+              📁 कस्टम चुनाव चिन्ह (Custom Symbol)
+            </button>
+          </div>
+
+          <!-- Standard Symbol Section -->
+          <div id="adminStandardSymbolSection">
+            <div class="form-group mb-0">
               <select id="adminCandSymbol" class="form-select" style="font-weight:700;" onchange="onAdminCandSymbolChanged()">
-                <!-- Populated dynamically -->
+                <!-- Populated dynamically with official symbols -->
               </select>
             </div>
-            <div class="form-group">
-              <input type="text" id="adminCandCustomSymbol" class="form-input" placeholder="या अन्य चुनाव चिन्ह का नाम लिखें" oninput="onAdminCandCustomSymbolInput(this.value)">
+          </div>
+
+          <!-- Custom Symbol Section -->
+          <div id="adminCustomSymbolSection" style="display:none;">
+            <input type="hidden" id="adminCandCustomSymbolUrl">
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+              <!-- Thumbnail Box -->
+              <div id="adminCandCustomSymbolPreviewBox" style="width:52px; height:52px; border:1.5px dashed #3b82f6; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#ffffff; flex-shrink:0;">
+                <img id="adminCandCustomSymbolPreviewImg" src="" alt="Custom Symbol" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+                <span id="adminCandCustomSymbolPlaceholder" style="font-size:0.65rem; color:#94a3b8; text-align:center;">चिन्ह नहीं</span>
+              </div>
+              <div class="flex-1" style="min-width:200px;">
+                <div class="d-flex gap-2 align-items-center mb-1">
+                  <label for="adminCandCustomSymbolFile" class="btn btn-xs btn-primary" style="cursor:pointer; font-weight:700;">
+                    📁 कस्टम चिन्ह फाइल चुनें (PNG/JPG)
+                  </label>
+                  <input type="file" id="adminCandCustomSymbolFile" accept="image/*" style="display:none;" onchange="handleAdminCandCustomSymbolFile(event)">
+                  <button type="button" id="adminCandCustomSymbolRemoveBtn" class="btn btn-xs btn-outline-danger" onclick="clearAdminCandCustomSymbol()" style="display:none;">
+                    🗑️ हटाएं
+                  </button>
+                </div>
+                <small class="text-muted" style="font-size:0.7rem; display:block;">पारदर्शी PNG या JPG फाइल अपलोड करें (स्वचालित कंप्रेस होगी)</small>
+              </div>
+            </div>
+            <div class="form-group mb-0">
+              <label for="adminCandCustomSymbolName" style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:2px; display:block;">कस्टम चुनाव चिन्ह का नाम *:</label>
+              <input type="text" id="adminCandCustomSymbolName" class="form-input form-input-sm" placeholder="उदा. शेर, ट्रैक्टर, बल्ला, तराजू" oninput="onAdminCandCustomSymbolNameInput(this.value)" style="font-weight:700;">
             </div>
           </div>
         </div>
