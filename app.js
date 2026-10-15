@@ -3617,63 +3617,24 @@ function openVoterSlipModal(voter) {
   State.currentSlipVoter = voter;
 
   const u = State.currentUser;
-  const isSuperAdmin = u && (u.role === 'SUPER_ADMIN' || u.role === 'admin' || String(u.id || u.username || '').toLowerCase() === 'admin');
-  const isCandidate = u && (u.role === 'CANDIDATE' || u.type === 'CANDIDATE' || String(u.id || '').startsWith('cand_') || u.candidate_mode === 'user_edit');
+  const isCandidate = u && (u.role === 'CANDIDATE' || u.type === 'CANDIDATE' || String(u.id || '').startsWith('cand_') || u.candidate_mode === 'user_edit' || u.candidate_mode === 'active');
 
-  // Initialize view mode
-  if (isCandidate) {
-    State.slipModalViewMode = 'candidate';
-  } else if (isSuperAdmin) {
-    if (!State.slipModalViewMode) State.slipModalViewMode = 'candidate';
-  } else {
-    State.slipModalViewMode = 'official';
+  // Super Admin & non-candidates: toolbar is strictly hidden, print system is 100% original official slip
+  const toolbar = document.getElementById('voterSlipModalToolbar');
+  if (toolbar) {
+    toolbar.style.display = isCandidate ? 'flex' : 'none';
   }
 
-  // Populate and configure Superadmin candidate picker if Superadmin
   const pickerWrap = document.getElementById('superadminCandidatePickerWrap');
-  const picker = document.getElementById('superadminCandidatePicker');
-  if (pickerWrap && picker) {
-    if (isSuperAdmin) {
-      pickerWrap.style.display = (State.slipModalViewMode === 'candidate') ? 'flex' : 'none';
-      picker.innerHTML = '';
-      
-      const candsMap = (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) || {};
-      const candsList = Object.keys(candsMap).map(k => ({ id: k, ...candsMap[k] }));
-      (State.adminControlUsers || []).forEach(u => {
-        if (u.candidate && !candsList.some(c => (c.id === u.id || c.id === u.username))) {
-          candsList.push({ id: u.id || u.username, ...u.candidate });
-        }
-      });
+  if (pickerWrap) pickerWrap.style.display = 'none';
 
-      // Add options
-      let matchedCandId = null;
-      candsList.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id || c.user_id;
-        const sym = c.symbol_name ? ` [चिन्ह: ${c.symbol_name}]` : '';
-        opt.textContent = `${c.candidate_name || c.id} (${c.panchayat || ''})${sym}`;
-        if (c.panchayat && voter.gram_panchayat && String(c.panchayat).trim().toLowerCase() === String(voter.gram_panchayat).trim().toLowerCase()) {
-          matchedCandId = opt.value;
-        }
-        picker.appendChild(opt);
-      });
-
-      if (matchedCandId) {
-        picker.value = matchedCandId;
-        State.superadminSelectedCandidateId = matchedCandId;
-      } else if (picker.options.length > 0) {
-        State.superadminSelectedCandidateId = picker.value;
-      }
-    } else {
-      pickerWrap.style.display = 'none';
-    }
+  if (isCandidate) {
+    State.slipModalViewMode = State.slipModalViewMode || 'candidate';
+    const btnOff = document.getElementById('btnSlipModeOfficial');
+    const btnCand = document.getElementById('btnSlipModeCandidate');
+    if (btnOff) btnOff.classList.toggle('active', State.slipModalViewMode === 'official');
+    if (btnCand) btnCand.classList.toggle('active', State.slipModalViewMode === 'candidate');
   }
-
-  // Update button active states in toolbar
-  const btnOff = document.getElementById('btnSlipModeOfficial');
-  const btnCand = document.getElementById('btnSlipModeCandidate');
-  if (btnOff) btnOff.classList.toggle('active', State.slipModalViewMode === 'official');
-  if (btnCand) btnCand.classList.toggle('active', State.slipModalViewMode === 'candidate');
 
   // Render modal slip content
   renderModalCandidateSlip(voter);
@@ -3687,32 +3648,21 @@ function renderModalCandidateSlip(voter) {
   if (!container) return;
 
   const u = State.currentUser;
-  const isSuperAdmin = u && (u.role === 'SUPER_ADMIN' || u.role === 'admin' || String(u.id || u.username || '').toLowerCase() === 'admin');
-  const isCandidate = u && (u.role === 'CANDIDATE' || u.type === 'CANDIDATE' || String(u.id || '').startsWith('cand_') || u.candidate_mode === 'user_edit');
+  const isCandidate = u && (u.role === 'CANDIDATE' || u.type === 'CANDIDATE' || String(u.id || '').startsWith('cand_') || u.candidate_mode === 'user_edit' || u.candidate_mode === 'active');
 
-  // Determine if candidate slip should be shown
-  let showCandidateSlip = false;
-  if (isSuperAdmin) {
-    showCandidateSlip = (State.slipModalViewMode === 'candidate');
-  } else if (isCandidate) {
-    showCandidateSlip = (State.slipModalViewMode !== 'official') && isCandidateSlipAllowedForVoter(voter);
+  // SUPER ADMIN & NON-CANDIDATES: ALWAYS get the original official slip (print system untouched)
+  if (!isCandidate) {
+    container.innerHTML = `
+      <div style="max-width: 440px; margin: 0 auto; box-shadow: 0 4px 14px rgba(0,0,0,0.12); border-radius: 4px;">
+        ${buildExactOfficialSlipInnerHtml(voter)}
+      </div>
+    `;
+    return;
   }
 
-  if (showCandidateSlip) {
-    // Resolve candidate
-    let cand = null;
-    if (isSuperAdmin) {
-      const picker = document.getElementById('superadminCandidatePicker');
-      const selectedId = (picker && picker.value) ? picker.value : State.superadminSelectedCandidateId;
-      if (selectedId && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates && window.PORTAL_USERS_DATA.candidates[selectedId]) {
-        cand = window.PORTAL_USERS_DATA.candidates[selectedId];
-      } else {
-        cand = findCandidateForVoter(voter);
-      }
-    } else {
-      cand = State.currentCandidate || findCandidateForVoter(voter);
-    }
-
+  // CANDIDATE LOGIN: Show candidate slip with custom symbol and campaign appeal if permitted
+  if (isCandidate && (State.slipModalViewMode !== 'official') && isCandidateSlipAllowedForVoter(voter)) {
+    const cand = State.currentCandidate || findCandidateForVoter(voter);
     if (cand && (cand.show_banner_on_slip !== false)) {
       const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
       const customUrl = cand.custom_symbol_url || cand.custom_symbol || cand.symbol_url;
@@ -3739,7 +3689,7 @@ function renderModalCandidateSlip(voter) {
     }
   }
 
-  // Exact Image 2 official format for modal preview as well
+  // Fallback to official slip for candidate if outside panchayat or official mode selected
   container.innerHTML = `
     <div style="max-width: 440px; margin: 0 auto; box-shadow: 0 4px 14px rgba(0,0,0,0.12); border-radius: 4px;">
       ${buildExactOfficialSlipInnerHtml(voter)}
@@ -6248,23 +6198,16 @@ window.buildOfficialSlipHtml = function(voter, layout, theme) {
   }
 
   const u = State.currentUser;
-  const isSuperAdmin = u && (u.role === 'SUPER_ADMIN' || u.role === 'admin' || String(u.id || u.username || '').toLowerCase() === 'admin');
-  const isCandidate = u && (u.role === 'CANDIDATE' || u.type === 'CANDIDATE' || String(u.id || '').startsWith('cand_') || u.candidate_mode === 'user_edit');
+  const isCandidate = u && (u.role === 'CANDIDATE' || u.type === 'CANDIDATE' || String(u.id || '').startsWith('cand_') || u.candidate_mode === 'user_edit' || u.candidate_mode === 'active');
 
-  let showCandidateSlip = false;
-  if (isSuperAdmin) {
-    showCandidateSlip = (State.slipModalViewMode === 'candidate');
-  } else if (isCandidate) {
-    showCandidateSlip = isCandidateSlipAllowedForVoter(voter);
+  // SUPER ADMIN & NON-CANDIDATES: ALWAYS get the original official slip (print system untouched)
+  if (!isCandidate) {
+    return buildExactOfficialSlipInnerHtml(voter);
   }
 
-  if (showCandidateSlip) {
-    let cand = null;
-    if (isSuperAdmin && State.superadminSelectedCandidateId && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
-      cand = window.PORTAL_USERS_DATA.candidates[State.superadminSelectedCandidateId];
-    }
-    if (!cand) cand = State.currentCandidate || findCandidateForVoter(voter);
-
+  // CANDIDATE LOGIN: Candidate detachable campaign slip
+  if (isCandidate && isCandidateSlipAllowedForVoter(voter)) {
+    const cand = State.currentCandidate || findCandidateForVoter(voter);
     if (cand && (cand.show_banner_on_slip !== false)) {
       const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
       const customUrl = cand.custom_symbol_url || cand.custom_symbol || cand.symbol_url;
@@ -6291,7 +6234,6 @@ window.buildOfficialSlipHtml = function(voter, layout, theme) {
     }
   }
 
-  // All other cases get the exact official Image 2 pattern
   return buildExactOfficialSlipInnerHtml(voter);
 };
 
@@ -7055,7 +6997,7 @@ function onAdminCandSymbolChanged() {
   updateAdminCandSymbolPreview();
 }
 
-function openAdminCandidateModal(userId) {
+async function openAdminCandidateModal(userId) {
   const u = (State.adminControlUsers || []).find(x => (x.id || x.username) === userId) || { id: userId, username: userId };
 
   const titleEl = document.getElementById('adminCandidateModalUserTitle');
@@ -7090,7 +7032,18 @@ function openAdminCandidateModal(userId) {
     });
   }
 
+  // Fetch freshest candidate profile from server API for 100% sync
   let cand = u.candidate;
+  try {
+    const res = await fetch('/api/candidate/' + encodeURIComponent(userId));
+    if (res.ok) {
+      const d = await res.json();
+      if (d && d.candidate && d.candidate.candidate_name) {
+        cand = { ...(cand || {}), ...d.candidate };
+        u.candidate = cand;
+      }
+    }
+  } catch(e) {}
   if (!cand && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
     cand = window.PORTAL_USERS_DATA.candidates[userId] || window.PORTAL_USERS_DATA.candidates[u.username];
   }
@@ -7257,12 +7210,20 @@ async function handleAdminSaveCandidate(event) {
     u.candidate = candData;
   }
 
-  // 2. Update in window.PORTAL_USERS_DATA.candidates
+  // 2. Update in window.PORTAL_USERS_DATA.candidates (both with and without cand_ prefix)
   if (!window.PORTAL_USERS_DATA) window.PORTAL_USERS_DATA = { users: [], candidates: {} };
   if (!window.PORTAL_USERS_DATA.candidates) window.PORTAL_USERS_DATA.candidates = {};
+  const altId = userId.startsWith('cand_') ? userId.replace('cand_', '') : ('cand_' + userId);
   window.PORTAL_USERS_DATA.candidates[userId] = candData;
-  if (u && u.username) window.PORTAL_USERS_DATA.candidates[u.username] = candData;
-  if (u && u.id) window.PORTAL_USERS_DATA.candidates[u.id] = candData;
+  window.PORTAL_USERS_DATA.candidates[altId] = candData;
+  if (u && u.username) {
+    window.PORTAL_USERS_DATA.candidates[u.username] = candData;
+    window.PORTAL_USERS_DATA.candidates['cand_' + u.username] = candData;
+  }
+  if (u && u.id) {
+    window.PORTAL_USERS_DATA.candidates[u.id] = candData;
+    window.PORTAL_USERS_DATA.candidates[u.id.replace('cand_', '')] = candData;
+  }
 
   // 3. Save to localStorage
   try {
