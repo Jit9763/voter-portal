@@ -1,34 +1,64 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <script id="autoLiveUpdater">
-  // AUTOMATIC ZERO-CACHE LIVE AUTO-UPDATER
-  // Periodically polls portal_users.json; when any change/sync is detected, reloads automatically without hard refresh!
-  (function() {
-    let lastVer = null;
-    async function checkAutoUpdate() {
+    <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261016_005820";</script>
+  <script>
+    // Instant Session Persistence: Prevent login screen flicker on refresh
+    (function() {
       try {
-        const r = await fetch('portal_users.json?_nocache=' + Date.now(), { cache: 'no-store' });
-        if (r.ok) {
-          const d = await r.json();
-          const ver = d.last_updated;
-          if (lastVer && ver && lastVer !== ver) {
-            console.log('[AUTO-UPDATER] Portal updated to', ver, '- reloading page automatically...');
-            window.location.reload();
+        var pt = window.PORTAL_TYPE || (location.pathname.includes('blo') ? 'blo' : (location.pathname.includes('voter') ? 'voter' : 'pan'));
+        var sk = 'portal_session_' + pt;
+        var s = localStorage.getItem(sk) || localStorage.getItem('panchayat_user_session');
+        if (s) {
+          var u = JSON.parse(s);
+          if (u && (u.username || u.id)) {
+            document.documentElement.classList.add('user-logged-in');
           }
-          lastVer = ver;
+        }
+      } catch(e) {}
+    })();
+  </script>
+  <style>
+    /* Prevent login screen bounce on reload */
+    html.user-logged-in #welcomeGatekeeper { display: none !important; }
+    html.user-logged-in #mainPortalApp { display: block !important; }
+  </style>
+
+  <script id="autoLiveUpdater">
+  // DEDICATED GITHUB DEPLOYMENT DETECTOR (NO LOOPING / NO LOGIN FLICKER)
+  // Only updates when a new build is pushed to GitHub via PUSH_PORTAL.bat!
+  (function() {
+    var currentVer = window.PORTAL_DEPLOY_VERSION || null;
+
+    async function checkDeploymentUpdate() {
+      try {
+        var r = await fetch('version.json?_t=' + Date.now(), { cache: 'no-store' });
+        if (r.ok) {
+          var d = await r.json();
+          var remoteVer = d.deploy_version || d.v;
+          if (currentVer && remoteVer && currentVer !== remoteVer) {
+            console.log('[DEPLOY-SYNC] New GitHub deployment detected (' + remoteVer + '). Applying updates seamlessly...');
+            var tag = (document.activeElement && document.activeElement.tagName) || '';
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+              console.log('[DEPLOY-SYNC] Input active, delaying update...');
+              return;
+            }
+            window.location.reload();
+          } else if (!currentVer && remoteVer) {
+            currentVer = remoteVer;
+          }
         }
       } catch(e) {}
     }
-    checkAutoUpdate();
-    setInterval(checkAutoUpdate, 6000);
-    window.addEventListener('focus', checkAutoUpdate);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') checkAutoUpdate();
+
+    // Check periodically at 60s and when returning to the tab
+    setInterval(checkDeploymentUpdate, 60000);
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') checkDeploymentUpdate();
     });
+    window.addEventListener('focus', checkDeploymentUpdate);
   })();
-</script>
-  <script>window.PORTAL_TYPE = "pan";</script>
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -39,7 +69,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1792091823419">
+  <link rel="stylesheet" href="styles.css?v=20261016_005820">
 </head>
 <body>
 
@@ -1929,10 +1959,10 @@
   <div id="toastContainer" class="toast-container no-print"></div>
 
   <!-- Scripts -->
-    <script src="symbols_master.js?v=20261005_2300"></script>
-  <script src="master_directory.js?v=1791547927"></script>
+    <script src="symbols_master.js?v=20261016_005820"></script>
+  <script src="master_directory.js?v=20261016_005820"></script>
   <script src="master_data.js?v=1791547927"></script>
-  <script src="app.js?v=1792091823419"></script>
+  <script src="app.js?v=20261016_005820"></script>
 
   <!-- Super Admin: Add New User Modal -->
   <div id="addUserModal" class="modal-overlay no-print" style="display:none;" onclick="if(event.target===this) closeAddUserModal()">

@@ -227,9 +227,8 @@ function exportToJson() {
         } catch(_) {}
       }
     });
-    if (typeof scheduleAutoPushToGithub === 'function') {
-      scheduleAutoPushToGithub('database_json_export');
-    }
+    // User requested: Only push when PUSH_PORTAL.bat is explicitly run!
+    // if (typeof scheduleAutoPushToGithub === 'function') { scheduleAutoPushToGithub('database_json_export'); }
   } catch (err) {
     console.error('JSON export error:', err);
   }
