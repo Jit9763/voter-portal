@@ -18248,12 +18248,12 @@
       "sub_tehsil": "बांदनवाड़ा",
       "ilr_circle": "बांदनवाड़ा",
       "panchayats": [
-        "कीटाप"
+        "कुम्हारिया"
       ],
-      "panchayat": "कीटाप",
-      "panchayat_str": "कीटाप",
+      "panchayat": "कुम्हारिया",
+      "panchayat_str": "कुम्हारिया",
       "villages": [],
-      "area_display": "प.मं. कीटाप (ग्राम: कीटाप)",
+      "area_display": "प.मं. कीटाप (कुम्हारिया)",
       "category": "PATWARI",
       "can_login": false,
       "username": "patwari_36"
@@ -18509,17 +18509,17 @@
       "role": "पटवारी",
       "charge": "मूल",
       "designation": "पटवारी (मूल)",
-      "patwar_mandal": "पड़ांगा",
-      "school_office": "पटवार मंडल पड़ांगा",
+      "patwar_mandal": "पड़ांगा",
+      "school_office": "पटवार मंडल पड़ांगा",
       "sub_tehsil": "बांदनवाड़ा",
       "ilr_circle": "सिंगावल",
       "panchayats": [
-        "पड़ांगा"
+        "पड़ांगा"
       ],
-      "panchayat": "पड़ांगा",
-      "panchayat_str": "पड़ांगा",
+      "panchayat": "पड़ांगा",
+      "panchayat_str": "पड़ांगा",
       "villages": [],
-      "area_display": "प.मं. पड़ांगा (ग्राम: पड़ांगा)",
+      "area_display": "प.मं. पड़ांगा (ग्राम: पड़ांगा)",
       "category": "PATWARI",
       "can_login": false,
       "username": "patwari_47"
@@ -19610,12 +19610,12 @@
       "sub_tehsil": "बांदनवाड़ा",
       "ilr_circle": "बांदनवाड़ा",
       "panchayats": [
-        "कीटाप"
+        "कुम्हारिया"
       ],
-      "panchayat": "कीटाप",
-      "panchayat_str": "कीटाप",
+      "panchayat": "कुम्हारिया",
+      "panchayat_str": "कुम्हारिया",
       "villages": [],
-      "area_display": "प.मं. कीटाप (ग्राम: कीटाप)",
+      "area_display": "प.मं. कीटाप (कुम्हारिया)",
       "category": "PATWARI",
       "can_login": false,
       "username": "patwari_36"
@@ -19871,17 +19871,17 @@
       "role": "पटवारी",
       "charge": "मूल",
       "designation": "पटवारी (मूल)",
-      "patwar_mandal": "पड़ांगा",
-      "school_office": "पटवार मंडल पड़ांगा",
+      "patwar_mandal": "पड़ांगा",
+      "school_office": "पटवार मंडल पड़ांगा",
       "sub_tehsil": "बांदनवाड़ा",
       "ilr_circle": "सिंगावल",
       "panchayats": [
-        "पड़ांगा"
+        "पड़ांगा"
       ],
-      "panchayat": "पड़ांगा",
-      "panchayat_str": "पड़ांगा",
+      "panchayat": "पड़ांगा",
+      "panchayat_str": "पड़ांगा",
       "villages": [],
-      "area_display": "प.मं. पड़ांगा (ग्राम: पड़ांगा)",
+      "area_display": "प.मं. पड़ांगा (ग्राम: पड़ांगा)",
       "category": "PATWARI",
       "can_login": false,
       "username": "patwari_47"

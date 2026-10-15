@@ -7098,12 +7098,14 @@ function renderDirectoryList() {
   }
 
   if (selectedGpName) {
+    const normGp = (selectedGpName || '').normalize('NFC').trim();
     contacts = contacts.filter(c => {
-      if (c.panchayat === selectedGpName) return true;
-      if (c.panchayats && c.panchayats.includes(selectedGpName)) return true;
-      if (c.school_office && c.school_office.includes(selectedGpName)) return true;
-      if (c.area_display && c.area_display.includes(selectedGpName)) return true;
-      if (c.patwar_mandal && c.patwar_mandal.includes(selectedGpName)) return true;
+      const cP = (c.panchayat || '').normalize('NFC').trim();
+      if (cP === normGp) return true;
+      if (c.panchayats && c.panchayats.some(p => (p || '').normalize('NFC').trim() === normGp)) return true;
+      if (c.school_office && c.school_office.normalize('NFC').includes(normGp)) return true;
+      if (c.area_display && c.area_display.normalize('NFC').includes(normGp)) return true;
+      if (c.patwar_mandal && c.patwar_mandal.normalize('NFC').includes(normGp)) return true;
       // Booth specific match if booth filter
       if (selectedBoothNo && c.booth_no && String(c.booth_no) === String(selectedBoothNo)) return true;
       return false;
