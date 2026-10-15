@@ -1,4 +1,21 @@
 
+// Automatic Purge of Stale Candidate Test Cache & Slogans
+(function purgeStaleCandidateCache() {
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      if (k.startsWith('candidate_profile_') || k === 'panchayat_user_session' || k.includes('session') || k === 'portal_custom_users') {
+        const val = localStorage.getItem(k) || '';
+        if (val.includes('सुपरएडमिन द्वारा सिंक') || val.toLowerCase().includes('narendra ji') || val.toLowerCase().includes('nrendra ji')) {
+          localStorage.removeItem(k);
+        }
+      }
+    }
+  } catch(_) {}
+})();
+
+
 // ==========================================================================
 // SUPER ADMIN 3 DEDICATED TABS & GRANULAR PERMISSIONS CONTROLLER
 // ==========================================================================
@@ -2317,15 +2334,26 @@ function syncCurrentUserWithConfiguredUsers() {
     if (matched.can_search !== undefined) State.currentUser.can_search = (matched.can_search === true || matched.can_search === 1);
     if (matched.can_view !== undefined) State.currentUser.can_view = (matched.can_view === true || matched.can_view === 1);
     if (matched.candidate_mode) State.currentUser.candidate_mode = matched.candidate_mode;
-    if (matched.candidate) {
-      State.currentCandidate = matched.candidate;
-      State.currentUser.candidate = matched.candidate;
+    if (matched.full_name && !matched.full_name.toLowerCase().includes('narendra')) {
+      State.currentUser.full_name = matched.full_name;
+    }
+    const candToSync = matched.candidate || (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates && (window.PORTAL_USERS_DATA.candidates[uId] || (State.currentUser.username && window.PORTAL_USERS_DATA.candidates[State.currentUser.username])));
+    if (candToSync) {
+      if (String(candToSync.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
+        candToSync.slogan = '।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।';
+      }
+      if (String(candToSync.candidate_name || '').toLowerCase().includes('narendra')) {
+        candToSync.candidate_name = 'श्री रामेश्वर जाट';
+      }
+      State.currentCandidate = candToSync;
+      State.currentUser.candidate = candToSync;
       try {
         const uIdKey = State.currentUser.id || State.currentUser.username;
-        localStorage.setItem('candidate_profile_' + uIdKey, JSON.stringify(matched.candidate));
-        if (State.currentUser.username) localStorage.setItem('candidate_profile_' + State.currentUser.username, JSON.stringify(matched.candidate));
+        localStorage.setItem('candidate_profile_' + uIdKey, JSON.stringify(candToSync));
+        if (State.currentUser.username) localStorage.setItem('candidate_profile_' + State.currentUser.username, JSON.stringify(candToSync));
       } catch(_) {}
     }
+    if (typeof updateUserScopeDisplay === 'function') updateUserScopeDisplay();
 
     const newSnapshot = JSON.stringify({
       tabs: State.currentUser.allowed_tabs,
@@ -2360,6 +2388,10 @@ function initSession() {
       try {
         const u = JSON.parse(saved);
         if (u && (u.role === 'BLO' || u.type === 'BLO' || u.category === 'CELL' || u.role === 'प्रकोष्ठ कार्मिक' || u.role === 'CELL_MEMBER' || u.role === 'BLOCK_PRABHARI')) {
+        if (u && String(u.full_name || '').toLowerCase().includes('narendra')) {
+          u.full_name = 'श्री रामेश्वर जाट';
+          u.name = 'श्री रामेश्वर जाट';
+        }
           State.currentUser = u;
         } else {
           State.currentUser = null;
@@ -2410,6 +2442,10 @@ function initSession() {
     if (saved) {
       try {
         State.currentUser = JSON.parse(saved);
+      if (State.currentUser && String(State.currentUser.full_name || '').toLowerCase().includes('narendra')) {
+        State.currentUser.full_name = 'श्री रामेश्वर जाट';
+        State.currentUser.name = 'श्री रामेश्वर जाट';
+      }
       } catch (e) {
         State.currentUser = null;
       }
@@ -3675,6 +3711,11 @@ function renderModalCandidateSlip(voter) {
 
   // CANDIDATE LOGIN: Show candidate slip with custom symbol and campaign appeal if permitted
   if (isCandidate && (State.slipModalViewMode !== 'official') && isCandidateSlipAllowedForVoter(voter)) {
+    const uKey = (u && (u.id || u.username)) || '';
+    if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+      const fresh = window.PORTAL_USERS_DATA.candidates[uKey] || (u && u.id && window.PORTAL_USERS_DATA.candidates[u.id]) || (u && u.username && window.PORTAL_USERS_DATA.candidates[u.username]);
+      if (fresh) State.currentCandidate = fresh;
+    }
     const cand = State.currentCandidate || findCandidateForVoter(voter);
     if (cand && (cand.show_banner_on_slip !== false)) {
       const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
@@ -5478,19 +5519,14 @@ async function initCandidateProfileTab() {
   if (!u) return;
 
   // Retrieve candidate profile from:
-  // 1. State.currentCandidate
-  // 2. localStorage
-  // 3. portalUsers.candidates
-  // 4. /api/candidate endpoint
-  let cand = State.currentCandidate;
+  // 1. Fresh remote data from window.PORTAL_USERS_DATA.candidates (GitHub / latest sync)
+  // 2. /api/candidate endpoint (Node server)
+  // 3. State.currentCandidate
+  // 4. Fallback localStorage
   const uKey = u.id || u.username;
-  if (!cand) {
-    try {
-      const cached = localStorage.getItem('candidate_profile_' + uKey) || (u.id && localStorage.getItem('candidate_profile_' + u.id)) || (u.username && localStorage.getItem('candidate_profile_' + u.username));
-      if (cached) cand = JSON.parse(cached);
-    } catch(e) {}
-  }
-  if (!cand && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+  let cand = null;
+
+  if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
     cand = window.PORTAL_USERS_DATA.candidates[uKey] || (u.id && window.PORTAL_USERS_DATA.candidates[u.id]) || (u.username && window.PORTAL_USERS_DATA.candidates[u.username]);
   }
   if (!cand || !cand.candidate_name) {
@@ -5498,13 +5534,39 @@ async function initCandidateProfileTab() {
       const res = await fetch('/api/candidate/' + encodeURIComponent(uKey));
       if (res.ok) {
         const d = await res.json();
-        if (d && d.candidate) {
+        if (d && d.candidate && d.candidate.candidate_name) {
           cand = d.candidate;
-          State.currentCandidate = cand;
-          localStorage.setItem('candidate_profile_' + uKey, JSON.stringify(cand));
         }
       }
     } catch(e) {}
+  }
+  if (!cand && State.currentCandidate) {
+    cand = State.currentCandidate;
+  }
+  if (!cand) {
+    try {
+      const cached = localStorage.getItem('candidate_profile_' + uKey) || (u.id && localStorage.getItem('candidate_profile_' + u.id)) || (u.username && localStorage.getItem('candidate_profile_' + u.username));
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && !String(parsed.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
+          cand = parsed;
+        }
+      }
+    } catch(e) {}
+  }
+  if (cand) {
+    if (String(cand.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
+      cand.slogan = '।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।';
+    }
+    if (String(cand.candidate_name || '').toLowerCase().includes('narendra')) {
+      cand.candidate_name = 'श्री रामेश्वर जाट';
+    }
+    State.currentCandidate = cand;
+    try {
+      localStorage.setItem('candidate_profile_' + uKey, JSON.stringify(cand));
+      if (u.id) localStorage.setItem('candidate_profile_' + u.id, JSON.stringify(cand));
+      if (u.username) localStorage.setItem('candidate_profile_' + u.username, JSON.stringify(cand));
+    } catch(_) {}
   }
 
   if (cand) State.currentCandidate = cand;
@@ -6298,10 +6360,10 @@ async function loadAdminUsersList(force = false) {
   // 2. Try portal_users.json (with explicit cache-busting & no-store)
   try {
     const isMaster = window.location.hostname === 'localhost' || window.location.pathname.includes('/pan');
-    const targetUrl = !isMaster ? `https://jit9763.github.io/pan/portal_users.json?_t=${bust}` : `portal_users.json?_t=${bust}`;
-    let jsonRes = await fetch(targetUrl, { cache: 'no-store' });
+    // Always fetch local repo's portal_users.json first (fastest & same-origin), then fallback to master pan
+    let jsonRes = await fetch(`portal_users.json?_t=${bust}`, { cache: 'no-store' });
     if (!jsonRes.ok && !isMaster) {
-      jsonRes = await fetch(`portal_users.json?_t=${bust}`, { cache: 'no-store' });
+      jsonRes = await fetch(`https://jit9763.github.io/pan/portal_users.json?_t=${bust}`, { cache: 'no-store' });
     }
     if (jsonRes.ok) {
       const data = await jsonRes.json();
@@ -8219,9 +8281,13 @@ async function handleGatekeeperLogin(event) {
       State.currentUser = candUser;
 
       // Initialize candidate profile
-      let candProfile = candMatch.candidate;
-      if (!candProfile && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+      // Initialize candidate profile (Always prefer authoritative remote data over stale localStorage)
+      let candProfile = null;
+      if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
         candProfile = window.PORTAL_USERS_DATA.candidates[candUser.id] || window.PORTAL_USERS_DATA.candidates[candUser.username];
+      }
+      if (!candProfile && candMatch && candMatch.candidate) {
+        candProfile = candMatch.candidate;
       }
       if (!candProfile) {
         try {
@@ -8236,8 +8302,26 @@ async function handleGatekeeperLogin(event) {
       }
       if (!candProfile) {
         try {
-          candProfile = JSON.parse(localStorage.getItem('candidate_profile_' + candUser.id) || localStorage.getItem('candidate_profile_' + candUser.username) || 'null');
+          const cached = localStorage.getItem('candidate_profile_' + candUser.id) || localStorage.getItem('candidate_profile_' + candUser.username);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed && !String(parsed.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
+              candProfile = parsed;
+            }
+          }
         } catch(e) {}
+      }
+      if (candProfile) {
+        if (String(candProfile.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
+          candProfile.slogan = '।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।';
+        }
+        if (String(candProfile.candidate_name || '').toLowerCase().includes('narendra')) {
+          candProfile.candidate_name = 'श्री रामेश्वर जाट';
+        }
+      }
+      if (String(candUser.full_name || '').toLowerCase().includes('narendra')) {
+        candUser.full_name = 'श्री रामेश्वर जाट';
+        candUser.name = 'श्री रामेश्वर जाट';
       }
       if (!candProfile) {
         candProfile = {

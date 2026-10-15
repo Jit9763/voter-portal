@@ -1,12 +1,12 @@
 {
   "version": "2.0.0",
-  "last_updated": "2026-10-15T15:29:05.886Z",
+  "last_updated": "2026-10-15T15:50:47Z",
   "users": [
     {
       "id": "cand_sarpanch",
       "username": "sarpanch",
       "password": "bhinai2026",
-      "full_name": "श्री रामेश्वर जाट (परीक्षण)",
+      "full_name": "श्री रामेश्वर जाट",
       "mobile": "9876543210",
       "role": "CANDIDATE",
       "status": "ACTIVE",
@@ -20,11 +20,27 @@
       ],
       "candidate_mode": "user_edit",
       "created_at": "2026-10-15T15:24:22.691Z",
-      "updated_at": "2026-10-15T15:24:22.691Z",
+      "updated_at": "2026-10-15T15:45:00.000Z",
       "can_print": true,
       "can_download": true,
       "can_search": true,
-      "can_view": true
+      "can_view": true,
+      "candidate": {
+        "candidate_name": "श्री रामेश्वर जाट",
+        "post": "सरपंच",
+        "panchayat": "बूबकिया",
+        "ward": "3",
+        "election_date": "15 अक्टूबर 2026",
+        "election_time": "प्रातः 7:00 बजे से सायं 5:00 बजे तक",
+        "symbol_name": "hath",
+        "symbol_icon": "custom",
+        "custom_symbol_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABjCAYAAAClp41/AAADTUlEQVR4AezTS2rrUBAE0JD97/k9sCcGgVH0uerqPhmY4Ohz61Tq958fAgRiBX5//BAgECtgwLHVOTiBnx8D9l9AIFhg8oCDa3N0Am8BA347+CQQKWDAkbU5NIG3gAG/HXwSiBQw4MjaTh/aA5oIGHCTIsWYKWDAM3uXuomAATcpUoyZAgY8s/fJqVtlN+BWdQozTcCApzUubysBA25VpzDTBAx4WuPythL444BbZReGQLyAAcdXKMBkAQOe3L7s8QIGHF+hAJMFDHh3+y4kUE/AgOt14kQEdgsY8G4qFxKoJ2DA9TpxIgK7BQx4N9XkC2WvKmDAVZtxLgI7BAx4B5JLCFQVMOCqzTgXgR0CBrwDySWTBWpnN+Da/Tgdga8CBvyVxx8J1BYw4Nr9OB2BrwIG/JXHHwnUFrh3wLWzOx2BeAEDjq9QgMkCBjy5fdnjBQw4vkIBJgsY8F3tey6BBQIGvADZKwjcJWDAd8l6LoEFAga8ANkrCNwlYMB3yU5+ruzLBAx4GbUXEbhewICvN/VEAssEDHgZtRcRuF7AgK839cTJAouzG/BicK8jcKWAAV+p6VkEFgsY8GJwryNwpYABX6npWQQWC5Qa8OLsXkcgXsCA4ysUYLKAAU9uX/Z4AQOOr1CAyQIGXKR9xyBwRMCAj6i5h0ARAQMuUoRjEDgiYMBH1NxDoIiAARcpYvIxZD8uYMDH7dxJ4HEBA368AgcgcFzAgI/buZPA4wIG/HgFDjBZ4Gx2Az4r6H4CDwoY8IP4Xk3grIABnxV0P4EHBQz4QXyvJnBWIHnAZ7O7n0C8gAHHVyjAZAEDnty+7PECBhxfoQCTBQw4s32nJvASMOAXgw8CmQIGnNmbUxN4CRjwi8EHgUwBA87sbfKpZf8QMOAPDL8SSBMw4LTGnJfAh4ABf2D4lUCagAGnNea8kwU22Q14Q+ILAjkCBpzTlZMS2AgY8IbEFwRyBAw4pysnJbARGDTgTXZfEIgXMOD4CgWYLGDAk9uXPV7AgOMrFGCygAGPaF/IrgIG3LVZuUYIGPCImoXsKmDAXZuVa4SAAY+oeXLI3tkNuHe/0jUXMODmBYvXW8CAe/crXXMBA25esHi9Bb4PuHd26QjEC/wHAAD//8Ooqq4AAAAGSURBVAMAYP29NECHWK4AAAAASUVORK5CYII=",
+        "photo_url": "",
+        "slogan": "।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।",
+        "mobile": "9876543210",
+        "show_banner_on_slip": true,
+        "updated_at": "2026-10-15T15:45:00.000Z"
+      }
     },
     {
       "id": "admin",
@@ -4027,7 +4043,23 @@
       "can_print": true,
       "can_download": true,
       "can_search": true,
-      "can_view": true
+      "can_view": true,
+      "candidate": {
+        "candidate_name": "सुरेश कुमार गुर्जर",
+        "post": "सरपंच",
+        "panchayat": "बूबकिया",
+        "ward": "3",
+        "election_date": "15 अक्टूबर 2026",
+        "election_time": "प्रातः 7:00 बजे से सायं 5:00 बजे तक",
+        "symbol_name": "उगता सूरज",
+        "symbol_icon": "sun",
+        "custom_symbol_url": "",
+        "photo_url": "",
+        "slogan": "विकास ही संकल्प",
+        "mobile": "9829012345",
+        "show_banner_on_slip": true,
+        "updated_at": "2026-10-15T15:04:33.308Z"
+      }
     },
     {
       "id": "cand_gp02",
@@ -4657,12 +4689,28 @@
       "can_print": true,
       "can_download": true,
       "can_search": true,
-      "can_view": true
+      "can_view": true,
+      "candidate": {
+        "candidate_name": "प्रत्याशी kk",
+        "post": "सरपंच",
+        "panchayat": "बड़गांव",
+        "ward": "",
+        "election_date": "15 अक्टूबर 2026",
+        "election_time": "प्रातः 7:00 बजे से सायं 5:00 बजे तक",
+        "symbol_name": "उगता सूरज",
+        "symbol_icon": "sun",
+        "custom_symbol_url": "",
+        "photo_url": "https://api.dicebear.com/7.x/identicon/svg?seed=kk",
+        "slogan": "अपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।",
+        "mobile": "",
+        "show_banner_on_slip": true,
+        "updated_at": "2026-10-13T07:19:51.159Z"
+      }
     }
   ],
   "candidates": {
     "cand_sarpanch": {
-      "candidate_name": "श्री रामेश्वर जाट (परीक्षण)",
+      "candidate_name": "श्री रामेश्वर जाट",
       "post": "सरपंच",
       "panchayat": "बूबकिया",
       "ward": "3",
@@ -4672,13 +4720,13 @@
       "symbol_icon": "custom",
       "custom_symbol_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABjCAYAAAClp41/AAADTUlEQVR4AezTS2rrUBAE0JD97/k9sCcGgVH0uerqPhmY4Ohz61Tq958fAgRiBX5//BAgECtgwLHVOTiBnx8D9l9AIFhg8oCDa3N0Am8BA347+CQQKWDAkbU5NIG3gAG/HXwSiBQw4MjaTh/aA5oIGHCTIsWYKWDAM3uXuomAATcpUoyZAgY8s/fJqVtlN+BWdQozTcCApzUubysBA25VpzDTBAx4WuPythL444BbZReGQLyAAcdXKMBkAQOe3L7s8QIGHF+hAJMFDHh3+y4kUE/AgOt14kQEdgsY8G4qFxKoJ2DA9TpxIgK7BQx4N9XkC2WvKmDAVZtxLgI7BAx4B5JLCFQVMOCqzTgXgR0CBrwDySWTBWpnN+Da/Tgdga8CBvyVxx8J1BYw4Nr9OB2BrwIG/JXHHwnUFrh3wLWzOx2BeAEDjq9QgMkCBjy5fdnjBQw4vkIBJgsY8F3tey6BBQIGvADZKwjcJWDAd8l6LoEFAga8ANkrCNwlYMB3yU5+ruzLBAx4GbUXEbhewICvN/VEAssEDHgZtRcRuF7AgK839cTJAouzG/BicK8jcKWAAV+p6VkEFgsY8GJwryNwpYABX6npWQQWC5Qa8OLsXkcgXsCA4ysUYLKAAU9uX/Z4AQOOr1CAyQIGXKR9xyBwRMCAj6i5h0ARAQMuUoRjEDgiYMBH1NxDoIiAARcpYvIxZD8uYMDH7dxJ4HEBA368AgcgcFzAgI/buZPA4wIG/HgFDjBZ4Gx2Az4r6H4CDwoY8IP4Xk3grIABnxV0P4EHBQz4QXyvJnBWIHnAZ7O7n0C8gAHHVyjAZAEDnty+7PECBhxfoQCTBQw4s32nJvASMOAXgw8CmQIGnNmbUxN4CRjwi8EHgUwBA87sbfKpZf8QMOAPDL8SSBMw4LTGnJfAh4ABf2D4lUCagAGnNea8kwU22Q14Q+ILAjkCBpzTlZMS2AgY8IbEFwRyBAw4pysnJbARGDTgTXZfEIgXMOD4CgWYLGDAk9uXPV7AgOMrFGCygAGPaF/IrgIG3LVZuUYIGPCImoXsKmDAXZuVa4SAAY+oeXLI3tkNuHe/0jUXMODmBYvXW8CAe/crXXMBA25esHi9Bb4PuHd26QjEC/wHAAD//8Ooqq4AAAAGSURBVAMAYP29NECHWK4AAAAASUVORK5CYII=",
       "photo_url": "",
-      "slogan": "।। समस्त ग्रामवासियों से विनम्र अपील ।।\\nसुपरएडमिन द्वारा सिंक किया गया नया संकल्प!",
+      "slogan": "।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।",
       "mobile": "9876543210",
       "show_banner_on_slip": true,
-      "updated_at": "2026-10-15T15:04:33.307Z"
+      "updated_at": "2026-10-15T15:45:00.000Z"
     },
     "sarpanch": {
-      "candidate_name": "श्री रामेश्वर जाट (परीक्षण)",
+      "candidate_name": "श्री रामेश्वर जाट",
       "post": "सरपंच",
       "panchayat": "बूबकिया",
       "ward": "3",
@@ -4688,10 +4736,10 @@
       "symbol_icon": "custom",
       "custom_symbol_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABjCAYAAAClp41/AAADTUlEQVR4AezTS2rrUBAE0JD97/k9sCcGgVH0uerqPhmY4Ohz61Tq958fAgRiBX5//BAgECtgwLHVOTiBnx8D9l9AIFhg8oCDa3N0Am8BA347+CQQKWDAkbU5NIG3gAG/HXwSiBQw4MjaTh/aA5oIGHCTIsWYKWDAM3uXuomAATcpUoyZAgY8s/fJqVtlN+BWdQozTcCApzUubysBA25VpzDTBAx4WuPythL444BbZReGQLyAAcdXKMBkAQOe3L7s8QIGHF+hAJMFDHh3+y4kUE/AgOt14kQEdgsY8G4qFxKoJ2DA9TpxIgK7BQx4N9XkC2WvKmDAVZtxLgI7BAx4B5JLCFQVMOCqzTgXgR0CBrwDySWTBWpnN+Da/Tgdga8CBvyVxx8J1BYw4Nr9OB2BrwIG/JXHHwnUFrh3wLWzOx2BeAEDjq9QgMkCBjy5fdnjBQw4vkIBJgsY8F3tey6BBQIGvADZKwjcJWDAd8l6LoEFAga8ANkrCNwlYMB3yU5+ruzLBAx4GbUXEbhewICvN/VEAssEDHgZtRcRuF7AgK839cTJAouzG/BicK8jcKWAAV+p6VkEFgsY8GJwryNwpYABX6npWQQWC5Qa8OLsXkcgXsCA4ysUYLKAAU9uX/Z4AQOOr1CAyQIGXKR9xyBwRMCAj6i5h0ARAQMuUoRjEDgiYMBH1NxDoIiAARcpYvIxZD8uYMDH7dxJ4HEBA368AgcgcFzAgI/buZPA4wIG/HgFDjBZ4Gx2Az4r6H4CDwoY8IP4Xk3grIABnxV0P4EHBQz4QXyvJnBWIHnAZ7O7n0C8gAHHVyjAZAEDnty+7PECBhxfoQCTBQw4s32nJvASMOAXgw8CmQIGnNmbUxN4CRjwi8EHgUwBA87sbfKpZf8QMOAPDL8SSBMw4LTGnJfAh4ABf2D4lUCagAGnNea8kwU22Q14Q+ILAjkCBpzTlZMS2AgY8IbEFwRyBAw4pysnJbARGDTgTXZfEIgXMOD4CgWYLGDAk9uXPV7AgOMrFGCygAGPaF/IrgIG3LVZuUYIGPCImoXsKmDAXZuVa4SAAY+oeXLI3tkNuHe/0jUXMODmBYvXW8CAe/crXXMBA25esHi9Bb4PuHd26QjEC/wHAAD//8Ooqq4AAAAGSURBVAMAYP29NECHWK4AAAAASUVORK5CYII=",
       "photo_url": "",
-      "slogan": "।। समस्त ग्रामवासियों से विनम्र अपील ।।\\nसुपरएडमिन द्वारा सिंक किया गया नया संकल्प!",
+      "slogan": "।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।",
       "mobile": "9876543210",
       "show_banner_on_slip": true,
-      "updated_at": "2026-10-15T15:04:33.307Z"
+      "updated_at": "2026-10-15T15:45:00.000Z"
     },
     "cand_gp01": {
       "candidate_name": "सुरेश कुमार गुर्जर",
