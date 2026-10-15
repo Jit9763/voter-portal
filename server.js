@@ -59,6 +59,8 @@ db.exec(`
   );
 `);
 try { db.prepare("ALTER TABLE candidates ADD COLUMN election_time TEXT").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE candidates ADD COLUMN election_date TEXT").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE candidates ADD COLUMN custom_symbol_url TEXT").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE users ADD COLUMN can_print INTEGER DEFAULT 1").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE users ADD COLUMN can_download INTEGER DEFAULT 1").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE users ADD COLUMN can_search INTEGER DEFAULT 1").run(); } catch(e) {}
@@ -160,20 +162,35 @@ function exportToJson() {
 
     const rawCandidates = db.prepare('SELECT * FROM candidates').all();
     const candidates = {};
+    const pickBestCand = (existing, incoming) => {
+      if (!existing) return incoming;
+      if (incoming.custom_symbol_url && !existing.custom_symbol_url) return incoming;
+      if (existing.custom_symbol_url && !incoming.custom_symbol_url) return existing;
+      if (new Date(incoming.updated_at || 0) >= new Date(existing.updated_at || 0)) return incoming;
+      return existing;
+    };
     rawCandidates.forEach(c => {
-      candidates[c.user_id] = {
+      const candObj = {
         candidate_name: c.candidate_name,
         post: c.post,
         panchayat: c.panchayat,
         ward: c.ward,
+        election_date: c.election_date || '15 अक्टूबर 2026',
+        election_time: c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
         symbol_name: c.symbol_name,
         symbol_icon: c.symbol_icon,
-        photo_url: c.photo_url,
-        slogan: c.slogan,
-        mobile: c.mobile,
+        custom_symbol_url: c.custom_symbol_url || '',
+        photo_url: c.photo_url || '',
+        slogan: c.slogan || '',
+        mobile: c.mobile || '',
         show_banner_on_slip: !!c.show_banner_on_slip,
         updated_at: c.updated_at
       };
+      const key1 = c.user_id;
+      const key2 = c.user_id.startsWith('cand_') ? c.user_id.replace('cand_', '') : ('cand_' + c.user_id);
+      candidates[key1] = pickBestCand(candidates[key1], candObj);
+      candidates[key2] = pickBestCand(candidates[key2], candObj);
+    });
     });
 
     const payload = {
@@ -279,37 +296,46 @@ function executeGithubPush(reason = 'update', callback = null) {
     const runDirectGitPush = () => {
     console.log(`[AUTO-SYNC] Running Tri-Repo clash-free Git push (pan, blo-portal, voter-portal) (Reason: ${reason})...`);
     const pcName = process.env.COMPUTERNAME || 'PC';
-    const gitPath = 'C:\\Users\\jiten\\AppData\\Local\\GitHubDesktop\\app-3.6.7\\resources\\app\\git\\cmd';
+    const gitDesktopCmd = 'C:/Users/jiten/AppData/Local/GitHubDesktop/app-3.6.7/resources/app/git/cmd/git.exe';
+    const gitExe = fs.existsSync(gitDesktopCmd) ? `"${gitDesktopCmd}"` : 'git';
     const commitMsg = `Auto-sync settings & users from ${pcName} (${reason}) [${new Date().toISOString()}]`;
 
-    // Tri-Repo Paths
-    const otherRepos = [
-      'C:\\Users\\jiten\\Documents\\GitHub\\blo-portal',
-      'C:\\Users\\jiten\\Documents\\GitHub\\voter-portal'
+    // Tri-Repo Paths with forward slashes to avoid escaping issues
+    const candidateDirs = [
+      'C:/Users/jiten/OneDrive/Documents/GitHub/blo-portal',
+      'C:/Users/jiten/Documents/GitHub/blo-portal',
+      'C:/Users/jiten/OneDrive/Documents/GitHub/voter-portal',
+      'C:/Users/jiten/Documents/GitHub/voter-portal'
     ];
+    const seen = new Set();
+    const otherRepos = candidateDirs.filter(d => {
+      if (fs.existsSync(d) && !seen.has(path.resolve(d).toLowerCase())) {
+        seen.add(path.resolve(d).toLowerCase());
+        return true;
+      }
+      return false;
+    });
 
-    const syncFiles = ['portal_users.json', 'portal_settings.json', 'app.js'];
+    const syncFiles = ['portal_users.json', 'portal_settings.json', 'app.js', 'index.html', 'styles.css'];
 
     // 1. Copy updated files to blo-portal and voter-portal
     otherRepos.forEach(rDir => {
-      if (fs.existsSync(rDir)) {
-        syncFiles.forEach(f => {
-          const s = path.join(__dirname, f);
-          const d = path.join(rDir, f);
-          if (fs.existsSync(s)) {
-            try { fs.copyFileSync(s, d); } catch(_) {}
-          }
-        });
-      }
+      syncFiles.forEach(f => {
+        const s = path.join(__dirname, f);
+        const d = path.join(rDir, f);
+        if (fs.existsSync(s)) {
+          try { fs.copyFileSync(s, d); } catch(_) {}
+        }
+      });
     });
 
-    // 2. Commit and push on all 3 repositories without clash
-    const allRepos = [__dirname, ...otherRepos.filter(d => fs.existsSync(d))];
+    // 2. Commit and push on all repositories without clash using git add -A
+    const allRepos = [__dirname, ...otherRepos];
     let completed = 0;
 
     allRepos.forEach(rDir => {
       const rName = path.basename(rDir);
-      const cmd = `"${gitPath}\\git.exe" add portal_settings.json portal_users.json app.js index.html && ("${gitPath}\\git.exe" diff --staged --quiet || "${gitPath}\\git.exe" commit -m "${commitMsg}") && "${gitPath}\\git.exe" pull --rebase origin main && "${gitPath}\\git.exe" push origin main`;
+      const cmd = `${gitExe} add -A && (${gitExe} diff --staged --quiet || ${gitExe} commit -m "${commitMsg}") && ${gitExe} pull --rebase origin main && ${gitExe} push origin main`;
       
       exec(cmd, { cwd: rDir }, (gErr, gStdout, gStderr) => {
         completed++;
@@ -661,10 +687,10 @@ const server = http.createServer(async (req, res) => {
 
         const merged = users.map(u => ({
           ...u,
-          candidate: candMap[u.id] || null
+          candidate: candMap[u.id] || candMap[u.username] || null
         }));
 
-        res.end(JSON.stringify({ success: true, users: merged }));
+        res.end(JSON.stringify({ success: true, users: merged, candidates: candMap }));
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ success: false, error: err.message }));
@@ -762,47 +788,50 @@ const server = http.createServer(async (req, res) => {
           const c = u.candidate;
           const candId = existing ? existing.id : userId;
           const existCand = db.prepare('SELECT user_id FROM candidates WHERE user_id = ?').get(candId);
-          if (existCand) {
-            db.prepare(`
-              UPDATE candidates SET
-                candidate_name = ?, post = ?, panchayat = ?, ward = ?, symbol_name = ?, symbol_icon = ?,
-                photo_url = ?, slogan = ?, election_time = ?, mobile = ?, show_banner_on_slip = ?, updated_at = ?
-              WHERE user_id = ?
-            `).run(
-              c.candidate_name || u.full_name || '',
-              c.post || 'सरपंच',
-              c.panchayat || u.allowed_panchayats || '',
-              c.ward || u.allowed_wards || '',
-              c.symbol_name || 'उगता सूरज',
-              c.symbol_icon || 'sun',
-              c.photo_url || '',
-              c.slogan || '',
-              c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
-              c.mobile || u.mobile || '',
-              c.show_banner_on_slip ? 1 : 0,
-              new Date().toISOString(),
-              candId
-            );
-          } else {
-            db.prepare(`
-              INSERT INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, photo_url, slogan, election_time, mobile, show_banner_on_slip, updated_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).run(
-              candId,
-              c.candidate_name || u.full_name || '',
-              c.post || 'सरपंच',
-              c.panchayat || u.allowed_panchayats || '',
-              c.ward || u.allowed_wards || '',
-              c.symbol_name || 'उगता सूरज',
-              c.symbol_icon || 'sun',
-              c.photo_url || '',
-              c.slogan || '',
-              c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
-              c.mobile || u.mobile || '',
-              c.show_banner_on_slip ? 1 : 0,
-              new Date().toISOString()
-            );
-          }
+      if (existCand) {
+        const customSymToSave = (c.custom_symbol_url !== undefined) ? c.custom_symbol_url : (existCand.custom_symbol_url || '');
+        db.prepare(`
+          UPDATE candidates SET
+            candidate_name = ?, post = ?, panchayat = ?, ward = ?, symbol_name = ?, symbol_icon = ?,
+            custom_symbol_url = ?, photo_url = ?, slogan = ?, election_time = ?, mobile = ?, show_banner_on_slip = ?, updated_at = ?
+          WHERE user_id = ?
+        `).run(
+          c.candidate_name || u.full_name || '',
+          c.post || 'सरपंच',
+          c.panchayat || u.allowed_panchayats || '',
+          c.ward || u.allowed_wards || '',
+          c.symbol_name || 'उगता सूरज',
+          c.symbol_icon || 'sun',
+          customSymToSave,
+          c.photo_url || '',
+          c.slogan || '',
+          c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
+          c.mobile || u.mobile || '',
+          c.show_banner_on_slip ? 1 : 0,
+          new Date().toISOString(),
+          candId
+        );
+      } else {
+        db.prepare(`
+          INSERT INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, custom_symbol_url, photo_url, slogan, election_time, mobile, show_banner_on_slip, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          candId,
+          c.candidate_name || u.full_name || '',
+          c.post || 'सरपंच',
+          c.panchayat || u.allowed_panchayats || '',
+          c.ward || u.allowed_wards || '',
+          c.symbol_name || 'उगता सूरज',
+          c.symbol_icon || 'sun',
+          c.custom_symbol_url || '',
+          c.photo_url || '',
+          c.slogan || '',
+          c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
+          c.mobile || u.mobile || '',
+          c.show_banner_on_slip ? 1 : 0,
+          new Date().toISOString()
+        );
+      }
         }
 
         exportToJson();
@@ -830,11 +859,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // Get / Save Candidate Profile
+    // Get / Save Candidate Profile (with bi-directional alias support: cand_xxx <-> xxx)
     if (pathname.startsWith('/api/candidate/')) {
       const uId = decodeURIComponent(pathname.replace('/api/candidate/', ''));
+      const altId = uId.startsWith('cand_') ? uId.replace('cand_', '') : ('cand_' + uId);
+
       if (req.method === 'GET') {
-        const cand = db.prepare('SELECT * FROM candidates WHERE user_id = ?').get(uId) || null;
+        const cand = db.prepare('SELECT * FROM candidates WHERE user_id = ? OR user_id = ?').get(uId, altId) || null;
         res.end(JSON.stringify({ success: true, candidate: cand }));
         return;
       }
@@ -842,12 +873,14 @@ const server = http.createServer(async (req, res) => {
       if (req.method === 'POST') {
         try {
           const c = await parseJsonBody(req);
-          const existing = db.prepare('SELECT user_id FROM candidates WHERE user_id = ?').get(uId);
+          const existing = db.prepare('SELECT user_id FROM candidates WHERE user_id = ? OR user_id = ?').get(uId, altId);
+          const targetId = existing ? existing.user_id : uId;
+
           if (existing) {
             db.prepare(`
               UPDATE candidates SET
                 candidate_name = ?, post = ?, panchayat = ?, ward = ?, symbol_name = ?, symbol_icon = ?,
-                photo_url = ?, slogan = ?, election_time = ?, mobile = ?, show_banner_on_slip = ?, updated_at = ?
+                custom_symbol_url = ?, photo_url = ?, slogan = ?, election_date = ?, election_time = ?, mobile = ?, show_banner_on_slip = ?, updated_at = ?
               WHERE user_id = ?
             `).run(
               c.candidate_name || '',
@@ -856,28 +889,32 @@ const server = http.createServer(async (req, res) => {
               c.ward || '',
               c.symbol_name || 'उगता सूरज',
               c.symbol_icon || 'sun',
+              c.custom_symbol_url || '',
               c.photo_url || '',
               c.slogan || '',
+              c.election_date || '15 अक्टूबर 2026',
               c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
               c.mobile || '',
               c.show_banner_on_slip ? 1 : 0,
               new Date().toISOString(),
-              uId
+              targetId
             );
           } else {
             db.prepare(`
-              INSERT INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, photo_url, slogan, election_time, mobile, show_banner_on_slip, updated_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              INSERT INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, custom_symbol_url, photo_url, slogan, election_date, election_time, mobile, show_banner_on_slip, updated_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).run(
-              uId,
+              targetId,
               c.candidate_name || '',
               c.post || 'सरपंच',
               c.panchayat || '',
               c.ward || '',
               c.symbol_name || 'उगता सूरज',
               c.symbol_icon || 'sun',
+              c.custom_symbol_url || '',
               c.photo_url || '',
               c.slogan || '',
+              c.election_date || '15 अक्टूबर 2026',
               c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
               c.mobile || '',
               c.show_banner_on_slip ? 1 : 0,
@@ -961,6 +998,36 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(500);
     res.end('Server Error: ' + e.message);
   }
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`⚠️ Port ${PORT} already in use. Cleaning up lingering process on port ${PORT}...`);
+    try {
+      const { execSync } = require('node:child_process');
+      const out = execSync(`netstat -ano | findstr :${PORT} | findstr LISTENING`, { encoding: 'utf8' });
+      const lines = out.trim().split('\n');
+      for (const line of lines) {
+        const parts = line.trim().split(/\s+/);
+        const pid = parts[parts.length - 1];
+        if (pid && pid !== '0' && pid !== String(process.pid)) {
+          try { execSync(`taskkill /F /PID ${pid}`); } catch(_) {}
+        }
+      }
+      setTimeout(() => {
+        server.listen(PORT, () => {
+          console.log(`🚀 Panchayat Chunav 2026 High-Speed Node & SQLite Server is LIVE on port ${PORT}!`);
+          console.log(`📁 Local DB: ${DB_PATH}`);
+          console.log(`🌐 URL: http://localhost:${PORT}`);
+        });
+      }, 800);
+      return;
+    } catch(e) {
+      console.error(`Could not auto-kill port ${PORT}:`, e.message);
+    }
+  }
+  console.error('Server error:', err);
+  process.exit(1);
 });
 
 server.listen(PORT, () => {

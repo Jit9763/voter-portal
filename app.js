@@ -2317,6 +2317,15 @@ function syncCurrentUserWithConfiguredUsers() {
     if (matched.can_search !== undefined) State.currentUser.can_search = (matched.can_search === true || matched.can_search === 1);
     if (matched.can_view !== undefined) State.currentUser.can_view = (matched.can_view === true || matched.can_view === 1);
     if (matched.candidate_mode) State.currentUser.candidate_mode = matched.candidate_mode;
+    if (matched.candidate) {
+      State.currentCandidate = matched.candidate;
+      State.currentUser.candidate = matched.candidate;
+      try {
+        const uIdKey = State.currentUser.id || State.currentUser.username;
+        localStorage.setItem('candidate_profile_' + uIdKey, JSON.stringify(matched.candidate));
+        if (State.currentUser.username) localStorage.setItem('candidate_profile_' + State.currentUser.username, JSON.stringify(matched.candidate));
+      } catch(_) {}
+    }
 
     const newSnapshot = JSON.stringify({
       tabs: State.currentUser.allowed_tabs,
@@ -3491,6 +3500,10 @@ function shareVoterSlipWhatsAppByIndex(index) {
 // Helper to find the matching candidate for any voter across the 30 Gram Panchayats
 function findCandidateForVoter(voter) {
   if (!voter) return null;
+  // If current logged-in user is a candidate, prioritize their configured candidate profile
+  if (State.currentCandidate && State.currentUser && (State.currentUser.role === 'CANDIDATE' || String(State.currentUser.id).startsWith('cand_') || State.currentUser.candidate_mode === 'user_edit' || State.currentUser.candidate_mode === 'active')) {
+    return State.currentCandidate;
+  }
   const voterGp = String(voter.gram_panchayat || voter.revenue_village || '').trim().toLowerCase();
   const voterGpCode = String(voter.panchayat_code || '').trim().toLowerCase();
   const voterWard = String(voter.ward_no || '').trim();
