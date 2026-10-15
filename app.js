@@ -3712,11 +3712,19 @@ function renderModalCandidateSlip(voter) {
   // CANDIDATE LOGIN: Show candidate slip with custom symbol and campaign appeal if permitted
   if (isCandidate && (State.slipModalViewMode !== 'official') && isCandidateSlipAllowedForVoter(voter)) {
     const uKey = (u && (u.id || u.username)) || '';
-    if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
-      const fresh = window.PORTAL_USERS_DATA.candidates[uKey] || (u && u.id && window.PORTAL_USERS_DATA.candidates[u.id]) || (u && u.username && window.PORTAL_USERS_DATA.candidates[u.username]);
-      if (fresh) State.currentCandidate = fresh;
+    // Always prioritize active in-memory State.currentCandidate or local edits so user changes appear instantly without hard refresh
+    let cand = State.currentCandidate;
+    if (!cand) {
+      try {
+        const cached = localStorage.getItem('candidate_profile_' + uKey) || (u && u.id && localStorage.getItem('candidate_profile_' + u.id)) || (u && u.username && localStorage.getItem('candidate_profile_' + u.username));
+        if (cached) cand = JSON.parse(cached);
+      } catch(e) {}
     }
-    const cand = State.currentCandidate || findCandidateForVoter(voter);
+    if (!cand && window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+      cand = window.PORTAL_USERS_DATA.candidates[uKey] || (u && u.id && window.PORTAL_USERS_DATA.candidates[u.id]) || (u && u.username && window.PORTAL_USERS_DATA.candidates[u.username]);
+    }
+    if (cand) State.currentCandidate = cand;
+    else cand = findCandidateForVoter(voter);
     if (cand && (cand.show_banner_on_slip !== false)) {
       const symbols = window.OFFICIAL_ELECTION_SYMBOLS || [];
       const customUrl = cand.custom_symbol_url || cand.custom_symbol || cand.symbol_url;
@@ -5639,6 +5647,9 @@ async function initCandidateProfileTab() {
   }
 
   renderLiveSpecimenSlip();
+  if (State.currentSlipVoter) {
+    try { renderModalCandidateSlip(State.currentSlipVoter); } catch(_) {}
+  }
 }
 
 function populateSymbolControls() {
@@ -6158,14 +6169,14 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
         </div>
       </div>
 
-      <!-- 2. PERFORATION CUTTING DIVIDER -->
+      <!-- 2. PERFORATION CUTTING DIVIDER (SLIM & COMPACT) -->
       <div class="slip-perforation-divider">
         <span class="cut-icon">✂️</span>
-        <span>---------------- यहाँ से काटकर मतदाता को दें (काट कर अलग करें) ----------------</span>
+        <span class="cut-text">- - काटकर मतदाता को दें (काट कर अलग करें) - -</span>
         <span class="cut-icon">✂️</span>
       </div>
 
-      <!-- 3. BOTTOM SECTION: 100% CLEAN OFFICIAL B&W VOTER SLIP (NO BACKGROUND) -->
+      <!-- 3. BOTTOM SECTION: 100% CLEAN OFFICIAL B&W VOTER SLIP (NO BACKGROUND, FOOTER REMOVED FOR MAXIMUM SPACE) -->
       <div class="official-bottom-bw-slip">
         <div class="bw-header">
           <div>
@@ -6187,11 +6198,6 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
 
         <div class="bw-booth-box">
           <strong>मतदान केंद्र ${boothNo}:</strong> ${boothName}
-        </div>
-
-        <div class="bw-footer">
-          <span>*मतदान हेतु अधिकृत पहचान पत्र साथ लावें</span>
-          <span>दिनांक: ${electionDate} | समय: ${electionTime}</span>
         </div>
       </div>
     </div>
