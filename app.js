@@ -15,6 +15,113 @@
   } catch(_) {}
 })();
 
+// ==========================================================================
+// TRI-PORTAL MASTER COMMAND & SETTINGS ENGINE (GLOBAL STATE AT TOP)
+// ==========================================================================
+var triPortalSettings = {
+  voter_portal: {
+    status: 'ACTIVE',
+    election_date: '15 अक्टूबर 2026',
+    election_time: 'प्रातः 7:00 बजे से सायं 6:00 बजे तक',
+    modules: { search: true, alpha: true, slips: true, candidate_edit: true }
+  },
+  blo_portal: { status: 'ACTIVE', block_bulk_slips: true, scope_restricted: true, cell_directory: true },
+  election_date: '15 अक्टूबर 2026',
+  election_time: 'प्रातः 7:00 बजे से सायं 6:00 बजे तक'
+};
+
+function getGlobalElectionDate() {
+  return (
+    (typeof triPortalSettings !== 'undefined' && (triPortalSettings?.voter_portal?.election_date || triPortalSettings?.election_date)) ||
+    (typeof window !== 'undefined' && window.PORTAL_USERS_DATA?.election_date) ||
+    '15 अक्टूबर 2026'
+  );
+}
+
+function getGlobalElectionTime() {
+  return (
+    (typeof triPortalSettings !== 'undefined' && (triPortalSettings?.voter_portal?.election_time || triPortalSettings?.election_time)) ||
+    (typeof window !== 'undefined' && window.PORTAL_USERS_DATA?.election_time) ||
+    'प्रातः 7:00 बजे से सायं 6:00 बजे तक'
+  );
+}
+
+function applyGlobalElectionDateToUI() {
+  if (typeof document === 'undefined') return;
+  const gDate = getGlobalElectionDate();
+  const gTime = getGlobalElectionTime();
+
+  // Topbar
+  const topbarDate = document.getElementById('topbarElectionDateText');
+  if (topbarDate) {
+    topbarDate.textContent = gDate;
+  }
+
+  // Candidate Profile Tab inputs
+  const candDateInput = document.getElementById('candidateElectionDateInput');
+  if (candDateInput && (!candDateInput.value || candDateInput.value.includes('15 अक्टूबर 2026') || !State?.currentCandidate?.election_date)) {
+    candDateInput.value = State?.currentCandidate?.election_date || gDate;
+  }
+  const candTimeInput = document.getElementById('candidateElectionTimeInput');
+  if (candTimeInput && (!candTimeInput.value || candTimeInput.value.includes('5:00') || !State?.currentCandidate?.election_time)) {
+    candTimeInput.value = State?.currentCandidate?.election_time || gTime;
+  }
+
+  // Super Admin Voter Portal control inputs
+  const vDateInp = document.getElementById('voterPortalElectionDateInput');
+  if (vDateInp && (triPortalSettings?.voter_portal?.election_date || triPortalSettings?.election_date)) {
+    vDateInp.value = triPortalSettings.voter_portal?.election_date || triPortalSettings.election_date;
+  }
+  const vTimeInp = document.getElementById('voterPortalElectionTimeInput');
+  if (vTimeInp && (triPortalSettings?.voter_portal?.election_time || triPortalSettings?.election_time)) {
+    vTimeInp.value = triPortalSettings.voter_portal?.election_time || triPortalSettings.election_time;
+  }
+
+  // Live specimen slip refresh if present
+  if (typeof renderLiveSpecimenSlip === 'function' && document.getElementById('liveSpecimenSlipContainer')) {
+    try { renderLiveSpecimenSlip(); } catch(_) {}
+  }
+}
+
+async function saveVoterPortalElectionDate() {
+  const dateInput = document.getElementById('voterPortalElectionDateInput');
+  const timeInput = document.getElementById('voterPortalElectionTimeInput');
+  const newDate = (dateInput ? dateInput.value : '').trim() || '15 अक्टूबर 2026';
+  const newTime = (timeInput ? timeInput.value : '').trim() || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
+
+  if (!triPortalSettings.voter_portal) triPortalSettings.voter_portal = {};
+  triPortalSettings.voter_portal.election_date = newDate;
+  triPortalSettings.voter_portal.election_time = newTime;
+  triPortalSettings.election_date = newDate;
+  triPortalSettings.election_time = newTime;
+
+  localStorage.setItem('portal_tri_settings', JSON.stringify(triPortalSettings));
+  applyGlobalElectionDateToUI();
+
+  if (typeof showToast === 'function') {
+    showToast(`📅 वोटर पोर्टल चुनाव दिनांक सेट: ${newDate} (${newTime})`);
+  }
+
+  try {
+    const isLocalServer = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalServer) {
+      const res = await fetch('/api/portal-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(triPortalSettings)
+      });
+      if (res.ok) {
+        if (typeof showToast === 'function') {
+          showToast('✅ चुनाव दिनांक व समय सुरक्षित एवं सभी पोर्टल्स पर लाइव सिंक हो गया!');
+        }
+      }
+    }
+  } catch(e) {
+    console.warn('Error saving portal settings:', e);
+  }
+}
+
+
 
 // ==========================================================================
 // SUPER ADMIN 3 DEDICATED TABS & GRANULAR PERMISSIONS CONTROLLER
@@ -888,20 +995,39 @@ function renderAdminCandTab() {
   if (!tbody) return;
 
   const users = State.adminControlUsers || [];
-  const candUsers = users.filter(u => u.type === 'CANDIDATE' || u.category === 'CANDIDATE' || (u.id && u.id.startsWith('cand_')));
-  const overrides = getUserOverrides();
+  // Robust candidate filter: matching role, id prefix, username prefix, or candidate object
+  const candUsers = users.filter(u => {
+    if (!u) return false;
+    const uid = String(u.id || '').toLowerCase();
+    const uname = String(u.username || '').toLowerCase();
+    const urole = String(u.role || '').toUpperCase();
+    return (
+      urole === 'CANDIDATE' ||
+      urole === 'प्रत्याशी' ||
+      uid.startsWith('cand_') ||
+      uname.startsWith('cand_') ||
+      uname === 'sarpanch' ||
+      u.type === 'CANDIDATE' ||
+      u.category === 'CANDIDATE' ||
+      (u.candidate && (u.candidate.candidate_name || u.candidate.panchayat))
+    );
+  });
 
+  const overrides = getUserOverrides();
   const searchVal = (document.getElementById('adminCandSearchInput') ? document.getElementById('adminCandSearchInput').value : '').toLowerCase().trim();
   const gpFilter = document.getElementById('adminCandGpFilter') ? document.getElementById('adminCandGpFilter').value : 'ALL';
 
   const filtered = candUsers.filter(c => {
     const cid = String(c.id || c.username || '');
-    if (gpFilter !== 'ALL' && c.panchayat !== gpFilter) return false;
+    const cGp = c.panchayat || c.allowed_panchayats || (c.candidate && c.candidate.panchayat) || '';
+    if (gpFilter !== 'ALL' && cGp !== gpFilter) return false;
     if (searchVal) {
       const match = (c.name && String(c.name).toLowerCase().includes(searchVal)) ||
-                    (c.panchayat && String(c.panchayat).toLowerCase().includes(searchVal)) ||
+                    (c.full_name && String(c.full_name).toLowerCase().includes(searchVal)) ||
+                    (cGp && String(cGp).toLowerCase().includes(searchVal)) ||
                     (c.mobile && String(c.mobile).includes(searchVal)) ||
-                    (cid && cid.toLowerCase().includes(searchVal));
+                    (cid && cid.toLowerCase().includes(searchVal)) ||
+                    (c.candidate && c.candidate.candidate_name && String(c.candidate.candidate_name).toLowerCase().includes(searchVal));
       if (!match) return false;
     }
     return true;
@@ -917,14 +1043,15 @@ function renderAdminCandTab() {
   filtered.forEach(c => {
     const cid = c.id || c.username;
     const ov = overrides[cid] || {};
-    const pass = ov.password || c.password || 'bhinai2026';
+    const pass = ov.password || c.password || 'cand@2026';
     const status = ov.status || c.status || 'ACTIVE';
     const isActive = (status === 'ACTIVE');
     const canSearch = (ov.can_search !== undefined) ? ov.can_search : (c.can_search !== undefined ? (c.can_search === true || c.can_search === 1) : true);
     const canView = (ov.can_view !== undefined) ? ov.can_view : (c.can_view !== undefined ? (c.can_view === true || c.can_view === 1) : true);
     const canPrint = (ov.can_print !== undefined) ? ov.can_print : (c.can_print !== undefined ? (c.can_print === true || c.can_print === 1) : true);
     const canDownload = (ov.can_download !== undefined) ? ov.can_download : (c.can_download !== undefined ? (c.can_download === true || c.can_download === 1) : true);
-    const scope = ov.allowed_panchayats || c.panchayat || 'ALL';
+    const cGp = c.panchayat || c.allowed_panchayats || (c.candidate && c.candidate.panchayat) || '-';
+    const scope = ov.allowed_panchayats || cGp || 'ALL';
 
     let cand = c.candidate;
     if (!cand) {
@@ -938,25 +1065,31 @@ function renderAdminCandTab() {
     const candSymbol = (cand && cand.symbol_name) || '';
     const candPhoto = (cand && cand.photo_url) || '';
     const agentName = (cand && cand.agent_name) || '';
+    const candElectionDate = (cand && cand.election_date) || getGlobalElectionDate();
+    const candElectionTime = (cand && cand.election_time) || getGlobalElectionTime();
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
-        <strong style="color:#d97706;">${cid}</strong>
+        <strong style="color:#d97706; font-size:0.9rem;">${cid}</strong>
       </td>
       <td>
         <div style="display:flex; align-items:center; gap:8px;">
-          ${candPhoto ? `<img src="${candPhoto}" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1.5px solid #d97706; flex-shrink:0;">` : `<span style="font-size:1.1rem; flex-shrink:0;">👤</span>`}
+          ${candPhoto ? `<img src="${candPhoto}" style="width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid #d97706; flex-shrink:0;">` : `<span style="font-size:1.2rem; flex-shrink:0;">👤</span>`}
           <div>
-            <div style="font-weight:700; color:#0f172a;">${candName}</div>
+            <div style="font-weight:700; color:#0f172a; font-size:0.9rem;">${candName}</div>
             <div style="font-size:0.75rem; color:#64748b;">${c.designation || (cand && cand.post) || 'प्रत्याशी'} ${agentName ? `• एजेंट: ${agentName}` : ''}</div>
           </div>
         </div>
       </td>
       <td>
-        <div style="font-weight:700; color:#1e40af;">🏛️ ${c.panchayat || (cand && cand.panchayat) || '-'}</div>
+        <div style="font-weight:700; color:#1e40af;">🏛️ ${cGp}</div>
         <div style="font-size:0.75rem; color:#d97706; font-weight:700;">वार्ड: ${c.allowed_wards || (cand && cand.ward) || 'समस्त'}</div>
         ${candSymbol ? `<span class="badge" style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 6px; border-radius:4px; margin-top:2px; display:inline-block;">🗳️ ${candSymbol}</span>` : ''}
+        <!-- प्रत्याशीवार मतदान दिनांक एवं समय बैज -->
+        <div style="font-size:0.73rem; color:#065f46; font-weight:700; margin-top:3px; background:#ecfdf5; padding:2px 6px; border-radius:4px; border:1px solid #a7f3d0; display:inline-block;">
+          📅 ${candElectionDate} <span style="color:#64748b; font-weight:500;">(${candElectionTime})</span>
+        </div>
       </td>
       <td>
         <a href="tel:${candMobile}" style="font-weight:700; color:#0284c7; text-decoration:none;">📞 ${candMobile}</a>
@@ -989,7 +1122,7 @@ function renderAdminCandTab() {
         </div>
         <div class="d-flex align-items-center gap-1 mt-1" style="min-height:36px;">
           <select class="form-select admin-scope-select" onchange="updateUserScope('${cid}', this.value)">
-            <option value="${c.panchayat || 'ALL'}" ${scope === (c.panchayat || 'ALL') ? 'selected' : ''}>🏛️ ${c.panchayat || 'पंचायत'}</option>
+            <option value="${cGp !== '-' ? cGp : 'ALL'}" ${scope === cGp ? 'selected' : ''}>🏛️ ${cGp !== '-' ? cGp : 'पंचायत'}</option>
             <option value="ALL" ${scope === 'ALL' ? 'selected' : ''}>🌐 समस्त 30 पं.</option>
           </select>
           <button type="button" class="btn btn-scope-allot" onclick="openCustomScopeModal('${cid}')" title="कस्टम आवंटन">🎯</button>
@@ -1002,7 +1135,7 @@ function renderAdminCandTab() {
       </td>
       <td style="text-align:center;">
         <div class="d-flex justify-content-center gap-1">
-          <button type="button" class="btn btn-xs btn-primary" onclick="openAdminCandidateModal('${cid}')" title="प्रत्याशी विवरण, फोटो व चुनाव चिन्ह संपादित करें" style="font-weight:700; padding:3px 7px;">✏️ संपादन</button>
+          <button type="button" class="btn btn-xs btn-primary" onclick="openAdminCandidateModal('${cid}')" title="प्रत्याशी विवरण, फोटो, चुनाव चिन्ह एवं मतदान दिनांक संपादित करें" style="font-weight:700; padding:4px 8px;">✏️ संपादन</button>
           <button type="button" class="admin-pass-btn admin-pass-btn-reset" onclick="resetUserPasswordToDefault('${cid}')" title="डिफ़ॉल्ट पासवर्ड करें">🔄 डिफ़ॉल्ट</button>
         </div>
       </td>
@@ -2582,7 +2715,7 @@ function enforceGatekeeperState() {
       tab.style.display = isSuperAdmin ? 'flex' : 'none';
     } else {
       if (tabId === 'candidateProfileTab') {
-        tab.style.display = (isCandUser && allowedTabs.includes('candidateProfileTab')) ? 'flex' : 'none';
+        tab.style.display = (isSuperAdmin || (isCandUser && allowedTabs.includes('candidateProfileTab'))) ? 'flex' : 'none';
       } else {
         const isAllowed = isSuperAdmin || allowedTabs.includes(tabId);
         tab.style.display = isAllowed ? 'flex' : 'none';
@@ -5969,7 +6102,7 @@ async function handleSaveCandidateProfile(event) {
   const post = document.getElementById('candidatePostSelect').value;
   const gp = document.getElementById('candidateGpSelect').value;
   const ward = (post === 'वार्ड पंच' && document.getElementById('candidateWardSelect')) ? document.getElementById('candidateWardSelect').value : '';
-  const electionDate = (document.getElementById('candidateElectionDateInput') ? document.getElementById('candidateElectionDateInput').value : '').trim() || '15 अक्टूबर 2026';
+  const electionDate = (document.getElementById('candidateElectionDateInput') ? document.getElementById('candidateElectionDateInput').value : '').trim() || getGlobalElectionDate();
   const electionTime = (document.getElementById('candidateElectionTimeInput') ? document.getElementById('candidateElectionTimeInput').value : '').trim() || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
   const slogan = (document.getElementById('candidateSloganTextarea').value || '').trim();
   const showBanner = document.getElementById('candidateShowBannerSlip').checked;
@@ -7179,6 +7312,12 @@ async function openAdminCandidateModal(userId) {
   if (gpSelect) gpSelect.value = targetGp;
 
   document.getElementById('adminCandWard').value = cand.ward || (u.allowed_wards !== 'ALL' ? u.allowed_wards : '');
+  if (document.getElementById('adminCandElectionDate')) {
+    document.getElementById('adminCandElectionDate').value = cand.election_date || getGlobalElectionDate();
+  }
+  if (document.getElementById('adminCandElectionTime')) {
+    document.getElementById('adminCandElectionTime').value = cand.election_time || getGlobalElectionTime();
+  }
   
   if (document.getElementById('adminCandElectionTime')) {
     document.getElementById('adminCandElectionTime').value = cand.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
@@ -7303,7 +7442,7 @@ async function handleAdminSaveCandidate(event) {
     post: post,
     panchayat: gp,
     ward: ward,
-    election_date: '15 अक्टूबर 2026',
+    election_date: electionDate,
     election_time: electionTime,
     symbol_name: symbolName,
     symbol_icon: symbolIcon,
@@ -8545,109 +8684,7 @@ function logoutUser() {
 // TRI-PORTAL MASTER COMMAND & CONTROL ENGINE (PAN MASTER HUB)
 // ==========================================================================
 
-let triPortalSettings = {
-  voter_portal: {
-    status: 'ACTIVE',
-    election_date: getGlobalElectionDate(),
-    election_time: getGlobalElectionTime(),
-    modules: { search: true, alpha: true, slips: true, candidate_edit: true }
-  },
-  blo_portal: { status: 'ACTIVE', block_bulk_slips: true, scope_restricted: true, cell_directory: true },
-  election_date: '15 अक्टूबर 2026',
-  election_time: 'प्रातः 7:00 बजे से सायं 6:00 बजे तक'
-};
-
-function getGlobalElectionDate() {
-  return (
-    triPortalSettings?.voter_portal?.election_date ||
-    triPortalSettings?.election_date ||
-    window.PORTAL_USERS_DATA?.election_date ||
-    '15 अक्टूबर 2026'
-  );
-}
-
-function getGlobalElectionTime() {
-  return (
-    triPortalSettings?.voter_portal?.election_time ||
-    triPortalSettings?.election_time ||
-    window.PORTAL_USERS_DATA?.election_time ||
-    'प्रातः 7:00 बजे से सायं 6:00 बजे तक'
-  );
-}
-
-function applyGlobalElectionDateToUI() {
-  const gDate = getGlobalElectionDate();
-  const gTime = getGlobalElectionTime();
-
-  // Topbar
-  const topbarDate = document.getElementById('topbarElectionDateText');
-  if (topbarDate) {
-    topbarDate.textContent = gDate;
-  }
-
-  // Candidate Profile Tab inputs
-  const candDateInput = document.getElementById('candidateElectionDateInput');
-  if (candDateInput && (!candDateInput.value || candDateInput.value === '15 अक्टूबर 2026' || !State.currentCandidate?.election_date)) {
-    candDateInput.value = State.currentCandidate?.election_date || gDate;
-  }
-  const candTimeInput = document.getElementById('candidateElectionTimeInput');
-  if (candTimeInput && (!candTimeInput.value || candTimeInput.value.includes('5:00') || !State.currentCandidate?.election_time)) {
-    candTimeInput.value = State.currentCandidate?.election_time || gTime;
-  }
-
-  // Super Admin Voter Portal control inputs
-  const vDateInp = document.getElementById('voterPortalElectionDateInput');
-  if (vDateInp && (triPortalSettings.voter_portal?.election_date || triPortalSettings.election_date)) {
-    vDateInp.value = triPortalSettings.voter_portal?.election_date || triPortalSettings.election_date;
-  }
-  const vTimeInp = document.getElementById('voterPortalElectionTimeInput');
-  if (vTimeInp && (triPortalSettings.voter_portal?.election_time || triPortalSettings.election_time)) {
-    vTimeInp.value = triPortalSettings.voter_portal?.election_time || triPortalSettings.election_time;
-  }
-
-  // Live specimen slip refresh if present
-  if (typeof renderLiveSpecimenSlip === 'function' && document.getElementById('liveSpecimenSlipContainer')) {
-    try { renderLiveSpecimenSlip(); } catch(_) {}
-  }
-}
-
-async function saveVoterPortalElectionDate() {
-  const dateInput = document.getElementById('voterPortalElectionDateInput');
-  const timeInput = document.getElementById('voterPortalElectionTimeInput');
-  const newDate = (dateInput ? dateInput.value : '').trim() || '15 अक्टूबर 2026';
-  const newTime = (timeInput ? timeInput.value : '').trim() || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
-
-  if (!triPortalSettings.voter_portal) triPortalSettings.voter_portal = {};
-  triPortalSettings.voter_portal.election_date = newDate;
-  triPortalSettings.voter_portal.election_time = newTime;
-  triPortalSettings.election_date = newDate;
-  triPortalSettings.election_time = newTime;
-
-  localStorage.setItem('portal_tri_settings', JSON.stringify(triPortalSettings));
-  applyGlobalElectionDateToUI();
-
-  if (typeof showToast === 'function') {
-    showToast(`📅 वोटर पोर्टल चुनाव दिनांक सेट: ${newDate} (${newTime})`);
-  }
-
-  try {
-    const isLocalServer = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocalServer) {
-      const res = await fetch('/api/portal-settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(triPortalSettings)
-      });
-      if (res.ok) {
-        if (typeof showToast === 'function') {
-          showToast('✅ चुनाव दिनांक व समय सुरक्षित एवं सभी पोर्टल्स पर लाइव सिंक हो गया!');
-        }
-      }
-    }
-  } catch(e) {
-    console.warn('Error saving portal settings:', e);
-  }
-}
+// triPortalSettings and helpers moved to top of file
 
 async function loadTriPortalSettings() {
   const isLocalServer = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
