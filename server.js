@@ -189,7 +189,7 @@ function exportToJson() {
         panchayat: c.panchayat,
         ward: c.ward,
         election_date: c.election_date || '15 अक्टूबर 2026',
-        election_time: c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
+        election_time: c.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक',
         symbol_name: c.symbol_name,
         symbol_icon: c.symbol_icon,
         custom_symbol_url: c.custom_symbol_url || '',
@@ -205,8 +205,23 @@ function exportToJson() {
       candidates[key2] = pickBestCand(candidates[key2], candObj);
     });
 
+    let globalElectionDate = '15 अक्टूबर 2026';
+    let globalElectionTime = 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
+    try {
+      const sp = path.join(__dirname, 'portal_settings.json');
+      if (fs.existsSync(sp)) {
+        const sData = JSON.parse(fs.readFileSync(sp, 'utf8'));
+        if (sData.voter_portal?.election_date) globalElectionDate = sData.voter_portal.election_date;
+        else if (sData.election_date) globalElectionDate = sData.election_date;
+        if (sData.voter_portal?.election_time) globalElectionTime = sData.voter_portal.election_time;
+        else if (sData.election_time) globalElectionTime = sData.election_time;
+      }
+    } catch(_) {}
+
     const payload = {
       version: '2.0.0',
+      election_date: globalElectionDate,
+      election_time: globalElectionTime,
       last_updated: new Date().toISOString(),
       users,
       candidates
@@ -217,6 +232,8 @@ function exportToJson() {
 
     // Synchronously copy updated portal_users.json to sibling repos (blo-portal and voter-portal)
     const siblingRepos = [
+      'C:\\Users\\jiten\\OneDrive\\Documents\\GitHub\\blo-portal',
+      'C:\\Users\\jiten\\OneDrive\\Documents\\GitHub\\voter-portal',
       'C:\\Users\\jiten\\Documents\\GitHub\\blo-portal',
       'C:\\Users\\jiten\\Documents\\GitHub\\voter-portal'
     ];
@@ -518,6 +535,7 @@ const server = http.createServer(async (req, res) => {
         const data = await parseJsonBody(req);
         const p = path.join(__dirname, 'portal_settings.json');
         fs.writeFileSync(p, JSON.stringify(data, null, 2), 'utf8');
+        try { exportToJson(); } catch(_) {}
         scheduleAutoPushToGithub('portal_settings');
         res.end(JSON.stringify({ success: true, settings: data, auto_push_scheduled: true }));
       } catch(e) {
@@ -745,7 +763,13 @@ const server = http.createServer(async (req, res) => {
           candidate: candMap[u.id] || candMap[u.username] || null
         }));
 
-        res.end(JSON.stringify({ success: true, users: merged, candidates: candMap }));
+        let spDate = '15 अक्टूबर 2026', spTime = 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
+        try {
+          const spData = JSON.parse(fs.readFileSync(path.join(__dirname, 'portal_settings.json'), 'utf8'));
+          spDate = spData.voter_portal?.election_date || spData.election_date || spDate;
+          spTime = spData.voter_portal?.election_time || spData.election_time || spTime;
+        } catch(_) {}
+        res.end(JSON.stringify({ success: true, users: merged, candidates: candMap, election_date: spDate, election_time: spTime }));
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ success: false, error: err.message }));
@@ -860,7 +884,7 @@ const server = http.createServer(async (req, res) => {
           customSymToSave,
           c.photo_url || '',
           c.slogan || '',
-          c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
+          c.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक',
           c.mobile || u.mobile || '',
           c.show_banner_on_slip ? 1 : 0,
           new Date().toISOString(),
@@ -881,7 +905,7 @@ const server = http.createServer(async (req, res) => {
           c.custom_symbol_url || '',
           c.photo_url || '',
           c.slogan || '',
-          c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
+          c.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक',
           c.mobile || u.mobile || '',
           c.show_banner_on_slip ? 1 : 0,
           new Date().toISOString()
@@ -948,7 +972,7 @@ const server = http.createServer(async (req, res) => {
               c.photo_url || '',
               c.slogan || '',
               c.election_date || '15 अक्टूबर 2026',
-              c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
+              c.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक',
               c.mobile || '',
               c.show_banner_on_slip ? 1 : 0,
               new Date().toISOString(),
@@ -970,7 +994,7 @@ const server = http.createServer(async (req, res) => {
               c.photo_url || '',
               c.slogan || '',
               c.election_date || '15 अक्टूबर 2026',
-              c.election_time || 'प्रातः 7:00 बजे से सायं 5:00 बजे तक',
+              c.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक',
               c.mobile || '',
               c.show_banner_on_slip ? 1 : 0,
               new Date().toISOString()
