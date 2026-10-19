@@ -2590,15 +2590,10 @@ function syncCurrentUserWithConfiguredUsers() {
 
 function initSession() {
   const ctx = getPortalContext();
-  const sessionKey = getSessionStorageKey();
+  const sessionKey = `panchayat_session_${ctx}`;
 
-  // Unified Multi-Storage Session Resolver (Prevents accidental logouts on refresh/sync)
-  const saved = localStorage.getItem(sessionKey) || 
-                sessionStorage.getItem(sessionKey) || 
-                localStorage.getItem('panchayat_user_session') || 
-                sessionStorage.getItem('panchayat_user_session') ||
-                localStorage.getItem('panchayat_session_voter') ||
-                localStorage.getItem('panchayat_session_master');
+  // STRICT Portal-Isolated Session: ONLY load session intended for this specific portal!
+  const saved = localStorage.getItem(sessionKey) || sessionStorage.getItem(sessionKey);
 
   if (saved) {
     try {
@@ -2870,9 +2865,28 @@ function updateUserScopeDisplay() {
   const gpName = document.getElementById('bannerGpName');
   const wardScope = document.getElementById('bannerWardScope');
   const sessionStatus = document.getElementById('sessionStatusText');
+  const bannerUserLabel = document.getElementById('bannerUserLabel');
+
+  const isCand = isCandidateUser(u);
+
+  if (bannerUserLabel) {
+    if (isCand) {
+      bannerUserLabel.textContent = 'प्रत्याशी:';
+    } else if (u.role === 'BLO') {
+      bannerUserLabel.textContent = 'बी.एल.ओ.:';
+    } else if (u.role === 'SUPER_ADMIN') {
+      bannerUserLabel.textContent = 'व्यवस्थापक:';
+    } else {
+      bannerUserLabel.textContent = 'उपयोगकर्ता:';
+    }
+  }
 
   if (roleBadge) {
-    if (u.role === 'SUPER_ADMIN') {
+    if (isCand) {
+      roleBadge.textContent = '🚩 अधिकृत प्रत्याशी सत्र (Candidate)';
+      roleBadge.style.background = '#d97706';
+      roleBadge.style.color = '#ffffff';
+    } else if (u.role === 'SUPER_ADMIN') {
       roleBadge.textContent = '👑 मुख्य व्यवस्थापक (Super Admin)';
       roleBadge.style.background = '#b45309';
       roleBadge.style.color = '#ffffff';
@@ -2903,7 +2917,6 @@ function updateUserScopeDisplay() {
     }
   }
 
-  const isCand = isCandidateUser(u);
   if (userName) userName.textContent = u.full_name || u.username;
   if (gpName) gpName.textContent = u.panchayat || (u.allowed_panchayats === 'ALL' ? 'समस्त 30 ग्राम पंचायतें' : u.allowed_panchayats);
   if (wardScope) wardScope.textContent = u.allowed_wards === 'ALL' ? 'समस्त वार्ड' : `वार्ड ${u.allowed_wards}`;
@@ -8782,12 +8795,13 @@ function logoutUser() {
   State.currentUser = null;
   State.currentCandidate = null;
 
-  // 1. Instantly remove user-logged-in class so CSS !important display rules release
+  // 1. Instantly remove user-logged-in class from both html and body
   if (typeof document !== 'undefined') {
     document.documentElement.classList.remove('user-logged-in');
+    if (document.body) document.body.classList.remove('user-logged-in');
   }
 
-  // 2. Remove all possible session keys across localStorage and sessionStorage
+  // 2. Clear all portal session keys across localStorage and sessionStorage
   const sessionKeys = [
     'panchayat_session_voter',
     'panchayat_session_master',
@@ -8796,7 +8810,7 @@ function logoutUser() {
     'portal_session_voter',
     'portal_session_master',
     'portal_session_blo',
-    (typeof getSessionStorageKey === 'function' ? getSessionStorageKey() : 'panchayat_session')
+    'panchayat_session'
   ];
 
   sessionKeys.forEach(k => {
@@ -8806,21 +8820,22 @@ function logoutUser() {
     } catch(_) {}
   });
 
-  // 3. Explicitly flip gatekeeper screen visible & hide main portal app
+  // 3. Clear password and error in login form
+  const passEl = document.getElementById('gatekeeperPassword');
+  if (passEl) passEl.value = '';
+  const errEl = document.getElementById('gatekeeperError');
+  if (errEl) errEl.style.display = 'none';
+
+  // 4. Reset screen elements
   const gatekeeper = document.getElementById('welcomeGatekeeper');
   const mainApp = document.getElementById('mainPortalApp');
   if (gatekeeper) gatekeeper.style.display = 'flex';
   if (mainApp) mainApp.style.display = 'none';
 
-  // 4. Clear password input in login card
-  const passEl = document.getElementById('gatekeeperPassword');
-  if (passEl) passEl.value = '';
-
-  enforceGatekeeperState();
-
-  if (typeof showToast === 'function') {
-    showToast('आप सफलतापूर्वक लॉगआउट हो गए हैं।');
-  }
+  // 5. Clean page reload to ensure 100% fresh login gatekeeper state without leftover memory
+  try {
+    window.location.reload();
+  } catch(_) {}
 }
 
 

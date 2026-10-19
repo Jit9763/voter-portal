@@ -1018,14 +1018,29 @@ const server = http.createServer(async (req, res) => {
 
   // =========================================================================
   // =========================================================================
+    // =========================================================================
+  // =========================================================================
   // HIGH-SPEED STATIC FILE SERVING WITH GZIP COMPRESSION & ZERO-CACHE HOT RELOAD
   // =========================================================================
-  let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
-  if (safePath === '/' || safePath === '\\') safePath = '/index.html';
+  const portalParam = (url.searchParams.get('portal') || '').toLowerCase();
+  const voterRepoDir = path.resolve(__dirname, '..', 'voter-portal');
+  const bloRepoDir = path.resolve(__dirname, '..', 'blo-portal');
 
-  let filePath = path.join(__dirname, safePath);
-  if (!fs.existsSync(filePath)) {
-    filePath = path.join(__dirname, 'index.html');
+  let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
+  const isVoterRoute = portalParam === 'voter' || pathname.startsWith('/voter');
+  const isBloRoute = portalParam === 'blo' || pathname.startsWith('/blo');
+
+  let filePath;
+  if (isVoterRoute && (pathname === '/' || pathname === '/index.html' || pathname === '/voter' || pathname === '/voter/' || pathname === '/voter-portal' || pathname === '/voter-portal/')) {
+    filePath = path.join(voterRepoDir, 'index.html');
+  } else if (isBloRoute && (pathname === '/' || pathname === '/index.html' || pathname === '/blo' || pathname === '/blo/' || pathname === '/blo-portal' || pathname === '/blo-portal/')) {
+    filePath = path.join(bloRepoDir, 'index.html');
+  } else {
+    if (safePath === '/' || safePath === '\\') safePath = '/index.html';
+    filePath = path.join(__dirname, safePath);
+    if (!fs.existsSync(filePath)) {
+      filePath = path.join(__dirname, 'index.html');
+    }
   }
 
   const ext = path.extname(filePath).toLowerCase();
