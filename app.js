@@ -50,26 +50,50 @@ function getGlobalElectionTime() {
 }
 
 function getActiveCandidate() {
-  if (typeof State === 'undefined') return null;
-  if (State.currentCandidate && (State.currentCandidate.candidate_name || State.currentCandidate.election_date)) {
+  if (typeof State === 'undefined' || !State || !State.currentUser) return null;
+  const u = State.currentUser;
+  const uId = String(u.id || u.username || '').toLowerCase();
+  const altId = uId.startsWith('cand_') ? uId.replace('cand_', '') : ('cand_' + uId);
+
+  // STRICT OWNERSHIP CHECK: A candidate object must belong to CURRENT user ONLY
+  function belongsToCurrentUser(c) {
+    if (!c || typeof c !== 'object') return false;
+    const cid = String(c.user_id || '').toLowerCase();
+    if (!cid) return false;
+    return cid === uId || cid === altId || (u.username && cid === String(u.username).toLowerCase());
+  }
+
+  // 1. Check State.currentUser.candidate
+  if (u.candidate && belongsToCurrentUser(u.candidate)) {
+    return u.candidate;
+  }
+
+  // 2. Check State.currentCandidate (only if belongs to current user!)
+  if (State.currentCandidate && belongsToCurrentUser(State.currentCandidate)) {
     return State.currentCandidate;
   }
-  if (State.currentUser) {
-    if (State.currentUser.candidate && (State.currentUser.candidate.candidate_name || State.currentUser.candidate.election_date)) {
-      return State.currentUser.candidate;
+
+  // 3. Check window.PORTAL_USERS_DATA.candidates
+  if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+    const cMap = window.PORTAL_USERS_DATA.candidates;
+    const c = cMap[u.id] || cMap[u.username] || cMap[uId] || cMap[altId];
+    if (c && (belongsToCurrentUser(c) || !c.user_id)) {
+      c.user_id = u.id || u.username;
+      return c;
     }
-    const uId = State.currentUser.id || State.currentUser.username;
-    const alt = uId ? (uId.startsWith('cand_') ? uId.replace('cand_', '') : ('cand_' + uId)) : '';
-    if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
-      if (uId && window.PORTAL_USERS_DATA.candidates[uId]) return window.PORTAL_USERS_DATA.candidates[uId];
-      if (State.currentUser.username && window.PORTAL_USERS_DATA.candidates[State.currentUser.username]) return window.PORTAL_USERS_DATA.candidates[State.currentUser.username];
-      if (alt && window.PORTAL_USERS_DATA.candidates[alt]) return window.PORTAL_USERS_DATA.candidates[alt];
-    }
-    try {
-      const c = localStorage.getItem('candidate_profile_' + uId) || (State.currentUser.username && localStorage.getItem('candidate_profile_' + State.currentUser.username)) || (alt && localStorage.getItem('candidate_profile_' + alt));
-      if (c) return JSON.parse(c);
-    } catch(_) {}
   }
+
+  // 4. Check localStorage strictly for current user
+  try {
+    const cached = localStorage.getItem('candidate_profile_' + u.id) || 
+                   (u.username && localStorage.getItem('candidate_profile_' + u.username)) ||
+                   (altId && localStorage.getItem('candidate_profile_' + altId));
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && belongsToCurrentUser(parsed)) return parsed;
+    }
+  } catch(_) {}
+
   return null;
 }
 
@@ -2879,10 +2903,19 @@ function updateUserScopeDisplay() {
     }
   }
 
+  const isCand = isCandidateUser(u);
   if (userName) userName.textContent = u.full_name || u.username;
   if (gpName) gpName.textContent = u.panchayat || (u.allowed_panchayats === 'ALL' ? 'समस्त 30 ग्राम पंचायतें' : u.allowed_panchayats);
   if (wardScope) wardScope.textContent = u.allowed_wards === 'ALL' ? 'समस्त वार्ड' : `वार्ड ${u.allowed_wards}`;
-  if (sessionStatus) sessionStatus.textContent = `${u.full_name || u.username} (${u.role === 'SUPER_ADMIN' ? 'सुपर एडमिन' : (u.role === 'INCHARGE' ? 'ब्लॉक इनचार्ज' : (u.role === 'VYAVASTHAPAK' ? 'व्यवस्थापक' : 'अधिकृत सत्र'))})`;
+  if (sessionStatus) {
+    if (u.role === 'SUPER_ADMIN') sessionStatus.textContent = `${u.full_name || u.username} (सुपर एडमिन)`;
+    else if (u.role === 'INCHARGE') sessionStatus.textContent = `${u.full_name || u.username} (ब्लॉक इनचार्ज)`;
+    else if (u.role === 'VYAVASTHAPAK') sessionStatus.textContent = `${u.full_name || u.username} (व्यवस्थापक)`;
+    else if (u.role === 'BLOCK_PRABHARI') sessionStatus.textContent = `${u.full_name || u.username} (ब्लॉक प्रभारी)`;
+    else if (isCand) sessionStatus.textContent = `${u.full_name || u.username} (प्रत्याशी)`;
+    else if (u.role === 'BLO') sessionStatus.textContent = `${u.full_name || u.username} (BLO)`;
+    else sessionStatus.textContent = `${u.full_name || u.username} (अधिकृत सत्र)`;
+  }
 
   // Admin users box visibility
   const adminBox = document.getElementById('adminUserManagementBox');
@@ -3762,8 +3795,11 @@ function findCandidateForVoter(voter) {
     }
   }
 
-  // 4. Return State.currentCandidate if present
-  if (State.currentCandidate) return State.currentCandidate;
+  // 4. Only return current candidate if their GP actually matches voter GP
+  if (State.currentCandidate && State.currentCandidate.panchayat) {
+    const candGp = String(State.currentCandidate.panchayat).trim().toLowerCase();
+    if (candGp === voterGp || candGp === voterGpCode) return State.currentCandidate;
+  }
 
   // 5. Default candidate for this GP
   return {
@@ -5711,58 +5747,59 @@ async function initCandidateProfileTab() {
 
   if (!u) return;
 
-  // Retrieve candidate profile from:
-  // 1. Fresh remote data from window.PORTAL_USERS_DATA.candidates (GitHub / latest sync)
-  // 2. /api/candidate endpoint (Node server)
-  // 3. State.currentCandidate
-  // 4. Fallback localStorage
   const uKey = u.id || u.username;
-  let cand = null;
+  const uIdLower = String(uKey).toLowerCase();
+  const altId = uIdLower.startsWith('cand_') ? uIdLower.replace('cand_', '') : ('cand_' + uIdLower);
 
-  if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
-    cand = window.PORTAL_USERS_DATA.candidates[uKey] || (u.id && window.PORTAL_USERS_DATA.candidates[u.id]) || (u.username && window.PORTAL_USERS_DATA.candidates[u.username]);
+  function belongsToUser(c) {
+    if (!c || typeof c !== 'object') return false;
+    const cid = String(c.user_id || '').toLowerCase();
+    if (!cid) return false;
+    return cid === uIdLower || cid === altId || (u.username && cid === String(u.username).toLowerCase());
   }
-  if (!cand || !cand.candidate_name) {
+
+  let cand = getActiveCandidate();
+
+  if (!cand || !belongsToUser(cand)) {
     try {
       const res = await fetch('/api/candidate/' + encodeURIComponent(uKey));
       if (res.ok) {
         const d = await res.json();
-        if (d && d.candidate && d.candidate.candidate_name) {
+        if (d && d.candidate && belongsToUser(d.candidate)) {
           cand = d.candidate;
         }
       }
     } catch(e) {}
   }
-  if (!cand && State.currentCandidate) {
-    cand = State.currentCandidate;
-  }
-  if (!cand) {
-    try {
-      const cached = localStorage.getItem('candidate_profile_' + uKey) || (u.id && localStorage.getItem('candidate_profile_' + u.id)) || (u.username && localStorage.getItem('candidate_profile_' + u.username));
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && !String(parsed.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
-          cand = parsed;
-        }
-      }
-    } catch(e) {}
-  }
-  if (cand) {
-    if (String(cand.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
-      cand.slogan = '।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।';
-    }
-    if (String(cand.candidate_name || '').toLowerCase().includes('narendra')) {
-      cand.candidate_name = 'श्री रामेश्वर जाट';
-    }
-    State.currentCandidate = cand;
-    try {
-      localStorage.setItem('candidate_profile_' + uKey, JSON.stringify(cand));
-      if (u.id) localStorage.setItem('candidate_profile_' + u.id, JSON.stringify(cand));
-      if (u.username) localStorage.setItem('candidate_profile_' + u.username, JSON.stringify(cand));
-    } catch(_) {}
+
+  // If still not found, create clean isolated candidate profile for THIS user only
+  if (!cand || !belongsToUser(cand)) {
+    cand = {
+      user_id: uKey,
+      candidate_name: (u.full_name && !u.full_name.includes('प्रतिनिधि')) ? u.full_name : (u.name || ''),
+      mobile: u.mobile || '',
+      post: 'सरपंच',
+      panchayat: u.panchayat || u.allowed_panchayats || '',
+      ward: (u.allowed_wards && u.allowed_wards !== 'ALL') ? u.allowed_wards : '',
+      election_date: getGlobalElectionDate(),
+      election_time: getGlobalElectionTime(),
+      symbol_name: 'उगता सूरज',
+      symbol_icon: 'sun',
+      custom_symbol_url: '',
+      photo_url: '',
+      slogan: '',
+      show_banner_on_slip: true,
+      updated_at: new Date().toISOString()
+    };
   }
 
-  if (cand) State.currentCandidate = cand;
+  State.currentCandidate = cand;
+  u.candidate = cand;
+  try {
+    localStorage.setItem('candidate_profile_' + uKey, JSON.stringify(cand));
+    if (u.id) localStorage.setItem('candidate_profile_' + u.id, JSON.stringify(cand));
+    if (u.username) localStorage.setItem('candidate_profile_' + u.username, JSON.stringify(cand));
+  } catch(_) {}
 
   const nameInput = document.getElementById('candidateNameInput');
   const mobileInput = document.getElementById('candidateMobileInput');
@@ -7009,13 +7046,13 @@ function startLivePermissionSyncWatcher() {
     }
   });
 
-  // D. Background live sync safety loop every 45 seconds (requested by user to keep performance high)
+  // D. Fast live sync loop every 5 seconds (auto-applies changes from .bat pushes without manual hard refresh)
   setInterval(async () => {
     if (document.visibilityState === 'hidden') return;
     try {
       await loadAdminUsersList(false);
     } catch(e) {}
-  }, 45000);
+  }, 5000);
 }
 
 function togglePasswordVisibility(inputId, btn) {
@@ -8743,15 +8780,47 @@ async function handleGatekeeperLogin(event) {
 
 function logoutUser() {
   State.currentUser = null;
-  const sk = getSessionStorageKey();
-  localStorage.removeItem(sk);
-  sessionStorage.removeItem(sk);
-  if (getPortalContext() === 'master') {
-    localStorage.removeItem('panchayat_user_session');
-    sessionStorage.removeItem('panchayat_user_session');
+  State.currentCandidate = null;
+
+  // 1. Instantly remove user-logged-in class so CSS !important display rules release
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.remove('user-logged-in');
   }
+
+  // 2. Remove all possible session keys across localStorage and sessionStorage
+  const sessionKeys = [
+    'panchayat_session_voter',
+    'panchayat_session_master',
+    'panchayat_session_blo',
+    'panchayat_user_session',
+    'portal_session_voter',
+    'portal_session_master',
+    'portal_session_blo',
+    (typeof getSessionStorageKey === 'function' ? getSessionStorageKey() : 'panchayat_session')
+  ];
+
+  sessionKeys.forEach(k => {
+    try {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    } catch(_) {}
+  });
+
+  // 3. Explicitly flip gatekeeper screen visible & hide main portal app
+  const gatekeeper = document.getElementById('welcomeGatekeeper');
+  const mainApp = document.getElementById('mainPortalApp');
+  if (gatekeeper) gatekeeper.style.display = 'flex';
+  if (mainApp) mainApp.style.display = 'none';
+
+  // 4. Clear password input in login card
+  const passEl = document.getElementById('gatekeeperPassword');
+  if (passEl) passEl.value = '';
+
   enforceGatekeeperState();
-  showToast('आप सफलतापूर्वक लॉगआउट हो गए हैं।');
+
+  if (typeof showToast === 'function') {
+    showToast('आप सफलतापूर्वक लॉगआउट हो गए हैं।');
+  }
 }
 
 
