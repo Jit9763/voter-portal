@@ -382,7 +382,7 @@ function executeGithubPush(reason = 'update', callback = null) {
     });
 
     // Copy shared files (preserving dedicated index.html)
-    const syncFiles = ['portal_users.json', 'portal_settings.json', 'app.js', 'styles.css', 'master_directory.js', 'symbols_master.js', 'version.json'];
+    const syncFiles = ['portal_users.json', 'portal_settings.json', 'app.js', 'styles.css', 'master_directory.js', 'symbols_master.js', 'version.json', 'Code.gs', 'candidates_seed.csv'];
     otherRepos.forEach(rDir => {
       syncFiles.forEach(f => {
         const s = path.join(__dirname, f);
@@ -440,6 +440,227 @@ function executeGithubPush(reason = 'update', callback = null) {
     });
   } else {
     runDirectGitPush();
+  }
+}
+
+// =========================================================================
+// GOOGLE SHEET CANDIDATE SYNC ENGINE (HOURLY AUTO-UPDATE & REALTIME CONTROL)
+// =========================================================================
+let isCandidateSyncing = false;
+let lastCandidateSyncTime = null;
+
+function getAppsScriptUrl() {
+  let url = process.env.APPS_SCRIPT_URL || '';
+  if (!url) {
+    try {
+      const spData = JSON.parse(fs.readFileSync(path.join(__dirname, 'portal_settings.json'), 'utf8'));
+      url = spData.google_sheet_sync?.apps_script_url || spData.apps_script_url || '';
+    } catch(_) {}
+  }
+  if (!url) {
+    url = 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+  }
+  return url;
+}
+
+async function syncCandidatesFromGoogleSheet(isManual = false) {
+  if (isCandidateSyncing) {
+    console.log('[GOOGLE-SHEET-SYNC] Sync already running in background, skipping.');
+    return { success: false, message: 'Sync already in progress' };
+  }
+  const url = getAppsScriptUrl();
+  if (!url) {
+    console.log('[GOOGLE-SHEET-SYNC] Apps Script URL not configured.');
+    return { success: false, message: 'Apps Script URL not configured' };
+  }
+
+  isCandidateSyncing = true;
+  console.log(`[GOOGLE-SHEET-SYNC] ${isManual ? 'Manual' : 'Hourly'} checking Google Sheet for candidate changes...`);
+
+  try {
+    const fetchUrl = `${url}${url.includes('?') ? '&' : '?'}action=getCandidates&_t=${Date.now()}`;
+    const res = await fetch(fetchUrl, {
+      redirect: 'follow',
+      headers: { 'Cache-Control': 'no-cache' }
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP error ${res.status}: ${res.statusText}`);
+    }
+    const data = await res.json();
+    if (!data || !data.success || !Array.isArray(data.candidates)) {
+      throw new Error(data?.error || 'Invalid candidates data returned from Google Sheet');
+    }
+
+    const sheetCandidates = data.candidates;
+    console.log(`[GOOGLE-SHEET-SYNC] Fetched ${sheetCandidates.length} candidate rows from Google Sheet.`);
+
+    // Fetch existing candidate users from SQLite (preserving all other user roles!)
+    const currentUsers = db.prepare(`
+      SELECT * FROM users 
+      WHERE (role = 'CANDIDATE' OR role = 'प्रत्याशी' OR id LIKE 'cand_%' OR username = 'sarpanch' OR username = 'b')
+        AND role != 'SUPER_ADMIN' AND role != 'BLO'
+        AND role NOT LIKE '%बी.एल.ओ%' AND role NOT LIKE '%प्रकोष्ठ%'
+        AND id NOT LIKE 'cell_%' AND username NOT IN ('admin', 'incharge', 'vyavasthapak', 'block_prabhari')
+    `).all();
+
+    const currentUserMap = new Map();
+    currentUsers.forEach(u => {
+      currentUserMap.set(String(u.id).toLowerCase(), u);
+      currentUserMap.set(String(u.username).toLowerCase(), u);
+      currentUserMap.set(String(u.id).toLowerCase().replace(/^cand_/i, ''), u);
+    });
+
+    const currentCandProfiles = db.prepare('SELECT * FROM candidates').all();
+    const currentCandMap = new Map();
+    currentCandProfiles.forEach(c => {
+      currentCandMap.set(String(c.user_id).toLowerCase(), c);
+      currentCandMap.set(String(c.user_id).toLowerCase().replace(/^cand_/i, ''), c);
+    });
+
+    const upsertUser = db.prepare(`
+      INSERT OR REPLACE INTO users (
+        id, username, password, full_name, mobile, role, status,
+        allowed_panchayats, allowed_wards, allowed_tabs, candidate_mode,
+        can_print, can_download, can_search, can_view, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 1, 1, ?, ?)
+    `);
+
+    const upsertCand = db.prepare(`
+      INSERT OR REPLACE INTO candidates (
+        user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon,
+        custom_symbol_url, photo_url, slogan, election_date, election_time,
+        mobile, show_banner_on_slip, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const deleteUserStmt = db.prepare('DELETE FROM users WHERE id = ? OR username = ?');
+    const deleteCandStmt = db.prepare('DELETE FROM candidates WHERE user_id = ?');
+
+    let addedCount = 0;
+    let updatedCount = 0;
+    let deletedCount = 0;
+    let hasChanges = false;
+
+    const sheetUsernames = new Set();
+    const sheetIds = new Set();
+
+    db.exec('BEGIN TRANSACTION;');
+    try {
+      // 1. Upsert all candidate rows from Google Sheet
+      for (const sc of sheetCandidates) {
+        const uId = (sc.id || ('cand_' + sc.username)).trim();
+        const username = (sc.username || sc.raw_id || uId.replace(/^cand_/i, '')).trim();
+        const altId = uId.startsWith('cand_') ? uId.replace('cand_', '') : ('cand_' + uId);
+
+        sheetUsernames.add(username.toLowerCase());
+        sheetIds.add(uId.toLowerCase());
+        sheetIds.add(altId.toLowerCase());
+
+        const existingUser = currentUserMap.get(username.toLowerCase()) || currentUserMap.get(uId.toLowerCase());
+        const existingCand = currentCandMap.get(username.toLowerCase()) || currentCandMap.get(uId.toLowerCase());
+
+        const candName = sc.candidate_name || sc.full_name || sc.name || username;
+        const password = sc.password || existingUser?.password || 'cand@2026';
+        const mobile = sc.mobile || '';
+        const post = sc.post || 'सरपंच';
+        const gp = sc.panchayat || sc.allowed_panchayats || '';
+        const ward = sc.ward || sc.allowed_wards || 'ALL';
+        const symName = sc.symbol_name || 'उगता सूरज';
+        const symIcon = sc.symbol_icon || (sc.custom_symbol_url ? 'custom' : 'sun');
+        const customSym = sc.custom_symbol_url || '';
+        const photo = sc.photo_url || '';
+        const slogan = sc.slogan || '';
+        const eDate = sc.election_date || '15 अक्टूबर 2026';
+        const eTime = sc.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
+        const status = (sc.status || 'ACTIVE').toUpperCase();
+        const showBanner = sc.show_banner_on_slip !== false ? 1 : 0;
+        const now = new Date().toISOString();
+
+        let isDiff = false;
+        if (!existingUser) {
+          isDiff = true;
+          addedCount++;
+        } else if (
+          existingUser.password !== password ||
+          existingUser.full_name !== candName ||
+          existingUser.mobile !== mobile ||
+          existingUser.allowed_panchayats !== gp ||
+          existingUser.allowed_wards !== ward ||
+          existingUser.status !== status ||
+          !existingCand ||
+          existingCand.candidate_name !== candName ||
+          existingCand.post !== post ||
+          existingCand.symbol_name !== symName ||
+          existingCand.symbol_icon !== symIcon ||
+          existingCand.custom_symbol_url !== customSym ||
+          existingCand.photo_url !== photo ||
+          existingCand.slogan !== slogan ||
+          existingCand.election_date !== eDate ||
+          existingCand.election_time !== eTime ||
+          existingCand.show_banner_on_slip !== showBanner
+        ) {
+          isDiff = true;
+          updatedCount++;
+        }
+
+        if (isDiff) {
+          hasChanges = true;
+          const allowedTabsJson = JSON.stringify(['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab']);
+          const createdAt = existingUser?.created_at || now;
+
+          upsertUser.run(uId, username, password, candName, mobile, 'CANDIDATE', status, gp, ward, allowedTabsJson, 'user_edit', createdAt, now);
+          upsertCand.run(uId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, now);
+          upsertCand.run(altId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, now);
+        }
+      }
+
+      // 2. Remove candidates deleted from Google Sheet
+      for (const u of currentUsers) {
+        const uLower = String(u.username || '').toLowerCase();
+        const idLower = String(u.id || '').toLowerCase();
+        const altLower = idLower.replace(/^cand_/i, '');
+
+        if (!sheetUsernames.has(uLower) && !sheetIds.has(idLower) && !sheetIds.has(altLower)) {
+          console.log(`[GOOGLE-SHEET-SYNC] Removing candidate '${u.username}' (deleted from Google Sheet).`);
+          deleteUserStmt.run(u.id, u.username);
+          deleteCandStmt.run(u.id);
+          deleteCandStmt.run(altLower);
+          deleteCandStmt.run('cand_' + altLower);
+          deletedCount++;
+          hasChanges = true;
+        }
+      }
+
+      db.exec('COMMIT;');
+    } catch (txErr) {
+      db.exec('ROLLBACK;');
+      throw txErr;
+    }
+
+    lastCandidateSyncTime = new Date().toISOString();
+
+    if (hasChanges) {
+      console.log(`[GOOGLE-SHEET-SYNC] ✅ Candidate Sync Complete! (+Added: ${addedCount}, ~Updated: ${updatedCount}, -Deleted: ${deletedCount})`);
+      exportToJson();
+      scheduleGitPush(`Candidate Google Sheet Sync (+Added: ${addedCount}, ~Updated: ${updatedCount}, -Deleted: ${deletedCount})`);
+    } else {
+      console.log('[GOOGLE-SHEET-SYNC] ✨ All candidates are in perfect sync with Google Sheet. No updates needed.');
+    }
+
+    return {
+      success: true,
+      hasChanges,
+      added: addedCount,
+      updated: updatedCount,
+      deleted: deletedCount,
+      total: sheetCandidates.length,
+      lastSync: lastCandidateSyncTime
+    };
+  } catch (err) {
+    console.error('[GOOGLE-SHEET-SYNC] Notice:', err.message);
+    return { success: false, error: err.message };
+  } finally {
+    isCandidateSyncing = false;
   }
 }
 
@@ -1001,6 +1222,19 @@ const server = http.createServer(async (req, res) => {
     }
 
     // Entire State Sync
+    
+    // Sync Candidates with Google Sheet
+    if (pathname === '/api/sync-candidates') {
+      try {
+        const syncResult = await syncCandidatesFromGoogleSheet(true);
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(syncResult));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+      return;
+    }
     if (pathname === '/api/state' && req.method === 'GET') {
       if (fs.existsSync(JSON_PATH)) {
         res.end(fs.readFileSync(JSON_PATH, 'utf8'));
@@ -1129,6 +1363,24 @@ server.on('error', (err) => {
           console.log(`🚀 Panchayat Chunav 2026 High-Speed Node & SQLite Server is LIVE on port ${PORT}!`);
           console.log(`📁 Local DB: ${DB_PATH}`);
           console.log(`🌐 URL: http://localhost:${PORT}`);
+
+// =========================================================================
+// CANDIDATE GOOGLE SHEET HOURLY RECURRING SYNC TIMER
+// =========================================================================
+const CANDIDATE_HOURLY_SYNC_MS = 60 * 60 * 1000; // 1 Hour
+
+// Initial sync 3 seconds after server start
+setTimeout(() => {
+  syncCandidatesFromGoogleSheet(false).catch(e => console.warn('[GOOGLE-SHEET-SYNC] Initial sync notice:', e.message));
+}, 3000);
+
+// Recurring hourly sync
+setInterval(() => {
+  syncCandidatesFromGoogleSheet(false).catch(e => console.warn('[GOOGLE-SHEET-SYNC] Hourly sync notice:', e.message));
+}, CANDIDATE_HOURLY_SYNC_MS);
+
+console.log('⏰ Candidate Google Sheet hourly sync active (Interval: 1 Hour / 3600000ms)');
+
         });
       }, 800);
       return;

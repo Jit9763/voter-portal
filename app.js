@@ -1,3 +1,123 @@
+// =========================================================================
+// CANDIDATE GOOGLE SHEET CLIENT-SIDE SYNC ENGINE (HOURLY / ON DEMAND)
+// =========================================================================
+async function syncCandidatesFromGoogleSheetClient(showNotification = false) {
+  const isLocalServer = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const bust = Date.now();
+  
+  if (showNotification && typeof showToast === 'function') {
+    showToast('⏳ गूगल शीट से प्रत्याशी डेटा सिंक किया जा रहा है...');
+  }
+
+  // A. If on local node server, use high-speed backend sync
+  if (isLocalServer) {
+    try {
+      const res = await fetch(`/api/sync-candidates?_t=${bust}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success) {
+          localStorage.setItem('last_sheet_candidate_sync', String(bust));
+          await loadAdminUsersList(true);
+          if (showNotification && typeof showToast === 'function') {
+            showToast(`✅ गूगल शीट से सिंक पूर्ण! (कुल: ${data.total || 0}, नए: +${data.added || 0}, अपडेट: ~${data.updated || 0})`);
+          }
+          if (typeof renderAdminCandTab === 'function') renderAdminCandTab();
+          return data;
+        }
+      }
+    } catch(e) {
+      console.warn('Local API sync fallback to direct sheet fetch:', e);
+    }
+  }
+
+  // B. Direct Google Apps Script fetch (For GitHub Pages & Client Mode)
+  const scriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+  if (scriptUrl) {
+    try {
+      const fetchUrl = `${scriptUrl}${scriptUrl.includes('?') ? '&' : '?'}action=getCandidates&_t=${bust}`;
+      const res = await fetch(fetchUrl);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.candidates)) {
+          if (!window.PORTAL_USERS_DATA) window.PORTAL_USERS_DATA = { users: [], candidates: {} };
+          if (!window.PORTAL_USERS_DATA.candidates) window.PORTAL_USERS_DATA.candidates = {};
+          
+          data.candidates.forEach(sc => {
+            const uId = sc.id || ('cand_' + sc.username);
+            const uName = sc.username;
+            const candProfile = {
+              user_id: uId,
+              candidate_name: sc.candidate_name,
+              mobile: sc.mobile,
+              post: sc.post,
+              panchayat: sc.panchayat,
+              ward: sc.ward,
+              symbol_name: sc.symbol_name,
+              symbol_icon: sc.symbol_icon,
+              custom_symbol_url: sc.custom_symbol_url,
+              photo_url: sc.photo_url,
+              slogan: sc.slogan,
+              election_date: sc.election_date,
+              election_time: sc.election_time,
+              show_banner_on_slip: sc.show_banner_on_slip
+            };
+            window.PORTAL_USERS_DATA.candidates[uId] = candProfile;
+            window.PORTAL_USERS_DATA.candidates[uName] = candProfile;
+            try {
+              localStorage.setItem('candidate_profile_' + uId, JSON.stringify(candProfile));
+              localStorage.setItem('candidate_profile_' + uName, JSON.stringify(candProfile));
+            } catch(_) {}
+
+            // Upsert in State.adminControlUsers
+            if (State.adminControlUsers) {
+              const exIdx = State.adminControlUsers.findIndex(u => (u.id === uId || u.username === uName));
+              const candUserObj = {
+                id: uId,
+                username: uName,
+                password: sc.password,
+                full_name: sc.candidate_name,
+                name: sc.candidate_name,
+                mobile: sc.mobile,
+                role: 'CANDIDATE',
+                status: sc.status || 'ACTIVE',
+                allowed_panchayats: sc.panchayat,
+                allowed_wards: sc.ward || 'ALL',
+                allowed_tabs: ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
+                candidate_mode: 'user_edit',
+                candidate: candProfile
+              };
+              if (exIdx >= 0) State.adminControlUsers[exIdx] = candUserObj;
+              else State.adminControlUsers.push(candUserObj);
+            }
+          });
+
+          localStorage.setItem('last_sheet_candidate_sync', String(bust));
+          if (showNotification && typeof showToast === 'function') {
+            showToast(`✅ गूगल शीट से ${data.candidates.length} प्रत्याशी सफलतापूर्वक सिंक!`);
+          }
+          if (typeof renderAdminCandTab === 'function') renderAdminCandTab();
+          return data;
+        }
+      }
+    } catch(err) {
+      console.warn('Direct Apps Script candidate sync notice:', err);
+      if (showNotification && typeof showToast === 'function') {
+        showToast('गूगल शीट से सिंक करने में समस्या: ' + err.message);
+      }
+    }
+  }
+}
+
+// Hourly Background Interval for client (1 hour / 3600000ms)
+setInterval(() => {
+  if (document.visibilityState === 'hidden') return;
+  const lastSync = parseInt(localStorage.getItem('last_sheet_candidate_sync') || '0', 10);
+  if (Date.now() - lastSync >= 3600000) {
+    syncCandidatesFromGoogleSheetClient(false);
+  }
+}, 60000);
+
+
 
 // Automatic Purge of Stale Candidate Test Cache & Slogans
 // Safe Purge: Clean up only corrupt test caches, never delete active sessions!
@@ -8652,13 +8772,67 @@ async function handleGatekeeperLogin(event) {
       enforceGatekeeperState();
       showToast(`नमस्ते ${candUser.full_name}! प्रत्याशी सत्र प्रारंभ हुआ।`);
       return;
-    } else {
-      if (errorDiv) {
-        errorDiv.textContent = 'अमान्य पासवर्ड! कृपया सही पासवर्ड दर्ज करें।';
-        errorDiv.style.display = 'block';
-      }
-      return;
     }
+  }
+
+  // E2. Online Google Sheet Direct Candidate Verification (For newly added candidates or real-time password updates)
+  const isVoterContext = (typeof getPortalContext === 'function' && getPortalContext() === 'voter') || window.location.pathname.includes('voter-portal');
+  const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+
+  if (gScriptUrl) {
+    try {
+      const gUrl = `${gScriptUrl}${gScriptUrl.includes('?') ? '&' : '?'}action=candidateLogin&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&_t=${Date.now()}`;
+      const gRes = await fetch(gUrl);
+      if (gRes.ok) {
+        const gData = await gRes.json();
+        if (gData && gData.success && gData.user && gData.candidate) {
+          const candUser = gData.user;
+          const candProfile = gData.candidate;
+          candUser.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+          candUser.candidate_mode = 'user_edit';
+          candUser.candidate = candProfile;
+          State.currentUser = candUser;
+          State.currentCandidate = candProfile;
+
+          if (!window.PORTAL_USERS_DATA) window.PORTAL_USERS_DATA = { users: [], candidates: {} };
+          if (!window.PORTAL_USERS_DATA.candidates) window.PORTAL_USERS_DATA.candidates = {};
+          window.PORTAL_USERS_DATA.candidates[candUser.id] = candProfile;
+          window.PORTAL_USERS_DATA.candidates[candUser.username] = candProfile;
+
+          try {
+            localStorage.setItem('candidate_profile_' + candUser.id, JSON.stringify(candProfile));
+            localStorage.setItem('candidate_profile_' + candUser.username, JSON.stringify(candProfile));
+            const sk = getSessionStorageKey();
+            localStorage.setItem(sk, JSON.stringify(candUser));
+            sessionStorage.setItem(sk, JSON.stringify(candUser));
+          } catch(_) {}
+
+          if (typeof document !== 'undefined') {
+            document.documentElement.classList.add('user-logged-in');
+          }
+          applyGlobalElectionDateToUI();
+          enforceGatekeeperState();
+          showToast(`नमस्ते ${candUser.full_name || candUser.username}! प्रत्याशी पोर्टल में स्वागत है (गूगल शीट सत्यापित)।`);
+          return;
+        } else if (gData && gData.error && (isVoterContext || candMatch)) {
+          if (errorDiv) {
+            errorDiv.textContent = gData.error;
+            errorDiv.style.display = 'block';
+          }
+          return;
+        }
+      }
+    } catch(gErr) {
+      console.warn('Google Sheet online candidate authentication notice:', gErr);
+    }
+  }
+
+  if (candMatch) {
+    if (errorDiv) {
+      errorDiv.textContent = 'अमान्य पासवर्ड! कृपया सही पासवर्ड दर्ज करें।';
+      errorDiv.style.display = 'block';
+    }
+    return;
   }
 
   // F. BLO & Cell Members lookup (Synchronized with Super Admin configuration)
