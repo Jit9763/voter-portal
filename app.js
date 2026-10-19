@@ -3086,6 +3086,11 @@ function switchTab(tabId) {
   if (tabId === 'directoryTab') initDirectoryTab();
   if (tabId === 'alphaTab') renderAlphabeticalList();
   if (tabId === 'bulkSlipTab') updateBulkGenerator();
+
+  // Also sync Candidates from Google Sheet
+  try {
+    await syncCandidatesFromGoogleSheetClient(!silent);
+  } catch (e) {}
   if (tabId === 'candidateProfileTab') initCandidateProfileTab();
   if (tabId === 'adminControlTab') initAdminControlTab();
 }
@@ -7768,6 +7773,22 @@ async function handleAdminSaveCandidate(event) {
       body: JSON.stringify(candData)
     });
   } catch(e) {}
+
+  // Push candidate to Google Sheet in background
+  try {
+    const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
+    if (gScriptUrl) {
+      fetch(gScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'saveCandidate',
+          candidateData: candData
+        }),
+        mode: 'no-cors'
+      }).catch(() => {});
+    }
+  } catch (e) {}
 
   // Broadcast to other open tabs
   broadcastAdminUpdate({ type: 'CANDIDATE_UPDATED', userId, candidate: candData });
