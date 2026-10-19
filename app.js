@@ -3087,10 +3087,6 @@ function switchTab(tabId) {
   if (tabId === 'alphaTab') renderAlphabeticalList();
   if (tabId === 'bulkSlipTab') updateBulkGenerator();
 
-  // Also sync Candidates from Google Sheet
-  try {
-    await syncCandidatesFromGoogleSheetClient(!silent);
-  } catch (e) {}
   if (tabId === 'candidateProfileTab') initCandidateProfileTab();
   if (tabId === 'adminControlTab') initAdminControlTab();
 }
@@ -5010,6 +5006,15 @@ async function syncWithGoogleSheet(silent = false) {
   performSearch();
   renderAlphabeticalList();
   updateBulkGenerator();
+
+  // Also sync Candidates from Google Sheet
+  try {
+    if (typeof syncCandidatesFromGoogleSheetClient === 'function') {
+      await syncCandidatesFromGoogleSheetClient(false);
+    }
+  } catch (e) {
+    console.warn('Candidate sync error:', e);
+  }
 
   if (!silent) {
     if (adminSyncCount > 0 || voterSyncCount > 0) {

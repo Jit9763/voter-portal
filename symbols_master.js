@@ -5,6 +5,34 @@
 
 window.OFFICIAL_ELECTION_SYMBOLS = [
   {
+    id: "lotus",
+    name_hi: "कमल (Lotus / BJP)",
+    name_en: "Lotus",
+    party: "BJP",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M50,88 C50,75 50,72 50,70" stroke="#15803d" stroke-width="3" stroke-linecap="round"/><path d="M22,78 Q50,92 78,78 Q50,76 22,78 Z" fill="#16a34a" stroke="#15803d" stroke-width="1.5"/><path d="M50,22 C44,38 44,58 50,70 C56,58 56,38 50,22 Z" fill="#ec4899" stroke="#be185d" stroke-width="2"/><path d="M50,70 C40,58 36,42 40,32 C45,45 49,60 50,70 Z" fill="#f43f5e" stroke="#e11d48" stroke-width="1.5"/><path d="M50,70 C60,58 64,42 60,32 C55,45 51,60 50,70 Z" fill="#f43f5e" stroke="#e11d48" stroke-width="1.5"/><path d="M50,70 C34,65 24,52 26,42 C34,54 44,64 50,70 Z" fill="#fb7185" stroke="#f43f5e" stroke-width="1.5"/><path d="M50,70 C66,65 76,52 74,42 C66,54 56,64 50,70 Z" fill="#fb7185" stroke="#f43f5e" stroke-width="1.5"/><path d="M50,70 C28,72 16,62 18,54 C28,62 42,68 50,70 Z" fill="#fda4af" stroke="#fb7185" stroke-width="1.5"/><path d="M50,70 C72,72 84,62 82,54 C72,62 58,68 50,70 Z" fill="#fda4af" stroke="#fb7185" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: "hand",
+    name_hi: "हाथ (Hand / Congress)",
+    name_en: "Hand",
+    party: "Congress",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M35,84 C32,76 32,66 33,52 C33,48 37,48 37,52 L37,35 C37,32 41,32 41,35 L41,25 C41,22 45,22 45,25 L45,22 C45,19 49,19 49,22 L49,42 C49,45 51,45 51,42 L51,28 C51,25 55,25 55,28 L55,45 C55,48 57,48 57,45 L57,35 C57,32 61,32 61,35 L61,54 C61,58 65,54 69,54 C73,54 73,59 69,65 C64,73 57,84 49,86 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2"/><path d="M41,58 Q51,63 57,56" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/><path d="M40,67 Q47,71 55,65" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/></svg>`
+  },
+  {
+    id: "elephant",
+    name_hi: "हाथी (Elephant / BSP)",
+    name_en: "Elephant",
+    party: "BSP",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M20,52 C18,38 30,24 48,24 C64,24 73,30 78,38 C82,44 85,52 83,62 C81,70 75,68 75,63 C75,56 73,48 68,46 C66,54 63,58 63,68 L63,82 L55,82 L55,68 C51,68 45,68 43,68 L43,82 L35,82 L35,68 C27,68 22,64 20,52 Z" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/><path d="M52,32 C60,32 65,42 61,54 C55,58 48,52 50,38 Z" fill="#60a5fa" stroke="#2563eb" stroke-width="1.5"/><path d="M73,55 Q82,56 84,50" fill="none" stroke="#f8fafc" stroke-width="2.5" stroke-linecap="round"/><circle cx="67" cy="36" r="2.5" fill="#ffffff"/><path d="M20,48 Q15,56 18,65" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/></svg>`
+  },
+  {
+    id: "bottle",
+    name_hi: "बोतल (Bottle / RLP)",
+    name_en: "Bottle",
+    party: "RLP",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="44" y="12" width="12" height="7" rx="2" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/><path d="M46,19 L46,34 L34,48 L34,82 A4,4 0 0,0 38,86 L62,86 A4,4 0 0,0 66,82 L66,48 L54,34 L54,19 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2.5"/><rect x="36" y="52" width="28" height="22" rx="2" fill="#ffffff" stroke="#0369a1" stroke-width="1.5"/><line x1="40" y1="58" x2="60" y2="58" stroke="#dc2626" stroke-width="2"/><line x1="42" y1="64" x2="58" y2="64" stroke="#0284c7" stroke-width="2"/><path d="M38,48 L40,80" stroke="#bae6fd" stroke-width="2" stroke-linecap="round"/></svg>`
+  },
+  {
     id: "sun",
     name_hi: "उगता सूरज (Rising Sun)",
     name_en: "Rising Sun",
@@ -127,6 +155,22 @@ window.OFFICIAL_ELECTION_SYMBOLS = [
 ];
 
 function getSymbolSvgById(symbolId) {
+  if (!symbolId) return (window.OFFICIAL_ELECTION_SYMBOLS && window.OFFICIAL_ELECTION_SYMBOLS[0].svg) || '';
+  const sStr = String(symbolId).trim().toLowerCase();
+  const sym = window.OFFICIAL_ELECTION_SYMBOLS.find(s => 
+    s.id === sStr || 
+    s.id === symbolId || 
+    s.name_hi.toLowerCase().includes(sStr) || 
+    s.name_en.toLowerCase() === sStr ||
+    (s.party && s.party.toLowerCase() === sStr) ||
+    (sStr.includes('कमल') && s.id === 'lotus') ||
+    (sStr.includes('हाथ') && s.id === 'hand') ||
+    (sStr.includes('हाथी') && s.id === 'elephant') ||
+    (sStr.includes('बोतल') && s.id === 'bottle')
+  );
+  return sym ? sym.svg : (window.OFFICIAL_ELECTION_SYMBOLS[0].svg);
+}
+function _orig_getSymbolSvgById_old(symbolId) {
   const sym = window.OFFICIAL_ELECTION_SYMBOLS.find(s => s.id === symbolId || s.name_hi.includes(symbolId) || s.name_en.toLowerCase() === String(symbolId).toLowerCase());
   return sym ? sym.svg : (window.OFFICIAL_ELECTION_SYMBOLS[0].svg);
 }
