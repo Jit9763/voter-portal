@@ -1,13 +1,16 @@
 
 // Automatic Purge of Stale Candidate Test Cache & Slogans
+// Safe Purge: Clean up only corrupt test caches, never delete active sessions!
 (function purgeStaleCandidateCache() {
   try {
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const k = localStorage.key(i);
       if (!k) continue;
-      if (k.startsWith('candidate_profile_') || k === 'panchayat_user_session' || k.includes('session') || k === 'portal_custom_users') {
+      // Never wipe login session keys
+      if (k.includes('session') || k === 'panchayat_user_session') continue;
+      if (k.startsWith('candidate_profile_') || k === 'portal_custom_users') {
         const val = localStorage.getItem(k) || '';
-        if (val.includes('सुपरएडमिन द्वारा सिंक') || val.toLowerCase().includes('narendra ji') || val.toLowerCase().includes('nrendra ji')) {
+        if (val.toLowerCase().includes('narendra ji') || val.toLowerCase().includes('nrendra ji')) {
           localStorage.removeItem(k);
         }
       }
@@ -16,7 +19,7 @@
 })();
 
 // ==========================================================================
-// TRI-PORTAL MASTER COMMAND & SETTINGS ENGINE (GLOBAL STATE AT TOP)
+// TRI-PORTAL MASTER COMMAND & SETTINGS ENGINE (GLOBAL STATE & CANDIDATE-AWARE)
 // ==========================================================================
 var triPortalSettings = {
   voter_portal: {
@@ -46,25 +49,78 @@ function getGlobalElectionTime() {
   );
 }
 
+function getActiveCandidate() {
+  if (typeof State === 'undefined') return null;
+  if (State.currentCandidate && (State.currentCandidate.candidate_name || State.currentCandidate.election_date)) {
+    return State.currentCandidate;
+  }
+  if (State.currentUser) {
+    if (State.currentUser.candidate && (State.currentUser.candidate.candidate_name || State.currentUser.candidate.election_date)) {
+      return State.currentUser.candidate;
+    }
+    const uId = State.currentUser.id || State.currentUser.username;
+    const alt = uId ? (uId.startsWith('cand_') ? uId.replace('cand_', '') : ('cand_' + uId)) : '';
+    if (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates) {
+      if (uId && window.PORTAL_USERS_DATA.candidates[uId]) return window.PORTAL_USERS_DATA.candidates[uId];
+      if (State.currentUser.username && window.PORTAL_USERS_DATA.candidates[State.currentUser.username]) return window.PORTAL_USERS_DATA.candidates[State.currentUser.username];
+      if (alt && window.PORTAL_USERS_DATA.candidates[alt]) return window.PORTAL_USERS_DATA.candidates[alt];
+    }
+    try {
+      const c = localStorage.getItem('candidate_profile_' + uId) || (State.currentUser.username && localStorage.getItem('candidate_profile_' + State.currentUser.username)) || (alt && localStorage.getItem('candidate_profile_' + alt));
+      if (c) return JSON.parse(c);
+    } catch(_) {}
+  }
+  return null;
+}
+
+function getCurrentElectionDate() {
+  const isCand = (typeof isCandidateUser === 'function' && isCandidateUser(State?.currentUser)) || 
+                 (State?.currentUser?.role === 'CANDIDATE') || 
+                 (typeof getPortalContext === 'function' && getPortalContext() === 'voter' && State?.currentUser);
+  if (isCand) {
+    const cand = getActiveCandidate();
+    if (cand && cand.election_date) {
+      return cand.election_date;
+    }
+  }
+  return getGlobalElectionDate();
+}
+
+function getCurrentElectionTime() {
+  const isCand = (typeof isCandidateUser === 'function' && isCandidateUser(State?.currentUser)) || 
+                 (State?.currentUser?.role === 'CANDIDATE') || 
+                 (typeof getPortalContext === 'function' && getPortalContext() === 'voter' && State?.currentUser);
+  if (isCand) {
+    const cand = getActiveCandidate();
+    if (cand && cand.election_time) {
+      return cand.election_time;
+    }
+  }
+  return getGlobalElectionTime();
+}
+
 function applyGlobalElectionDateToUI() {
   if (typeof document === 'undefined') return;
+  const curDate = getCurrentElectionDate();
+  const curTime = getCurrentElectionTime();
   const gDate = getGlobalElectionDate();
   const gTime = getGlobalElectionTime();
+  const cand = getActiveCandidate();
 
-  // Topbar
+  // Topbar date (in candidate login, shows candidate-specific date from Super Admin)
   const topbarDate = document.getElementById('topbarElectionDateText');
   if (topbarDate) {
-    topbarDate.textContent = gDate;
+    topbarDate.textContent = curDate;
   }
 
-  // Candidate Profile Tab inputs
+  // Candidate Profile Tab inputs (displays Super Admin configured date & time for candidate)
   const candDateInput = document.getElementById('candidateElectionDateInput');
-  if (candDateInput && (!candDateInput.value || candDateInput.value.includes('15 अक्टूबर 2026') || !State?.currentCandidate?.election_date)) {
-    candDateInput.value = State?.currentCandidate?.election_date || gDate;
+  if (candDateInput) {
+    candDateInput.value = (cand && cand.election_date) ? cand.election_date : curDate;
   }
   const candTimeInput = document.getElementById('candidateElectionTimeInput');
-  if (candTimeInput && (!candTimeInput.value || candTimeInput.value.includes('5:00') || !State?.currentCandidate?.election_time)) {
-    candTimeInput.value = State?.currentCandidate?.election_time || gTime;
+  if (candTimeInput) {
+    candTimeInput.value = (cand && cand.election_time) ? cand.election_time : curTime;
   }
 
   // Super Admin Voter Portal control inputs
@@ -75,11 +131,6 @@ function applyGlobalElectionDateToUI() {
   const vTimeInp = document.getElementById('voterPortalElectionTimeInput');
   if (vTimeInp && (triPortalSettings?.voter_portal?.election_time || triPortalSettings?.election_time)) {
     vTimeInp.value = triPortalSettings.voter_portal?.election_time || triPortalSettings.election_time;
-  }
-
-  // Live specimen slip refresh if present
-  if (typeof renderLiveSpecimenSlip === 'function' && document.getElementById('liveSpecimenSlipContainer')) {
-    try { renderLiveSpecimenSlip(); } catch(_) {}
   }
 }
 
@@ -95,29 +146,28 @@ async function saveVoterPortalElectionDate() {
   triPortalSettings.election_date = newDate;
   triPortalSettings.election_time = newTime;
 
-  localStorage.setItem('portal_tri_settings', JSON.stringify(triPortalSettings));
   applyGlobalElectionDateToUI();
 
-  if (typeof showToast === 'function') {
-    showToast(`📅 वोटर पोर्टल चुनाव दिनांक सेट: ${newDate} (${newTime})`);
-  }
+  try {
+    localStorage.setItem('tri_portal_master_settings', JSON.stringify(triPortalSettings));
+  } catch (e) {}
 
   try {
-    const isLocalServer = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocalServer) {
-      const res = await fetch('/api/portal-settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(triPortalSettings)
-      });
-      if (res.ok) {
-        if (typeof showToast === 'function') {
-          showToast('✅ चुनाव दिनांक व समय सुरक्षित एवं सभी पोर्टल्स पर लाइव सिंक हो गया!');
-        }
+    const res = await fetch('/api/portal-settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(triPortalSettings)
+    });
+    if (res.ok) {
+      if (typeof showToast === 'function') {
+        showToast('✅ वोटर पोर्टल मतदान दिनांक (' + newDate + ') एवं समय (' + newTime + ') सफलतापूर्वक अपडेट!');
       }
+      return;
     }
-  } catch(e) {
-    console.warn('Error saving portal settings:', e);
+  } catch (err) {}
+
+  if (typeof showToast === 'function') {
+    showToast('✅ मतदान दिनांक (' + newDate + ') स्थानीय रूप से सुरक्षित!');
   }
 }
 
@@ -2426,6 +2476,9 @@ function syncCurrentUserWithConfiguredUsers() {
       sessionStorage.removeItem(sk);
       localStorage.removeItem('panchayat_user_session');
       sessionStorage.removeItem('panchayat_user_session');
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.remove('user-logged-in');
+      }
       enforceGatekeeperState();
       const errEl = document.getElementById('gatekeeperError');
       if (errEl) {
@@ -2453,6 +2506,10 @@ function syncCurrentUserWithConfiguredUsers() {
       const isVoter = (typeof getPortalContext === 'function' && getPortalContext() === 'voter') || (window.PORTAL_TYPE === 'voter');
       if (isCand || isVoter) {
         parsedTabs = parsedTabs.filter(t => t !== 'directoryTab');
+        // Candidate must ALWAYS keep candidateProfileTab
+        if (isCand && !parsedTabs.includes('candidateProfileTab')) {
+          parsedTabs.push('candidateProfileTab');
+        }
       }
       State.currentUser.allowed_tabs = parsedTabs;
     }
@@ -2471,14 +2528,9 @@ function syncCurrentUserWithConfiguredUsers() {
     if (matched.full_name && !matched.full_name.toLowerCase().includes('narendra')) {
       State.currentUser.full_name = matched.full_name;
     }
+
     const candToSync = matched.candidate || (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates && (window.PORTAL_USERS_DATA.candidates[uId] || (State.currentUser.username && window.PORTAL_USERS_DATA.candidates[State.currentUser.username])));
     if (candToSync) {
-      if (String(candToSync.slogan || '').includes('सुपरएडमिन द्वारा सिंक')) {
-        candToSync.slogan = '।। समस्त ग्रामवासियों से विनम्र अपील ।।\nअपने कर्मठ, ईमानदार एवं सेवाभावी प्रत्याशी को भारी मतों से विजयी बनावें।';
-      }
-      if (String(candToSync.candidate_name || '').toLowerCase().includes('narendra')) {
-        candToSync.candidate_name = 'श्री रामेश्वर जाट';
-      }
       State.currentCandidate = candToSync;
       State.currentUser.candidate = candToSync;
       try {
@@ -2487,6 +2539,9 @@ function syncCurrentUserWithConfiguredUsers() {
         if (State.currentUser.username) localStorage.setItem('candidate_profile_' + State.currentUser.username, JSON.stringify(candToSync));
       } catch(_) {}
     }
+
+    applyGlobalElectionDateToUI();
+
     if (typeof updateUserScopeDisplay === 'function') updateUserScopeDisplay();
 
     const newSnapshot = JSON.stringify({
@@ -2503,10 +2558,8 @@ function syncCurrentUserWithConfiguredUsers() {
       const sk = getSessionStorageKey();
       localStorage.setItem(sk, JSON.stringify(State.currentUser));
       sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
+      localStorage.setItem('panchayat_user_session', JSON.stringify(State.currentUser));
       enforceGatekeeperState();
-      if (typeof showToast === 'function') {
-        showToast('🔔 आपकी अनुमतियाँ और टैब लाइव अपडेट हो गए हैं!');
-      }
     }
   }
 }
@@ -2515,75 +2568,68 @@ function initSession() {
   const ctx = getPortalContext();
   const sessionKey = getSessionStorageKey();
 
-  if (ctx === 'blo') {
-    // BLO Portal: NEVER auto-login as SUPER_ADMIN!
-    const saved = localStorage.getItem(sessionKey) || sessionStorage.getItem(sessionKey);
-    if (saved) {
-      try {
-        const u = JSON.parse(saved);
-        if (u && (u.role === 'BLO' || u.type === 'BLO' || u.category === 'CELL' || u.role === 'प्रकोष्ठ कार्मिक' || u.role === 'CELL_MEMBER' || u.role === 'BLOCK_PRABHARI')) {
-        if (u && String(u.full_name || '').toLowerCase().includes('narendra')) {
-          u.full_name = 'श्री रामेश्वर जाट';
-          u.name = 'श्री रामेश्वर जाट';
-        }
-          State.currentUser = u;
-        } else {
-          State.currentUser = null;
-          localStorage.removeItem(sessionKey);
-          sessionStorage.removeItem(sessionKey);
-        }
-      } catch (e) {
-        State.currentUser = null;
-      }
-    } else {
-      State.currentUser = null;
-    }
-  } else if (ctx === 'voter') {
-    // Voter Portal: NEVER auto-login as SUPER_ADMIN!
-    const saved = localStorage.getItem(sessionKey) || sessionStorage.getItem(sessionKey);
-    if (saved) {
-      try {
-        const u = JSON.parse(saved);
-        if (u && u.role !== 'SUPER_ADMIN' && u.id !== 'admin' && u.username !== 'admin') {
-          // Auto upgrade any user session on voter portal to candidate mode
-          if (u.role === 'USER' || !u.role || u.candidate_mode === 'admin_locked' || u.role === 'PANCHAYAT_AGENT' || u.username === 'kk') {
-            u.role = 'CANDIDATE';
-            u.type = 'CANDIDATE';
-            u.category = 'CANDIDATE';
-            u.candidate_mode = 'user_edit';
-            if (!u.allowed_tabs || !Array.isArray(u.allowed_tabs) || u.allowed_tabs.length === 0) {
+  // Unified Multi-Storage Session Resolver (Prevents accidental logouts on refresh/sync)
+  const saved = localStorage.getItem(sessionKey) || 
+                sessionStorage.getItem(sessionKey) || 
+                localStorage.getItem('panchayat_user_session') || 
+                sessionStorage.getItem('panchayat_user_session') ||
+                localStorage.getItem('panchayat_session_voter') ||
+                localStorage.getItem('panchayat_session_master');
+
+  if (saved) {
+    try {
+      const u = JSON.parse(saved);
+      if (u) {
+        // Enforce role sanity per portal context
+        if (ctx === 'blo') {
+          if (u.role === 'BLO' || u.type === 'BLO' || u.category === 'CELL' || u.role === 'प्रकोष्ठ कार्मिक' || u.role === 'CELL_MEMBER' || u.role === 'BLOCK_PRABHARI') {
+            State.currentUser = u;
+          } else {
+            State.currentUser = null;
+          }
+        } else if (ctx === 'voter') {
+          if (u.role !== 'SUPER_ADMIN' && u.id !== 'admin' && u.username !== 'admin') {
+            // Guarantee full candidate tabs
+            if (u.role === 'USER' || !u.role || u.candidate_mode === 'admin_locked' || u.role === 'PANCHAYAT_AGENT' || u.username === 'kk') {
+              u.role = 'CANDIDATE';
+              u.type = 'CANDIDATE';
+              u.category = 'CANDIDATE';
+              u.candidate_mode = 'user_edit';
+            }
+            if (!u.allowed_tabs || !Array.isArray(u.allowed_tabs) || u.allowed_tabs.length === 0 || !u.allowed_tabs.includes('candidateProfileTab')) {
               u.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
             }
-          }
-          if (Array.isArray(u.allowed_tabs)) {
             u.allowed_tabs = u.allowed_tabs.filter(t => t !== 'directoryTab');
+            State.currentUser = u;
+          } else {
+            State.currentUser = null;
           }
-          State.currentUser = u;
         } else {
-          State.currentUser = null;
-          localStorage.removeItem(sessionKey);
-          sessionStorage.removeItem(sessionKey);
+          // Master Portal (/pan/ or ?portal=master)
+          State.currentUser = u;
         }
-      } catch (e) {
-        State.currentUser = null;
+
+        if (State.currentUser) {
+          // Restore candidate profile if user is candidate
+          const isCand = isCandidateUser(State.currentUser);
+          if (isCand) {
+            const cand = getActiveCandidate();
+            if (cand) {
+              State.currentCandidate = cand;
+              State.currentUser.candidate = cand;
+            }
+          }
+          // Flag HTML to prevent login screen bounce
+          if (typeof document !== 'undefined') {
+            document.documentElement.classList.add('user-logged-in');
+          }
+        }
       }
-    } else {
+    } catch(e) {
       State.currentUser = null;
     }
   } else {
-    // Master Portal (/pan/ or ?portal=master)
-    const saved = localStorage.getItem(sessionKey) || localStorage.getItem('panchayat_user_session') || sessionStorage.getItem(sessionKey);
-    if (saved) {
-      try {
-        State.currentUser = JSON.parse(saved);
-      if (State.currentUser && String(State.currentUser.full_name || '').toLowerCase().includes('narendra')) {
-        State.currentUser.full_name = 'श्री रामेश्वर जाट';
-        State.currentUser.name = 'श्री रामेश्वर जाट';
-      }
-      } catch (e) {
-        State.currentUser = null;
-      }
-    }
+    State.currentUser = null;
   }
 
   // Populate dropdowns and trigger background sync
@@ -2591,6 +2637,7 @@ function initSession() {
   populateLoginUserDropdown();
   syncLatestActiveUsersFromAppsScript();
   syncCurrentUserWithConfiguredUsers();
+  applyGlobalElectionDateToUI();
   enforceGatekeeperState();
 }
 
@@ -7455,7 +7502,8 @@ async function handleAdminSaveCandidate(event) {
 
   // 1. Update in State.adminControlUsers
   if (!State.adminControlUsers) State.adminControlUsers = [];
-  let u = State.adminControlUsers.find(x => (x.id || x.username) === userId);
+  const altId = userId.startsWith('cand_') ? userId.replace('cand_', '') : ('cand_' + userId);
+  let u = State.adminControlUsers.find(x => (x.id === userId || x.username === userId || x.id === altId || x.username === altId));
   if (u) {
     u.name = name;
     u.full_name = name;
@@ -7466,10 +7514,9 @@ async function handleAdminSaveCandidate(event) {
     u.candidate = candData;
   }
 
-  // 2. Update in window.PORTAL_USERS_DATA.candidates (both with and without cand_ prefix)
+  // 2. Update in window.PORTAL_USERS_DATA.candidates for BOTH keys
   if (!window.PORTAL_USERS_DATA) window.PORTAL_USERS_DATA = { users: [], candidates: {} };
   if (!window.PORTAL_USERS_DATA.candidates) window.PORTAL_USERS_DATA.candidates = {};
-  const altId = userId.startsWith('cand_') ? userId.replace('cand_', '') : ('cand_' + userId);
   window.PORTAL_USERS_DATA.candidates[userId] = candData;
   window.PORTAL_USERS_DATA.candidates[altId] = candData;
   if (u && u.username) {
@@ -7481,14 +7528,15 @@ async function handleAdminSaveCandidate(event) {
     window.PORTAL_USERS_DATA.candidates[u.id.replace('cand_', '')] = candData;
   }
 
-  // 3. Save to localStorage
+  // 3. Save to localStorage for both keys
   try {
     localStorage.setItem('candidate_profile_' + userId, JSON.stringify(candData));
+    localStorage.setItem('candidate_profile_' + altId, JSON.stringify(candData));
     if (u && u.username) localStorage.setItem('candidate_profile_' + u.username, JSON.stringify(candData));
   } catch(e) {}
 
-  // 4. If current logged in candidate, update State
-  if (State.currentUser && (State.currentUser.id === userId || State.currentUser.username === userId)) {
+  // 4. If current logged in user is this candidate, update active state & apply to topbar immediately
+  if (State.currentUser && (State.currentUser.id === userId || State.currentUser.username === userId || State.currentUser.id === altId || State.currentUser.username === altId)) {
     State.currentCandidate = candData;
     State.currentUser.full_name = name;
     State.currentUser.name = name;
@@ -7497,7 +7545,14 @@ async function handleAdminSaveCandidate(event) {
     State.currentUser.allowed_panchayats = gp;
     State.currentUser.allowed_wards = ward || 'ALL';
     State.currentUser.candidate = candData;
+    const sk = getSessionStorageKey();
+    localStorage.setItem(sk, JSON.stringify(State.currentUser));
+    sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
+    localStorage.setItem('panchayat_user_session', JSON.stringify(State.currentUser));
   }
+
+  // Apply to UI (Topbar, inputs, preview)
+  applyGlobalElectionDateToUI();
 
   // 5. Send POST to server API to save in SQLite & portal_users.json
   try {
@@ -7507,6 +7562,9 @@ async function handleAdminSaveCandidate(event) {
       body: JSON.stringify(candData)
     });
   } catch(e) {}
+
+  // Broadcast to other open tabs
+  broadcastAdminUpdate({ type: 'CANDIDATE_UPDATED', userId, candidate: candData });
 
   closeAdminCandidateModal();
   if (typeof renderAdminControlTab === 'function') renderAdminControlTab();
@@ -8459,6 +8517,8 @@ async function handleGatekeeperLogin(event) {
           : ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
         candidate_mode: 'user_edit'
       };
+      // Ensure candidate has full suite of candidate tabs
+      candUser.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
       State.currentUser = candUser;
 
       // Initialize candidate profile

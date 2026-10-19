@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261019_154557";</script>
+  <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261019_161418";</script>
   <script>
     // Instant Session Persistence: Prevent login screen flicker on refresh
     (function() {
       try {
-        var pt = window.PORTAL_TYPE || (location.pathname.includes('blo') ? 'blo' : (location.pathname.includes('voter') ? 'voter' : 'pan'));
-        var sk = 'portal_session_' + pt;
-        var s = localStorage.getItem(sk) || localStorage.getItem('panchayat_user_session');
+        var pt = window.PORTAL_TYPE || (location.pathname.includes('blo') ? 'blo' : (location.pathname.includes('voter') ? 'voter' : 'master'));
+        var s = localStorage.getItem('panchayat_session_' + pt) || 
+                localStorage.getItem('portal_session_' + pt) ||
+                localStorage.getItem('panchayat_session_voter') ||
+                localStorage.getItem('panchayat_session_master') ||
+                localStorage.getItem('panchayat_session_blo') ||
+                localStorage.getItem('panchayat_user_session') ||
+                sessionStorage.getItem('panchayat_session_' + pt) ||
+                sessionStorage.getItem('panchayat_user_session');
         if (s) {
           var u = JSON.parse(s);
           if (u && (u.username || u.id)) {
@@ -67,7 +73,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261019_154557">
+  <link rel="stylesheet" href="styles.css?v=20261019_161418">
 </head>
 <body>
 
@@ -1953,10 +1959,10 @@
   <div id="toastContainer" class="toast-container no-print"></div>
 
   <!-- Scripts -->
-    <script src="symbols_master.js?v=20261019_154557"></script>
-  <script src="master_directory.js?v=20261019_154557"></script>
+    <script src="symbols_master.js?v=20261019_161418"></script>
+  <script src="master_directory.js?v=20261019_161418"></script>
   <script src="master_data.js?v=20261016_012604"></script>
-  <script src="app.js?v=20261019_154557"></script>
+  <script src="app.js?v=20261019_161418"></script>
 
   <!-- Super Admin: Add New User Modal -->
   <div id="addUserModal" class="modal-overlay no-print" style="display:none;" onclick="if(event.target===this) closeAddUserModal()">
