@@ -3138,6 +3138,12 @@ function getAllowedWardsList(gpCode) {
   if (isPrivileged) return 'ALL';
 
   const ov = (typeof getUserOverrides === 'function') ? (getUserOverrides()[u.id || u.username] || {}) : {};
+  const candPost = String(State.currentCandidate?.post || u.post || u.candidate?.post || '').trim();
+  const isPsOrZp = candPost.includes('पंचायत समिति') || candPost.includes('जिला परिषद');
+  if (isPsOrZp) {
+    // PS & ZP members can search and view all GP wards in their assigned Panchayats
+    return 'ALL';
+  }
   const effWards = ov.allowed_wards || u.allowed_wards || u.assigned_wards || u.wards || u.ward || 'ALL';
 
   if (!effWards || effWards === 'ALL' || effWards === 'समस्त' || effWards === 'समस्त वार्ड') {
@@ -3980,10 +3986,17 @@ function isCandidateSlipAllowedForVoter(voter) {
   });
   if (!matchGp) return false;
 
-  // Check Ward match if candidate is assigned specific ward(s)
-  const allowedWards = getAllowedWardsList(voterGpCode);
-  if (allowedWards !== 'ALL' && Array.isArray(allowedWards) && allowedWards.length > 0) {
-    if (!allowedWards.includes(String(voter.ward_no))) return false;
+  // Check Ward match:
+  // For Panchayat Samiti and Zila Parishad members, they represent entire Panchayats (all GP wards)
+  const candPost = String(State.currentCandidate?.post || u.post || u.candidate?.post || '').trim();
+  const isPsOrZp = candPost.includes('पंचायत समिति') || candPost.includes('जिला परिषद');
+
+  if (!isPsOrZp) {
+    // Ward Panch: Strictly restricted to their single allotted GP ward
+    const allowedWards = getAllowedWardsList(voterGpCode);
+    if (allowedWards !== 'ALL' && Array.isArray(allowedWards) && allowedWards.length > 0) {
+      if (!allowedWards.includes(String(voter.ward_no))) return false;
+    }
   }
 
   return true;
@@ -6522,8 +6535,27 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
           </div>
         </div>
 
-        <!-- SINGLE LINE GP & WARD -->
-        <div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong> ${cWard ? `• वार्ड नं.: <strong>${cWard}</strong>` : ''}</div>
+        <!-- DYNAMIC GP & WARD ACCORDING TO POST (SARPANCH / WARD PANCH / PS / ZP) -->
+        ${(() => {
+          const postStr = String(cPost || '').trim();
+          const rawWard = String(candidateData.ward || voter.ward_no || '').trim();
+          const cleanWard = (rawWard && rawWard.toUpperCase() !== 'ALL') ? rawWard : '';
+          
+          if (postStr.includes('पंचायत समिति')) {
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanWard ? `• पं.स. वार्ड नं.: <strong>${cleanWard}</strong>` : ''}</div>`;
+          } else if (postStr.includes('जिला परिषद')) {
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanWard ? `• जि.प. वार्ड नं.: <strong>${cleanWard}</strong>` : ''}</div>`;
+          } else if (postStr.includes('सरपंच')) {
+            // सरपंच: पूरी ग्राम पंचायत (वार्ड नहीं छपेगा)
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong></div>`;
+          } else if (postStr.includes('वार्ड पंच') || postStr.includes('पंच')) {
+            // वार्ड पंच: ग्राम पंचायत व उनका अधिकृत वार्ड नंबर
+            const wpNo = cleanWard || voter.ward_no || '1';
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong> • वार्ड नं.: <strong>${wpNo}</strong></div>`;
+          } else {
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong>${cleanWard ? ` • वार्ड नं.: <strong>${cleanWard}</strong>` : ''}</div>`;
+          }
+        })()}
 
         <!-- SINGLE LINE DATE & TIME (SMALL LIKE BEFORE) -->
         <div class="candidate-banner-time">🗓️ मतदान: <strong>${electionDate}</strong> | ⏰ समय: <strong>${electionTime}</strong></div>

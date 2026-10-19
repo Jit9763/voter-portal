@@ -829,46 +829,106 @@ var CANDIDATE_HEADERS = [
 function setupCandidatesSheet() {
   var sheet = getOrCreateSheet(SHEET_CANDIDATES);
   
-  // Set headers
+  // 1. Set headers with clean green styling & frozen top row
   var headerRange = sheet.getRange(1, 1, 1, CANDIDATE_HEADERS.length);
   headerRange.setValues([CANDIDATE_HEADERS]);
   headerRange.setBackground("#15803d");
   headerRange.setFontColor("#ffffff");
   headerRange.setFontWeight("bold");
+  headerRange.setHorizontalAlignment("center");
   sheet.setFrozenRows(1);
 
-  // If already has data rows, don't overwrite
-  if (sheet.getLastRow() > 1) {
-    Logger.log("Candidates sheet already has data: " + (sheet.getLastRow() - 1) + " rows.");
-    return { success: true, message: "Sheet already has " + (sheet.getLastRow() - 1) + " rows.", rowCount: sheet.getLastRow() - 1 };
-  }
+  // 2. Set helpful cell notes on headers (Hindi tooltips)
+  sheet.getRange(1, 1).setNote("यूजरनेम / लॉगिन आईडी (उदा. cand_gp01, sarpanch, ramesh)");
+  sheet.getRange(1, 2).setNote("प्रत्याशी लॉगिन पासवर्ड (उदा. cand1@2026)");
+  sheet.getRange(1, 3).setNote("प्रत्याशी का पूरा नाम (मतदाता पर्ची पर छपने वाला)");
+  sheet.getRange(1, 4).setNote("प्रत्याशी का मोबाइल नंबर");
+  sheet.getRange(1, 5).setNote("पद चुनें: सरपंच, वार्ड पंच, पंचायत समिति सदस्य, या जिला परिषद सदस्य");
+  sheet.getRange(1, 6).setNote("ग्राम पंचायत: ड्रॉपडाउन से चुनें या कॉमा लगाकर कई पंचायतें लिखें (उदा. बूबकिया, बांदनवाड़ा) या ALL");
+  sheet.getRange(1, 7).setNote("वार्ड: वार्ड पंच के लिए वार्ड संख्या (उदा. 3), पं.स./जि.प. सदस्य के लिए पं.स./जि.प. वार्ड नं. (उदा. 12), या ALL");
+  sheet.getRange(1, 8).setNote("चुनाव चिन्ह: ड्रॉपडाउन से आधिकारिक चिन्ह चुनें या नया नाम लिखें");
+  sheet.getRange(1, 10).setNote("कस्टम चुनाव चिन्ह: यदि कोई अलग चिन्ह की फोटो हो तो उसका URL (अन्यथा खाली रखें)");
+  sheet.getRange(1, 11).setNote("प्रत्याशी फोटो URL: फोटो का लिंक (Google Drive/Imgur आदि, अन्यथा खाली रखें)");
+  sheet.getRange(1, 12).setNote("मतदाता अपील / नारा (मतदाता पर्ची पर छपने वाला)");
+  sheet.getRange(1, 15).setNote("स्थिति: ACTIVE (सक्रिय), INACTIVE (निष्क्रिय), या DELETED (हटाया गया)");
 
-  // Populate with INITIAL_CANDIDATES_SEED
-  var rows = [];
-  for (var i = 0; i < INITIAL_CANDIDATES_SEED.length; i++) {
-    var c = INITIAL_CANDIDATES_SEED[i];
-    rows.push([
-      c.username || c.id,
-      c.password || "cand@2026",
-      c.candidate_name || "",
-      c.mobile || "",
-      c.post || "सरपंच",
-      c.panchayat || "",
-      c.ward || "ALL",
-      c.symbol_name || "उगता सूरज",
-      c.symbol_icon || "sun",
-      c.custom_symbol_url || "",
-      c.photo_url || "",
-      c.slogan || "",
-      c.election_date || "15 अक्टूबर 2026",
-      c.election_time || "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
-      c.status || "ACTIVE",
-      c.show_banner_on_slip !== false ? "TRUE" : "FALSE"
-    ]);
-  }
+  // 3. Create Smart Dropdowns (Data Validation)
+  var maxRows = Math.max(sheet.getMaxRows(), 500);
 
-  if (rows.length > 0) {
-    sheet.getRange(2, 1, rows.length, CANDIDATE_HEADERS.length).setValues(rows);
+  // Column E: Post (पद) Dropdown
+  var postList = ["सरपंच", "वार्ड पंच", "पंचायत समिति सदस्य", "जिला परिषद सदस्य", "उप-सरपंच"];
+  var postRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(postList, true)
+    .setAllowInvalid(true)
+    .build();
+  sheet.getRange(2, 5, maxRows - 1, 1).setDataValidation(postRule);
+
+  // Column F: Panchayat (ग्राम पंचायत) Dropdown (Supports single or multiple comma-separated)
+  var gpList = [
+    "बूबकिया", "बड़ली", "बगराई", "बांदनवाड़ा", "भिनाय", "चापानेरी", "छछून्दरा", "देवपुरा", 
+    "देवलियाकलां", "धांतोल", "एकलसिंहा", "घणा", "गुढाखुर्द", "हियालिया", "कनईकला", "करांटी", 
+    "कैरोंट", "खेडी", "कुम्हारिया", "लामगरा", "नागोला", "नान्दसी", "पड़ांगा", "पाडलिया", 
+    "राममालिया", "राताकोट", "सिंगावल", "सोबडी", "सोलखुर्द", "बड़गांव", "ALL"
+  ];
+  var gpRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(gpList, true)
+    .setAllowInvalid(true) // Allows typing multiple comma-separated panchayats
+    .build();
+  sheet.getRange(2, 6, maxRows - 1, 1).setDataValidation(gpRule);
+
+  // Column H: Symbol Name Dropdown
+  var symList = [
+    "उगता सूरज", "हाथ", "कलम", "पतंग", "ताला चाबी", "सिलाई मशीन", "कार", 
+    "गैस सिलेंडर", "कप प्लेट", "हवाई जहाज", "बल्ला", "साइकिल", "अलमारी", "कस्टम चिन्ह"
+  ];
+  var symRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(symList, true)
+    .setAllowInvalid(true)
+    .build();
+  sheet.getRange(2, 8, maxRows - 1, 1).setDataValidation(symRule);
+
+  // Column O: Status Dropdown (ACTIVE / INACTIVE / DELETED)
+  var statusRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["ACTIVE", "INACTIVE", "DELETED"], true)
+    .setAllowInvalid(false)
+    .build();
+  sheet.getRange(2, 15, maxRows - 1, 1).setDataValidation(statusRule);
+
+  // Column P: Show Banner Dropdown (TRUE / FALSE)
+  var bannerRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["TRUE", "FALSE"], true)
+    .setAllowInvalid(false)
+    .build();
+  sheet.getRange(2, 16, maxRows - 1, 1).setDataValidation(bannerRule);
+
+  // 4. Populate with INITIAL_CANDIDATES_SEED if sheet was empty
+  if (sheet.getLastRow() <= 1) {
+    var rows = [];
+    for (var i = 0; i < INITIAL_CANDIDATES_SEED.length; i++) {
+      var c = INITIAL_CANDIDATES_SEED[i];
+      rows.push([
+        c.username || c.id,
+        c.password || "cand@2026",
+        c.candidate_name || "",
+        c.mobile || "",
+        c.post || "सरपंच",
+        c.panchayat || "",
+        c.ward || "ALL",
+        c.symbol_name || "उगता सूरज",
+        c.symbol_icon || "sun",
+        c.custom_symbol_url || "",
+        c.photo_url || "",
+        c.slogan || "",
+        c.election_date || "15 अक्टूबर 2026",
+        c.election_time || "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
+        c.status || "ACTIVE",
+        c.show_banner_on_slip !== false ? "TRUE" : "FALSE"
+      ]);
+    }
+
+    if (rows.length > 0) {
+      sheet.getRange(2, 1, rows.length, CANDIDATE_HEADERS.length).setValues(rows);
+    }
   }
 
   // Auto-fit columns
@@ -878,8 +938,8 @@ function setupCandidatesSheet() {
     }
   } catch(e) {}
 
-  Logger.log("✅ Successfully setup Candidates sheet with " + rows.length + " candidates!");
-  return { success: true, count: rows.length };
+  Logger.log("✅ Successfully setup Candidates sheet with Dropdowns & Data Validations!");
+  return { success: true, message: "Candidates sheet setup with smart dropdowns complete!", rowCount: sheet.getLastRow() - 1 };
 }
 
 /**
