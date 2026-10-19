@@ -31,7 +31,7 @@ async function syncCandidatesFromGoogleSheetClient(showNotification = false) {
   }
 
   // B. Direct Google Apps Script fetch (For GitHub Pages & Client Mode)
-  const scriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+  const scriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
   if (scriptUrl) {
     try {
       const fetchUrl = `${scriptUrl}${scriptUrl.includes('?') ? '&' : '?'}action=getCandidates&_t=${bust}`;
@@ -2372,7 +2372,7 @@ const State = {
   config: {
     adminSheetUrl: '',
     voterSheetUrl: '',
-    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec'
+    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec'
   }
 };
 
@@ -2500,7 +2500,7 @@ function initMasterData() {
     State.panchayats = window.MASTER_DATA.panchayats || [];
     State.adminUsers = window.MASTER_DATA.admin_users || [];
     State.deletedVoters = window.MASTER_DATA.deleted_voters || [];
-    State.config.appsScriptUrl = localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+    State.config.appsScriptUrl = localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
     const appsScriptInput = document.getElementById('appsScriptUrlInput');
     if (appsScriptInput && State.config.appsScriptUrl) {
       appsScriptInput.value = State.config.appsScriptUrl;
@@ -5118,7 +5118,7 @@ function loadDefaultMasterData() {
     State.voters = window.MASTER_DATA.initial_voters || [];
     State.adminUsers = window.MASTER_DATA.admin_users || [];
     State.deletedVoters = window.MASTER_DATA.deleted_voters || [];
-    State.config.appsScriptUrl = localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+    State.config.appsScriptUrl = localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
     const appsScriptInput = document.getElementById('appsScriptUrlInput');
     if (appsScriptInput && State.config.appsScriptUrl) {
       appsScriptInput.value = State.config.appsScriptUrl;
@@ -8809,7 +8809,7 @@ async function handleGatekeeperLogin(event) {
 
   // E2. Online Google Sheet Direct Candidate Verification (For newly added candidates or real-time password updates)
   const isVoterContext = (typeof getPortalContext === 'function' && getPortalContext() === 'voter') || window.location.pathname.includes('voter-portal');
-  const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+  const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
 
   if (gScriptUrl) {
     try {

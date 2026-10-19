@@ -458,7 +458,7 @@ function getAppsScriptUrl() {
     } catch(_) {}
   }
   if (!url) {
-    url = 'https://script.google.com/macros/s/AKfycbzhZ-VdcGJ_nUuG40vm-MyMNJEnLfTgk3kBqyhi1OIefCgW9Smw0XweLTUd7D6o710lpA/exec';
+    url = 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
   }
   return url;
 }
