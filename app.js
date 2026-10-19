@@ -8288,14 +8288,29 @@ async function handleGatekeeperLogin(event) {
         const data = await res.json();
         if (data && data.success && data.user) {
           State.currentUser = data.user;
+          const candProfile = data.candidate || data.user.candidate || (window.PORTAL_USERS_DATA && window.PORTAL_USERS_DATA.candidates && (window.PORTAL_USERS_DATA.candidates[data.user.id] || window.PORTAL_USERS_DATA.candidates[data.user.username]));
+          if (candProfile) {
+            State.currentCandidate = candProfile;
+            State.currentUser.candidate = candProfile;
+            try {
+              localStorage.setItem('candidate_profile_' + data.user.id, JSON.stringify(candProfile));
+              localStorage.setItem('candidate_profile_' + data.user.username, JSON.stringify(candProfile));
+            } catch(_) {}
+          }
+          if (isCandidateUser(State.currentUser)) {
+            if (!State.currentUser.allowed_tabs || !State.currentUser.allowed_tabs.includes('candidateProfileTab')) {
+              State.currentUser.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+            }
+          }
           syncCurrentUserWithConfiguredUsers();
           const sk = getSessionStorageKey();
-          if (document.getElementById('gatekeeperRememberMe')?.checked) {
-            localStorage.setItem(sk, JSON.stringify(State.currentUser));
-            if (getPortalContext() === 'master') localStorage.setItem('panchayat_user_session', JSON.stringify(State.currentUser));
-          } else {
-            sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
+          localStorage.setItem(sk, JSON.stringify(State.currentUser));
+          sessionStorage.setItem(sk, JSON.stringify(State.currentUser));
+          localStorage.setItem('panchayat_user_session', JSON.stringify(State.currentUser));
+          if (typeof document !== 'undefined') {
+            document.documentElement.classList.add('user-logged-in');
           }
+          applyGlobalElectionDateToUI();
           enforceGatekeeperState();
           showToast(`नमस्ते ${data.user.full_name || data.user.name || data.user.username}! स्वागत है।`);
           return;
