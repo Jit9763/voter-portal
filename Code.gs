@@ -888,21 +888,21 @@ function setupCandidatesSheet() {
     .requireValueInList(symList, true)
     .setAllowInvalid(true)
     .build();
-  sheet.getRange(2, 8, maxRows - 1, 1).setDataValidation(symRule);
+  sheet.getRange(2, 9, maxRows - 1, 1).setDataValidation(symRule);
 
   // Column O: Status Dropdown (ACTIVE / INACTIVE / DELETED)
   var statusRule = SpreadsheetApp.newDataValidation()
     .requireValueInList(["ACTIVE", "INACTIVE", "DELETED"], true)
     .setAllowInvalid(false)
     .build();
-  sheet.getRange(2, 15, maxRows - 1, 1).setDataValidation(statusRule);
+  sheet.getRange(2, 16, maxRows - 1, 1).setDataValidation(statusRule);
 
   // Column P: Show Banner Dropdown (TRUE / FALSE)
   var bannerRule = SpreadsheetApp.newDataValidation()
     .requireValueInList(["TRUE", "FALSE"], true)
     .setAllowInvalid(false)
     .build();
-  sheet.getRange(2, 16, maxRows - 1, 1).setDataValidation(bannerRule);
+  sheet.getRange(2, 17, maxRows - 1, 1).setDataValidation(bannerRule);
 
   // 4. Populate with INITIAL_CANDIDATES_SEED if sheet was empty
   if (sheet.getLastRow() <= 1) {
@@ -917,6 +917,7 @@ function setupCandidatesSheet() {
         c.post || "सरपंच",
         c.panchayat || "",
         c.ward || "ALL",
+        c.ps_zp_ward || "",
         c.symbol_name || "उगता सूरज",
         c.symbol_icon || "sun",
         c.custom_symbol_url || "",
@@ -1174,6 +1175,7 @@ function handleSaveCandidate(candData) {
     candData.post || "सरपंच",
     candData.panchayat || candData.allowed_panchayats || "",
     candData.ward || candData.allowed_wards || "ALL",
+    candData.ps_zp_ward || "",
     candData.symbol_name || "उगता सूरज",
     candData.symbol_icon || "sun",
     candData.custom_symbol_url || "",
