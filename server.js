@@ -74,6 +74,7 @@ db.exec(`
 try { db.prepare("ALTER TABLE candidates ADD COLUMN election_time TEXT").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE candidates ADD COLUMN election_date TEXT").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE candidates ADD COLUMN custom_symbol_url TEXT").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE candidates ADD COLUMN ps_zp_ward TEXT").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE users ADD COLUMN can_print INTEGER DEFAULT 1").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE users ADD COLUMN can_download INTEGER DEFAULT 1").run(); } catch(e) {}
 try { db.prepare("ALTER TABLE users ADD COLUMN can_search INTEGER DEFAULT 1").run(); } catch(e) {}
@@ -179,6 +180,12 @@ function exportToJson() {
       if (!existing) return incoming;
       if (incoming.custom_symbol_url && !existing.custom_symbol_url) return incoming;
       if (existing.custom_symbol_url && !incoming.custom_symbol_url) return existing;
+      if (incoming.photo_url && !existing.photo_url) return incoming;
+      if (existing.photo_url && !incoming.photo_url) return existing;
+      if (incoming.slogan && !existing.slogan) return incoming;
+      if (existing.slogan && !incoming.slogan) return existing;
+      if (incoming.ps_zp_ward && !existing.ps_zp_ward) return incoming;
+      if (existing.ps_zp_ward && !incoming.ps_zp_ward) return existing;
       if (new Date(incoming.updated_at || 0) >= new Date(existing.updated_at || 0)) return incoming;
       return existing;
     };
@@ -188,6 +195,7 @@ function exportToJson() {
         post: c.post,
         panchayat: c.panchayat,
         ward: c.ward,
+        ps_zp_ward: c.ps_zp_ward || "",
         election_date: c.election_date || '15 अक्टूबर 2026',
         election_time: c.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक',
         symbol_name: c.symbol_name,
@@ -529,8 +537,8 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
       INSERT OR REPLACE INTO candidates (
         user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon,
         custom_symbol_url, photo_url, slogan, election_date, election_time,
-        mobile, show_banner_on_slip, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        mobile, show_banner_on_slip, ps_zp_ward, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const deleteUserStmt = db.prepare('DELETE FROM users WHERE id = ? OR username = ?');
@@ -567,9 +575,10 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
         const ward = sc.ward || sc.allowed_wards || 'ALL';
         const symName = sc.symbol_name || 'उगता सूरज';
         const symIcon = sc.symbol_icon || (sc.custom_symbol_url ? 'custom' : 'sun');
-        const customSym = sc.custom_symbol_url || '';
-        const photo = sc.photo_url || '';
-        const slogan = sc.slogan || '';
+        const psZpWard = (sc.ps_zp_ward || sc.constituency_ward || existingCand?.ps_zp_ward || '').trim();
+        const customSym = (sc.custom_symbol_url && sc.custom_symbol_url.trim()) ? sc.custom_symbol_url.trim() : (existingCand?.custom_symbol_url || '');
+        const photo = (sc.photo_url && sc.photo_url.trim()) ? sc.photo_url.trim() : (existingCand?.photo_url || '');
+        const slogan = (sc.slogan && sc.slogan.trim()) ? sc.slogan.trim() : (existingCand?.slogan || '');
         const eDate = sc.election_date || '15 अक्टूबर 2026';
         const eTime = sc.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
         const status = (sc.status || 'ACTIVE').toUpperCase();
@@ -592,9 +601,10 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
           existingCand.post !== post ||
           existingCand.symbol_name !== symName ||
           existingCand.symbol_icon !== symIcon ||
-          existingCand.custom_symbol_url !== customSym ||
-          existingCand.photo_url !== photo ||
-          existingCand.slogan !== slogan ||
+          (customSym && existingCand.custom_symbol_url !== customSym) ||
+          (sc.photo_url && sc.photo_url.trim() && existingCand.photo_url !== photo) ||
+          (sc.slogan && sc.slogan.trim() && existingCand.slogan !== slogan) ||
+          (psZpWard && existingCand.ps_zp_ward !== psZpWard) ||
           existingCand.election_date !== eDate ||
           existingCand.election_time !== eTime ||
           existingCand.show_banner_on_slip !== showBanner
@@ -609,8 +619,8 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
           const createdAt = existingUser?.created_at || now;
 
           upsertUser.run(uId, username, password, candName, mobile, 'CANDIDATE', status, gp, ward, allowedTabsJson, 'user_edit', createdAt, now);
-          upsertCand.run(uId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, now);
-          upsertCand.run(altId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, now);
+          upsertCand.run(uId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, psZpWard, now);
+          upsertCand.run(altId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, psZpWard, now);
         }
       }
 
@@ -1181,7 +1191,7 @@ const server = http.createServer(async (req, res) => {
           db.prepare(`
             UPDATE candidates SET
               candidate_name = ?, post = ?, panchayat = ?, ward = ?, symbol_name = ?, symbol_icon = ?,
-              custom_symbol_url = ?, photo_url = ?, slogan = ?, election_date = ?, election_time = ?, mobile = ?, show_banner_on_slip = ?, updated_at = ?
+              custom_symbol_url = ?, photo_url = ?, slogan = ?, election_date = ?, election_time = ?, mobile = ?, show_banner_on_slip = ?, ps_zp_ward = ?, updated_at = ?
             WHERE user_id = ? OR user_id = ?
           `).run(
             c.candidate_name || '',
@@ -1197,19 +1207,20 @@ const server = http.createServer(async (req, res) => {
             candTime,
             c.mobile || '',
             c.show_banner_on_slip ? 1 : 0,
+            c.ps_zp_ward || '',
             now,
             uId,
             altId
           );
 
           const insertCandidateStmt = db.prepare(`
-            INSERT OR REPLACE INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, custom_symbol_url, photo_url, slogan, election_date, election_time, mobile, show_banner_on_slip, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO candidates (user_id, candidate_name, post, panchayat, ward, symbol_name, symbol_icon, custom_symbol_url, photo_url, slogan, election_date, election_time, mobile, show_banner_on_slip, ps_zp_ward, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `);
 
           // Ensure both uId and altId exist in candidates table with identical freshest data
-          insertCandidateStmt.run(uId, c.candidate_name || '', c.post || 'सरपंच', c.panchayat || '', c.ward || '', c.symbol_name || 'उगता सूरज', c.symbol_icon || 'sun', c.custom_symbol_url || '', c.photo_url || '', c.slogan || '', candDate, candTime, c.mobile || '', c.show_banner_on_slip ? 1 : 0, now);
-          insertCandidateStmt.run(altId, c.candidate_name || '', c.post || 'सरपंच', c.panchayat || '', c.ward || '', c.symbol_name || 'उगता सूरज', c.symbol_icon || 'sun', c.custom_symbol_url || '', c.photo_url || '', c.slogan || '', candDate, candTime, c.mobile || '', c.show_banner_on_slip ? 1 : 0, now);
+          insertCandidateStmt.run(uId, c.candidate_name || '', c.post || 'सरपंच', c.panchayat || '', c.ward || '', c.symbol_name || 'उगता सूरज', c.symbol_icon || 'sun', c.custom_symbol_url || '', c.photo_url || '', c.slogan || '', candDate, candTime, c.mobile || '', c.show_banner_on_slip ? 1 : 0, c.ps_zp_ward || '', now);
+          insertCandidateStmt.run(altId, c.candidate_name || '', c.post || 'सरपंच', c.panchayat || '', c.ward || '', c.symbol_name || 'उगता सूरज', c.symbol_icon || 'sun', c.custom_symbol_url || '', c.photo_url || '', c.slogan || '', candDate, candTime, c.mobile || '', c.show_banner_on_slip ? 1 : 0, c.ps_zp_ward || '', now);
 
           exportToJson();
           res.end(JSON.stringify({ success: true, message: 'प्रत्याशी प्रोफाइल सफलतापूर्वक सुरक्षित!' }));

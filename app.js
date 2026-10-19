@@ -6364,6 +6364,7 @@ async function handleSaveCandidateProfile(event) {
     post: post,
     panchayat: gp,
     ward: ward,
+    ps_zp_ward: (document.getElementById("adminCandPsZpWard")?.value || "").trim(),
     election_date: electionDate,
     election_time: electionTime,
     symbol_name: symbolName,
@@ -6541,10 +6542,13 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
           const rawWard = String(candidateData.ward || voter.ward_no || '').trim();
           const cleanWard = (rawWard && rawWard.toUpperCase() !== 'ALL') ? rawWard : '';
           
+          const psZpNo = String(candidateData.ps_zp_ward || (postStr.includes('पंचायत समिति') || postStr.includes('जिला परिषद') ? cleanWard : '') || '').trim();
+          const cleanPsZpNo = (psZpNo && psZpNo.toUpperCase() !== 'ALL') ? psZpNo : '';
+
           if (postStr.includes('पंचायत समिति')) {
-            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanWard ? `• पं.स. वार्ड नं.: <strong>${cleanWard}</strong>` : ''}</div>`;
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanPsZpNo ? `• पंचायत समिति वार्ड नं.: <strong>${cleanPsZpNo}</strong>` : ''}</div>`;
           } else if (postStr.includes('जिला परिषद')) {
-            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanWard ? `• जि.प. वार्ड नं.: <strong>${cleanWard}</strong>` : ''}</div>`;
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanPsZpNo ? `• जिला परिषद वार्ड नं.: <strong>${cleanPsZpNo}</strong>` : ''}</div>`;
           } else if (postStr.includes('सरपंच')) {
             // सरपंच: पूरी ग्राम पंचायत (वार्ड नहीं छपेगा)
             return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong></div>`;
