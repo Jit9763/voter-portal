@@ -615,10 +615,20 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
 
         if (isDiff) {
           hasChanges = true;
-          const allowedTabsJson = JSON.stringify(['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab']);
+          let candTabs = sc.allowed_tabs;
+          if (typeof candTabs === 'string') {
+            try { candTabs = JSON.parse(candTabs); } catch(e) { candTabs = candTabs.split(',').map(s=>s.trim()).filter(Boolean); }
+          }
+          if (!Array.isArray(candTabs) || candTabs.length === 0) {
+            candTabs = existingUser?.allowed_tabs ? (() => { try { return JSON.parse(existingUser.allowed_tabs); } catch(e) { return ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab']; } })() : ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+          }
+          const allowedTabsJson = JSON.stringify(candTabs);
+          const candMode = sc.candidate_mode || existingUser?.candidate_mode || 'user_edit';
+          const canPrint = sc.can_print !== false && sc.can_print !== 'FALSE' ? 1 : 0;
+          const canDownload = sc.can_download !== false && sc.can_download !== 'FALSE' ? 1 : 0;
           const createdAt = existingUser?.created_at || now;
 
-          upsertUser.run(uId, username, password, candName, mobile, 'CANDIDATE', status, gp, ward, allowedTabsJson, 'user_edit', createdAt, now);
+          upsertUser.run(uId, username, password, candName, mobile, 'CANDIDATE', status, gp, ward, allowedTabsJson, candMode, canPrint, canDownload, createdAt, now);
           upsertCand.run(uId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, psZpWard, now);
           upsertCand.run(altId, candName, post, gp, ward, symName, symIcon, customSym, photo, slogan, eDate, eTime, mobile, showBanner, psZpWard, now);
         }
@@ -1221,6 +1231,19 @@ const server = http.createServer(async (req, res) => {
           // Ensure both uId and altId exist in candidates table with identical freshest data
           insertCandidateStmt.run(uId, c.candidate_name || '', c.post || 'सरपंच', c.panchayat || '', c.ward || '', c.symbol_name || 'उगता सूरज', c.symbol_icon || 'sun', c.custom_symbol_url || '', c.photo_url || '', c.slogan || '', candDate, candTime, c.mobile || '', c.show_banner_on_slip ? 1 : 0, c.ps_zp_ward || '', now);
           insertCandidateStmt.run(altId, c.candidate_name || '', c.post || 'सरपंच', c.panchayat || '', c.ward || '', c.symbol_name || 'उगता सूरज', c.symbol_icon || 'sun', c.custom_symbol_url || '', c.photo_url || '', c.slogan || '', candDate, candTime, c.mobile || '', c.show_banner_on_slip ? 1 : 0, c.ps_zp_ward || '', now);
+
+          // Update users table permissions if provided
+          if (c.allowed_tabs || c.candidate_mode !== undefined || c.can_print !== undefined || c.can_download !== undefined) {
+            const tabsVal = c.allowed_tabs ? (Array.isArray(c.allowed_tabs) ? JSON.stringify(c.allowed_tabs) : String(c.allowed_tabs)) : JSON.stringify(['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab']);
+            const modeVal = c.candidate_mode || 'user_edit';
+            const printVal = c.can_print !== false ? 1 : 0;
+            const dlVal = c.can_download !== false ? 1 : 0;
+            try {
+              db.prepare('UPDATE users SET allowed_tabs = ?, candidate_mode = ?, can_print = ?, can_download = ?, updated_at = ? WHERE id = ? OR username = ? OR id = ? OR username = ?').run(
+                tabsVal, modeVal, printVal, dlVal, now, uId, uId, altId, altId
+              );
+            } catch(e) {}
+          }
 
           exportToJson();
           res.end(JSON.stringify({ success: true, message: 'प्रत्याशी प्रोफाइल सफलतापूर्वक सुरक्षित!' }));

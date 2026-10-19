@@ -71,6 +71,13 @@ async function syncCandidatesFromGoogleSheetClient(showNotification = false) {
             // Upsert in State.adminControlUsers
             if (State.adminControlUsers) {
               const exIdx = State.adminControlUsers.findIndex(u => (u.id === uId || u.username === uName));
+              let scTabs = sc.allowed_tabs;
+              if (typeof scTabs === 'string') {
+                try { scTabs = JSON.parse(scTabs); } catch(e) { scTabs = scTabs.split(',').map(s=>s.trim()).filter(Boolean); }
+              }
+              if (!Array.isArray(scTabs) || scTabs.length === 0) {
+                scTabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+              }
               const candUserObj = {
                 id: uId,
                 username: uName,
@@ -82,10 +89,26 @@ async function syncCandidatesFromGoogleSheetClient(showNotification = false) {
                 status: sc.status || 'ACTIVE',
                 allowed_panchayats: sc.panchayat,
                 allowed_wards: sc.ward || 'ALL',
-                allowed_tabs: ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
-                candidate_mode: 'user_edit',
+                allowed_tabs: scTabs,
+                candidate_mode: sc.candidate_mode || 'user_edit',
+                can_print: sc.can_print !== false,
+                can_download: sc.can_download !== false,
                 candidate: candProfile
               };
+
+              // If currently logged in user is this candidate, update active session in real-time
+              if (State.currentUser && (State.currentUser.id === uId || State.currentUser.username === uName || State.currentUser.id === ('cand_' + uName))) {
+                State.currentUser.allowed_tabs = scTabs;
+                State.currentUser.candidate_mode = sc.candidate_mode || 'user_edit';
+                State.currentUser.can_print = candUserObj.can_print;
+                State.currentUser.can_download = candUserObj.can_download;
+                State.currentUser.candidate = candProfile;
+                try {
+                  const sk = getSessionStorageKey();
+                  localStorage.setItem(sk, JSON.stringify(State.currentUser));
+                } catch(_) {}
+                if (typeof enforceGatekeeperState === 'function') enforceGatekeeperState();
+              }
               if (exIdx >= 0) State.adminControlUsers[exIdx] = candUserObj;
               else State.adminControlUsers.push(candUserObj);
             }
@@ -2872,7 +2895,8 @@ function enforceGatekeeperState() {
                          (window.location && window.location.href && window.location.href.toLowerCase().includes('/voter-portal')) ||
                          (typeof getPortalContext === 'function' && getPortalContext() === 'voter');
   if (isCandUser || isVoterContext) {
-    allowedTabs = allowedTabs.filter(t => t !== 'directoryTab');
+    // Candidates & Voters NEVER see Dashboard, Directory, Admin Control, or Settings
+    allowedTabs = allowedTabs.filter(t => t !== 'directoryTab' && t !== 'dashboardTab' && t !== 'adminControlTab' && t !== 'settingsTab');
     document.querySelectorAll('.nav-tab[data-tab="directoryTab"], .bottom-nav-item[data-tab="directoryTab"]').forEach(el => {
       el.style.display = 'none';
     });
@@ -7613,6 +7637,28 @@ async function openAdminCandidateModal(userId) {
   const showBannerCb = document.getElementById('adminCandShowBanner');
   if (showBannerCb) showBannerCb.checked = (cand.show_banner_on_slip !== false);
 
+  // Populate Allowed Tabs
+  let userTabs = u.allowed_tabs || cand.allowed_tabs;
+  if (typeof userTabs === 'string') {
+    try { userTabs = JSON.parse(userTabs); } catch(e) { userTabs = userTabs.split(',').map(s=>s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(userTabs) || userTabs.length === 0) {
+    userTabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+  }
+  document.querySelectorAll('.admin-cand-tab-cb').forEach(cb => {
+    cb.checked = userTabs.includes(cb.value);
+  });
+
+  // Populate Candidate Mode & Action Permissions
+  const modeSel = document.getElementById('adminCandMode');
+  if (modeSel) modeSel.value = cand.candidate_mode || u.candidate_mode || 'user_edit';
+
+  const printCb = document.getElementById('adminCandCanPrint');
+  if (printCb) printCb.checked = (cand.can_print !== false && u.can_print !== false);
+
+  const dlCb = document.getElementById('adminCandCanDownload');
+  if (dlCb) dlCb.checked = (cand.can_download !== false && u.can_download !== false);
+
   updateAdminCandPhotoPreview();
 
   const modal = document.getElementById('adminCandidateModal');
@@ -7713,6 +7759,10 @@ async function handleAdminSaveCandidate(event) {
     photo_url: photo,
     slogan: slogan,
     show_banner_on_slip: showBanner,
+    allowed_tabs: Array.from(document.querySelectorAll('.admin-cand-tab-cb:checked')).map(cb => cb.value),
+    candidate_mode: document.getElementById('adminCandMode')?.value || 'user_edit',
+    can_print: document.getElementById('adminCandCanPrint')?.checked !== false,
+    can_download: document.getElementById('adminCandCanDownload')?.checked !== false,
     updated_at: new Date().toISOString()
   };
 
@@ -7727,6 +7777,10 @@ async function handleAdminSaveCandidate(event) {
     u.panchayat = gp;
     u.allowed_panchayats = gp;
     u.allowed_wards = ward || 'ALL';
+    u.allowed_tabs = candData.allowed_tabs;
+    u.candidate_mode = candData.candidate_mode;
+    u.can_print = candData.can_print;
+    u.can_download = candData.can_download;
     u.candidate = candData;
   }
 

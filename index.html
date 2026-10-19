@@ -1,26 +1,94 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="hi" data-portal="voter">
 <head>
   <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261020_041247";</script>
-  <script>
-    // Instant Session Persistence: Prevent login screen flicker on refresh
+    <script>
+    // Instant Zero-Flicker Session Persistence & Dynamic Tab Access Pre-Filter
     (function() {
       try {
-        var s = localStorage.getItem('panchayat_session_voter') || 
-                sessionStorage.getItem('panchayat_session_voter');
+        var s = localStorage.getItem('panchayat_session_master') || 
+                sessionStorage.getItem('panchayat_session_master') ||
+                localStorage.getItem('panchayat_session_voter') || 
+                sessionStorage.getItem('panchayat_session_voter') ||
+                localStorage.getItem('panchayat_user_session');
         if (s) {
           var u = JSON.parse(s);
           if (u && (u.username || u.id)) {
             document.documentElement.classList.add('user-logged-in');
+            var role = String(u.role || '').toUpperCase();
+            var isSuper = (role === 'SUPER_ADMIN' || u.id === 'admin' || u.id === 'superadmin' || u.username === 'admin' || u.username === 'superadmin');
+            var isCand = (role === 'CANDIDATE' || String(u.id||'').startsWith('cand_') || String(u.username||'').startsWith('cand_') || u.candidate_mode);
+
+            if (isCand && !isSuper) {
+              document.documentElement.classList.add('is-candidate-session');
+            } else if (!isSuper) {
+              document.documentElement.classList.add('is-restricted-session');
+            }
+
+            // Real-time allowed_tabs filter (Google Sheet & Super Admin permission enforcement)
+            var rawTabs = u.allowed_tabs;
+            var allowed = null;
+            if (Array.isArray(rawTabs)) allowed = rawTabs;
+            else if (typeof rawTabs === 'string') {
+              try { allowed = JSON.parse(rawTabs); } catch(e) { allowed = rawTabs.split(',').map(function(x){return x.trim();}).filter(Boolean); }
+            }
+            if (isCand && (!allowed || allowed.length === 0)) {
+              allowed = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+            }
+
+            if (allowed && Array.isArray(allowed) && !isSuper) {
+              var allTabIds = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab', 'candidateProfileTab', 'adminControlTab', 'settingsTab'];
+              var css = '';
+              allTabIds.forEach(function(t) {
+                if (allowed.indexOf(t) === -1) {
+                  css += '.nav-tab[data-tab="' + t + '"], .bottom-nav-item[data-tab="' + t + '"], #' + t + ' { display: none !important; } ';
+                }
+              });
+              if (css) {
+                var styleEl = document.createElement('style');
+                styleEl.id = 'instant-allowed-tabs-filter';
+                styleEl.textContent = css;
+                document.head.appendChild(styleEl);
+              }
+            }
           }
         }
       } catch(e) {}
     })();
   </script>
   <style>
-    /* Prevent login screen bounce on reload */
+    /* Prevent login screen bounce & enforce zero-flicker permissions */
     html.user-logged-in #welcomeGatekeeper { display: none !important; }
     html.user-logged-in #mainPortalApp { display: block !important; }
+
+    /* Candidate Session: Never render Dashboard, Ward Directory, Admin Control, or Settings */
+    html.is-candidate-session .nav-tab[data-tab="dashboardTab"],
+    html.is-candidate-session .nav-tab[data-tab="directoryTab"],
+    html.is-candidate-session .nav-tab[data-tab="adminControlTab"],
+    html.is-candidate-session .nav-tab[data-tab="settingsTab"],
+    html.is-candidate-session .bottom-nav-item[data-tab="dashboardTab"],
+    html.is-candidate-session .bottom-nav-item[data-tab="directoryTab"],
+    html.is-candidate-session #dashboardTab,
+    html.is-candidate-session #directoryTab,
+    html.is-candidate-session #adminControlTab,
+    html.is-candidate-session #settingsTab,
+    html.is-candidate-session #adminCandidateModal {
+      display: none !important;
+    }
+
+    /* Voter Portal (Public Search Only): Strictly hide Dashboard, Directory, Admin Control, and Settings */
+    html[data-portal="voter"] .nav-tab[data-tab="dashboardTab"],
+    html[data-portal="voter"] .nav-tab[data-tab="directoryTab"],
+    html[data-portal="voter"] .nav-tab[data-tab="adminControlTab"],
+    html[data-portal="voter"] .nav-tab[data-tab="settingsTab"],
+    html[data-portal="voter"] .bottom-nav-item[data-tab="dashboardTab"],
+    html[data-portal="voter"] .bottom-nav-item[data-tab="directoryTab"],
+    html[data-portal="voter"] #dashboardTab,
+    html[data-portal="voter"] #directoryTab,
+    html[data-portal="voter"] #adminControlTab,
+    html[data-portal="voter"] #settingsTab {
+      display: none !important;
+    }
   </style>
 
   <script id="autoLiveUpdater">
@@ -192,11 +260,11 @@
 
         <!-- Navigation Tabs -->
         <div class="nav-tabs-wrapper">
-          <button class="nav-tab active" data-tab="dashboardTab" onclick="switchTab('dashboardTab')">
+          <button class="nav-tab" data-tab="dashboardTab" style="display:none;" onclick="switchTab('dashboardTab')">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
             होम / डैशबोर्ड (Home)
           </button>
-          <button class="nav-tab" data-tab="searchTab" onclick="switchTab('searchTab')">
+          <button class="nav-tab active" data-tab="searchTab" onclick="switchTab('searchTab')">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             मतदाता खोज (Search)
           </button>
@@ -1782,6 +1850,55 @@
             <input type="checkbox" id="adminCandShowBanner" checked style="width:18px; height:18px;">
             <span>मतदाता पर्ची के साथ प्रचार कार्ड (Detachable Slip Banner) सक्रिय रखें</span>
           </label>
+        </div>
+
+        <!-- SUPER ADMIN PERMISSIONS & TABS CONTROL (SYNCED WITH GOOGLE SHEET) -->
+        <div class="card p-3 mt-3" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px;">
+          <h4 style="font-size:0.88rem; font-weight:800; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <span>🛡️ प्रत्याशी अनुमतियाँ एवं टैब्स (Super Admin & Google Sheet Permissions)</span>
+          </h4>
+          
+          <div class="row-2col mb-2">
+            <div class="form-group mb-0">
+              <label for="adminCandMode"><strong>प्रत्याशी संपादन मोड (Edit Mode):</strong></label>
+              <select id="adminCandMode" class="form-select" style="font-weight:700;">
+                <option value="user_edit">✏️ user_edit (प्रत्याशी खुद फोटो/स्लोगन बदल सकता है)</option>
+                <option value="view_only">🔒 view_only (केवल देख सकता है, संपादन बंद)</option>
+              </select>
+            </div>
+            <div class="form-group mb-0">
+              <label><strong>पर्ची व सूची अनुमतियाँ:</strong></label>
+              <div class="d-flex gap-3 align-items-center mt-1">
+                <label class="d-flex align-items-center gap-1" style="font-weight:600; cursor:pointer;">
+                  <input type="checkbox" id="adminCandCanPrint" checked> <span>🖨️ पर्ची प्रिंट</span>
+                </label>
+                <label class="d-flex align-items-center gap-1" style="font-weight:600; cursor:pointer;">
+                  <input type="checkbox" id="adminCandCanDownload" checked> <span>📥 डाउनलोड</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group mb-0 mt-2">
+            <label style="font-weight:700; color:#334155; margin-bottom:4px; display:block;">प्रत्याशी के लिए अनुमत टैब्स (Allowed Tabs):</label>
+            <div class="d-flex gap-3 flex-wrap">
+              <label class="d-flex align-items-center gap-1" style="font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="admin-cand-tab-cb" value="searchTab" checked> <span>🔍 मतदाता खोज</span>
+              </label>
+              <label class="d-flex align-items-center gap-1" style="font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="admin-cand-tab-cb" value="alphaTab" checked> <span>🔤 वर्णमाला सूची</span>
+              </label>
+              <label class="d-flex align-items-center gap-1" style="font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="admin-cand-tab-cb" value="bulkSlipTab" checked> <span>📋 थोक पर्ची जनरेटर</span>
+              </label>
+              <label class="d-flex align-items-center gap-1" style="font-weight:600; cursor:pointer;">
+                <input type="checkbox" class="admin-cand-tab-cb" value="candidateProfileTab" checked> <span>👤 प्रत्याशी प्रोफाइल</span>
+              </label>
+            </div>
+            <small class="text-muted" style="font-size:0.72rem; display:block; margin-top:4px;">
+              * अनचेक किए गए टैब प्रत्याशी के लॉगिन पर बिल्कुल नहीं दिखेंगे (गूगल शीट में Allowed_Tabs से भी नियंत्रित)।
+            </small>
+          </div>
         </div>
 
         <div class="d-flex justify-content-end gap-2 mt-4 pt-2" style="border-top:1px solid #e2e8f0;">

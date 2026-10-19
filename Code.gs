@@ -821,7 +821,11 @@ var CANDIDATE_HEADERS = [
   "Election_Date",
   "Election_Time",
   "Status",
-  "Show_Banner_On_Slip"
+  "Show_Banner_On_Slip",
+  "Allowed_Tabs",
+  "Candidate_Mode",
+  "Can_Print",
+  "Can_Download"
 ];
 
 /**
@@ -904,6 +908,33 @@ function setupCandidatesSheet() {
     .build();
   sheet.getRange(2, 17, maxRows - 1, 1).setDataValidation(bannerRule);
 
+  // Column R: Allowed_Tabs Note
+  sheet.getRange(1, 18).setNote("अनुमत टैब्स कॉमा लगाकर लिखें (उदा. searchTab,candidateProfileTab,bulkSlipTab या searchTab,candidateProfileTab या ALL)");
+
+  // Column S: Candidate_Mode Dropdown (user_edit / view_only)
+  sheet.getRange(1, 19).setNote("प्रत्याशी संपादन मोड: user_edit (प्रत्याशी खुद फोटो/स्लोगन बदल सकता है) या view_only (केवल देख सकता है)");
+  var modeRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["user_edit", "view_only"], true)
+    .setAllowInvalid(false)
+    .build();
+  sheet.getRange(2, 19, maxRows - 1, 1).setDataValidation(modeRule);
+
+  // Column T: Can_Print Dropdown (TRUE / FALSE)
+  sheet.getRange(1, 20).setNote("पर्ची प्रिंट करने की अनुमति");
+  var printRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["TRUE", "FALSE"], true)
+    .setAllowInvalid(false)
+    .build();
+  sheet.getRange(2, 20, maxRows - 1, 1).setDataValidation(printRule);
+
+  // Column U: Can_Download Dropdown (TRUE / FALSE)
+  sheet.getRange(1, 21).setNote("मतदाता सूची/पर्ची डाउनलोड अनुमति");
+  var downloadRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["TRUE", "FALSE"], true)
+    .setAllowInvalid(false)
+    .build();
+  sheet.getRange(2, 21, maxRows - 1, 1).setDataValidation(downloadRule);
+
   // 4. Populate with INITIAL_CANDIDATES_SEED if sheet was empty
   if (sheet.getLastRow() <= 1) {
     var rows = [];
@@ -926,7 +957,11 @@ function setupCandidatesSheet() {
         c.election_date || "15 अक्टूबर 2026",
         c.election_time || "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
         c.status || "ACTIVE",
-        c.show_banner_on_slip !== false ? "TRUE" : "FALSE"
+        c.show_banner_on_slip !== false ? "TRUE" : "FALSE",
+        c.allowed_tabs ? (Array.isArray(c.allowed_tabs) ? c.allowed_tabs.join(",") : c.allowed_tabs) : "searchTab,alphaTab,bulkSlipTab,candidateProfileTab",
+        c.candidate_mode || "user_edit",
+        c.can_print !== false ? "TRUE" : "FALSE",
+        c.can_download !== false ? "TRUE" : "FALSE"
       ]);
     }
 
@@ -989,6 +1024,10 @@ function handleGetCandidates() {
   var colTime = findCol(["election_time", "time"]);
   var colStatus = findCol(["status", "स्थिति"]);
   var colBanner = findCol(["show_banner_on_slip", "show_banner", "banner"]);
+  var colAllowedTabs = findCol(["allowed_tabs", "tabs", "टैब्स", "allowed_tab"]);
+  var colCandMode = findCol(["candidate_mode", "mode", "मोड", "edit_mode"]);
+  var colCanPrint = findCol(["can_print", "print", "प्रिंट"]);
+  var colCanDownload = findCol(["can_download", "download", "डाउनलोड"]);
 
   var candidates = [];
 
@@ -1019,6 +1058,20 @@ function handleGetCandidates() {
     var formattedId = uId.startsWith("cand_") ? uId : ("cand_" + uId);
     var cleanUsername = uId.replace(/^cand_/i, "");
 
+    var rawAllowedTabs = colAllowedTabs !== -1 ? String(row[colAllowedTabs] || "").trim() : "";
+    var parsedTabs = ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
+    if (rawAllowedTabs) {
+      if (rawAllowedTabs.toUpperCase() === "ALL") {
+        parsedTabs = ["dashboardTab", "searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
+      } else {
+        parsedTabs = rawAllowedTabs.split(",").map(function(t) { return t.trim(); }).filter(Boolean);
+      }
+    }
+
+    var candMode = colCandMode !== -1 ? String(row[colCandMode] || "user_edit").trim() : "user_edit";
+    var canPrint = colCanPrint !== -1 ? (String(row[colCanPrint]).toUpperCase() !== "FALSE") : true;
+    var canDownload = colCanDownload !== -1 ? (String(row[colCanDownload]).toUpperCase() !== "FALSE") : true;
+
     candidates.push({
       rowIndex: r + 1,
       id: formattedId,
@@ -1044,8 +1097,10 @@ function handleGetCandidates() {
       status: status,
       show_banner_on_slip: showBanner,
       role: "CANDIDATE",
-      candidate_mode: "user_edit",
-      allowed_tabs: ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"]
+      candidate_mode: candMode,
+      allowed_tabs: parsedTabs,
+      can_print: canPrint,
+      can_download: canDownload
     });
   }
 
@@ -1184,7 +1239,11 @@ function handleSaveCandidate(candData) {
     candData.election_date || "15 अक्टूबर 2026",
     candData.election_time || "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
     candData.status || "ACTIVE",
-    candData.show_banner_on_slip !== false ? "TRUE" : "FALSE"
+    candData.show_banner_on_slip !== false ? "TRUE" : "FALSE",
+    candData.allowed_tabs ? (Array.isArray(candData.allowed_tabs) ? candData.allowed_tabs.join(",") : candData.allowed_tabs) : "searchTab,alphaTab,bulkSlipTab,candidateProfileTab",
+    candData.candidate_mode || "user_edit",
+    candData.can_print !== false ? "TRUE" : "FALSE",
+    candData.can_download !== false ? "TRUE" : "FALSE"
   ];
 
   if (targetRow !== -1) {
