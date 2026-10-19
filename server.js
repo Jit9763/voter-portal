@@ -642,7 +642,7 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
     if (hasChanges) {
       console.log(`[GOOGLE-SHEET-SYNC] ✅ Candidate Sync Complete! (+Added: ${addedCount}, ~Updated: ${updatedCount}, -Deleted: ${deletedCount})`);
       exportToJson();
-      scheduleGitPush(`Candidate Google Sheet Sync (+Added: ${addedCount}, ~Updated: ${updatedCount}, -Deleted: ${deletedCount})`);
+      if (typeof executeGithubPush === 'function') { executeGithubPush(`Candidate Google Sheet Sync (+Added: ${addedCount}, ~Updated: ${updatedCount}, -Deleted: ${deletedCount})`); }
     } else {
       console.log('[GOOGLE-SHEET-SYNC] ✨ All candidates are in perfect sync with Google Sheet. No updates needed.');
     }
