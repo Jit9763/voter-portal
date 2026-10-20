@@ -75,9 +75,10 @@ async function syncCandidatesFromGoogleSheetClient(showNotification = false) {
               if (typeof scTabs === 'string') {
                 try { scTabs = JSON.parse(scTabs); } catch(e) { scTabs = scTabs.split(',').map(s=>s.trim()).filter(Boolean); }
               }
-              if (!Array.isArray(scTabs) || scTabs.length === 0) {
+              if (!Array.isArray(scTabs)) {
                 scTabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
               }
+              scTabs = scTabs.filter(t => t !== 'directoryTab');
               const candUserObj = {
                 id: uId,
                 username: uName,
@@ -2626,11 +2627,14 @@ function syncCurrentUserWithConfiguredUsers() {
   const uId = String(State.currentUser.id || State.currentUser.username || '').toLowerCase();
   const boothExact = State.currentUser.booth_no ? `blo_${String(State.currentUser.booth_no).trim().toLowerCase()}` : '';
   if (!State.adminControlUsers || State.adminControlUsers.length === 0) return;
+  const uName = String(State.currentUser.username || State.currentUser.id || '').toLowerCase();
   const matched = State.adminControlUsers.find(x => {
     const xU = String(x.username || '').toLowerCase();
     const xId = String(x.id || '').toLowerCase();
     const xBooth = x.booth_no ? `blo_${String(x.booth_no).trim().toLowerCase()}` : '';
-    return xU === uId || xId === uId || 
+    return xU === uId || xId === uId || xU === uName || xId === uName ||
+           (xId === ('cand_' + uName)) || (xU === ('cand_' + uName)) ||
+           (('cand_' + xId) === uName) || (('cand_' + xU) === uName) ||
            (boothExact && (xU === boothExact || xId === boothExact || xBooth === boothExact)) ||
            (uId.startsWith('blo_') && (xBooth === uId || xU === uId || xId === uId));
   });
@@ -2731,14 +2735,28 @@ function initSession() {
   const ctx = getPortalContext();
   const sessionKey = `panchayat_session_${ctx}`;
 
-  // Synchronously populate State.adminControlUsers from cached Google Sheet admins
+  // Synchronously populate State.adminControlUsers from cached Google Sheet admins & candidates
   const cachedAdminsStr = localStorage.getItem('panchayat_admins_cache');
   if (cachedAdminsStr) {
     try {
       const parsedAdmins = JSON.parse(cachedAdminsStr);
       if (Array.isArray(parsedAdmins) && parsedAdmins.length > 0) {
         State.adminUsers = parsedAdmins;
-        State.adminControlUsers = parsedAdmins;
+        State.adminControlUsers = [...parsedAdmins];
+      }
+    } catch(e) {}
+  }
+  const cachedCandsStr = localStorage.getItem('panchayat_candidates_cache');
+  if (cachedCandsStr) {
+    try {
+      const parsedCands = JSON.parse(cachedCandsStr);
+      if (Array.isArray(parsedCands) && parsedCands.length > 0) {
+        if (!State.adminControlUsers) State.adminControlUsers = [];
+        parsedCands.forEach(c => {
+          const exIdx = State.adminControlUsers.findIndex(u => u.id === c.id || u.username === c.username || (c.id && u.id === c.id.replace('cand_', '')));
+          if (exIdx >= 0) State.adminControlUsers[exIdx] = { ...State.adminControlUsers[exIdx], ...c };
+          else State.adminControlUsers.push(c);
+        });
       }
     } catch(e) {}
   }
@@ -5710,8 +5728,13 @@ async function syncLatestActiveUsersFromAppsScript() {
   if (!url) return;
 
   try {
-    const res = await fetch(`${url}?action=getUsers`);
-    const data = await res.json();
+    const [res, cRes] = await Promise.all([
+      fetch(`${url}?action=getUsers&_t=${Date.now()}`).catch(() => null),
+      fetch(`${url}?action=getCandidates&_t=${Date.now()}`).catch(() => null)
+    ]);
+    const data = res && res.ok ? await res.json() : null;
+    const cData = cRes && cRes.ok ? await cRes.json() : null;
+
     if (data && data.success && Array.isArray(data.users) && data.users.length > 0) {
       State.adminUsers = data.users.map(u => {
         let tabs = [];
@@ -5766,6 +5789,62 @@ async function syncLatestActiveUsersFromAppsScript() {
       syncCurrentUserWithConfiguredUsers();
       enforceGatekeeperState();
       localStorage.setItem('panchayat_admins_cache', JSON.stringify(State.adminUsers));
+
+      // Synchronize candidates from Candidates sheet
+      if (cData && cData.success && Array.isArray(cData.candidates)) {
+        const candsList = cData.candidates.map(sc => {
+          let tabs = [];
+          if (sc.tab_search !== undefined || sc.tab_alpha !== undefined || sc.tab_bulkslip !== undefined || sc.tab_profile !== undefined) {
+            if (sc.tab_search === true || String(sc.tab_search).toUpperCase() === 'TRUE') tabs.push('searchTab');
+            if (sc.tab_alpha === true || String(sc.tab_alpha).toUpperCase() === 'TRUE') tabs.push('alphaTab');
+            if (sc.tab_bulkslip === true || String(sc.tab_bulkslip).toUpperCase() === 'TRUE') tabs.push('bulkSlipTab');
+            if (sc.tab_profile === true || String(sc.tab_profile).toUpperCase() === 'TRUE') tabs.push('candidateProfileTab');
+          } else if (Array.isArray(sc.allowed_tabs)) {
+            tabs = sc.allowed_tabs.filter(t => t !== 'directoryTab');
+          } else if (typeof sc.allowed_tabs === 'string') {
+            try { tabs = JSON.parse(sc.allowed_tabs); } catch(e) { tabs = sc.allowed_tabs.split(',').map(s=>s.trim()).filter(Boolean); }
+          }
+          return {
+            id: sc.id || ('cand_' + sc.username),
+            username: sc.username,
+            user_id: sc.id || ('cand_' + sc.username),
+            password: sc.password,
+            fullName: sc.candidate_name,
+            full_name: sc.candidate_name,
+            mobile: sc.mobile || '',
+            role: 'CANDIDATE',
+            status: (sc.status || 'ACTIVE').toUpperCase(),
+            allowed_panchayats: sc.panchayat || '',
+            allowed_wards: sc.ward || 'ALL',
+            allowed_tabs: tabs,
+            candidate_mode: sc.candidate_mode || 'user_edit',
+            can_print: (sc.can_print === true || String(sc.can_print).toUpperCase() === 'TRUE'),
+            can_download: (sc.can_download === true || String(sc.can_download).toUpperCase() === 'TRUE'),
+            candidate: sc
+          };
+        });
+        localStorage.setItem('panchayat_candidates_cache', JSON.stringify(candsList));
+        candsList.forEach(cand => {
+          const uKey = String(cand.username || cand.id).toLowerCase();
+          const existingIdx = State.adminControlUsers.findIndex(x => 
+            (x.id && String(x.id).toLowerCase() === uKey) || 
+            (x.username && String(x.username).toLowerCase() === uKey) ||
+            (cand.id && String(x.id).toLowerCase() === cand.id.replace('cand_', ''))
+          );
+          if (existingIdx >= 0) {
+            State.adminControlUsers[existingIdx] = {
+              ...State.adminControlUsers[existingIdx],
+              ...cand,
+              allowed_tabs: cand.allowed_tabs
+            };
+          } else {
+            State.adminControlUsers.push(cand);
+          }
+        });
+        syncCurrentUserWithConfiguredUsers();
+        enforceGatekeeperState();
+      }
+
       populateLoginUserDropdown();
       if (document.getElementById('superAdminUsersTable')) {
         renderSuperAdminUsers();
@@ -7004,16 +7083,23 @@ async function loadAdminUsersList(force = false) {
     // API server not reachable, fallback to static JSON
   }
 
-  // 2. Try Google Apps Script on GitHub Pages for immediate zero-cache live updates
+  // 2. Try Google Apps Script on GitHub Pages for immediate zero-cache live updates (Users + Candidates)
   const isGitHub = window.location.hostname.includes('github.io');
   const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
   if (isGitHub && gScriptUrl) {
     try {
-      const gRes = await fetch(`${gScriptUrl}?action=getUsers&_t=${bust}`);
-      if (gRes.ok) {
+      const [gRes, cRes] = await Promise.all([
+        fetch(`${gScriptUrl}?action=getUsers&_t=${bust}`).catch(() => null),
+        fetch(`${gScriptUrl}?action=getCandidates&_t=${bust}`).catch(() => null)
+      ]);
+
+      let combinedUsers = [];
+      let candidatesMap = {};
+
+      if (gRes && gRes.ok) {
         const gData = await gRes.json();
-        if (gData && Array.isArray(gData.users) && gData.users.length > 0) {
-          State.adminControlUsers = gData.users.map(u => {
+        if (gData && Array.isArray(gData.users)) {
+          combinedUsers = gData.users.map(u => {
             let tabs = [];
             if (u.tab_search !== undefined || u.tab_alpha !== undefined || u.tab_bulkslip !== undefined || u.tab_directory !== undefined) {
               if (u.tab_search === true || String(u.tab_search).toUpperCase() === 'TRUE') tabs.push('searchTab');
@@ -7031,12 +7117,65 @@ async function loadAdminUsersList(force = false) {
               can_print: (u.can_print === true || String(u.can_print).toUpperCase() === 'TRUE'),
               can_download: (u.can_download === true || String(u.can_download).toUpperCase() === 'TRUE')
             };
-          }).map(sanitizeUserTabs);
-          if (!window.PORTAL_USERS_DATA) window.PORTAL_USERS_DATA = { users: [], candidates: {} };
-          window.PORTAL_USERS_DATA.users = State.adminControlUsers;
-          syncCurrentUserWithConfiguredUsers();
-          return;
+          });
+          localStorage.setItem('panchayat_admins_cache', JSON.stringify(combinedUsers));
         }
+      }
+
+      if (cRes && cRes.ok) {
+        const cData = await cRes.json();
+        if (cData && Array.isArray(cData.candidates)) {
+          const candsList = cData.candidates.map(sc => {
+            let tabs = [];
+            if (sc.tab_search !== undefined || sc.tab_alpha !== undefined || sc.tab_bulkslip !== undefined || sc.tab_profile !== undefined) {
+              if (sc.tab_search === true || String(sc.tab_search).toUpperCase() === 'TRUE') tabs.push('searchTab');
+              if (sc.tab_alpha === true || String(sc.tab_alpha).toUpperCase() === 'TRUE') tabs.push('alphaTab');
+              if (sc.tab_bulkslip === true || String(sc.tab_bulkslip).toUpperCase() === 'TRUE') tabs.push('bulkSlipTab');
+              if (sc.tab_profile === true || String(sc.tab_profile).toUpperCase() === 'TRUE') tabs.push('candidateProfileTab');
+            } else if (Array.isArray(sc.allowed_tabs)) {
+              tabs = sc.allowed_tabs.filter(t => t !== 'directoryTab');
+            } else if (typeof sc.allowed_tabs === 'string') {
+              try { tabs = JSON.parse(sc.allowed_tabs); } catch(e) { tabs = sc.allowed_tabs.split(',').map(s=>s.trim()).filter(Boolean); }
+            }
+            const candUserObj = {
+              id: sc.id || ('cand_' + sc.username),
+              username: sc.username,
+              user_id: sc.id || ('cand_' + sc.username),
+              password: sc.password,
+              fullName: sc.candidate_name,
+              full_name: sc.candidate_name,
+              mobile: sc.mobile || '',
+              role: 'CANDIDATE',
+              status: (sc.status || 'ACTIVE').toUpperCase(),
+              allowed_panchayats: sc.panchayat || '',
+              allowed_wards: sc.ward || 'ALL',
+              allowed_tabs: tabs,
+              candidate_mode: sc.candidate_mode || 'user_edit',
+              can_print: (sc.can_print === true || String(sc.can_print).toUpperCase() === 'TRUE'),
+              can_download: (sc.can_download === true || String(sc.can_download).toUpperCase() === 'TRUE'),
+              candidate: sc
+            };
+            candidatesMap[candUserObj.id] = sc;
+            candidatesMap[candUserObj.username] = sc;
+            return candUserObj;
+          });
+          localStorage.setItem('panchayat_candidates_cache', JSON.stringify(candsList));
+          candsList.forEach(candUser => {
+            const exIdx = combinedUsers.findIndex(u => u.id === candUser.id || u.username === candUser.username);
+            if (exIdx >= 0) combinedUsers[exIdx] = { ...combinedUsers[exIdx], ...candUser };
+            else combinedUsers.push(candUser);
+          });
+        }
+      }
+
+      if (combinedUsers.length > 0) {
+        State.adminControlUsers = combinedUsers.map(sanitizeUserTabs);
+        if (!window.PORTAL_USERS_DATA) window.PORTAL_USERS_DATA = { users: [], candidates: {} };
+        window.PORTAL_USERS_DATA.users = State.adminControlUsers;
+        if (!window.PORTAL_USERS_DATA.candidates) window.PORTAL_USERS_DATA.candidates = {};
+        Object.assign(window.PORTAL_USERS_DATA.candidates, candidatesMap);
+        syncCurrentUserWithConfiguredUsers();
+        return;
       }
     } catch(_) {}
   }
@@ -9145,7 +9284,16 @@ async function handleGatekeeperLogin(event) {
         if (gData && gData.success && gData.user && gData.candidate) {
           const candUser = gData.user;
           const candProfile = gData.candidate;
-          candUser.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+          let allowed = gData.candidate?.allowed_tabs || gData.user?.allowed_tabs;
+          if (typeof allowed === 'string') {
+            try { allowed = JSON.parse(allowed); } catch(e) { allowed = allowed.split(',').map(s=>s.trim()).filter(Boolean); }
+          }
+          if (!Array.isArray(allowed)) {
+            allowed = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+          }
+          candUser.allowed_tabs = allowed.filter(t => t !== 'directoryTab');
+          candUser.can_print = (gData.candidate?.can_print !== false && gData.user?.can_print !== false);
+          candUser.can_download = (gData.candidate?.can_download !== false && gData.user?.can_download !== false);
           candUser.candidate_mode = 'user_edit';
           candUser.candidate = candProfile;
           State.currentUser = candUser;
