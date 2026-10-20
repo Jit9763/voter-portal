@@ -819,32 +819,66 @@ async function syncUsersFromGoogleSheet(isManual = false) {
           try { tabs = JSON.parse(su.allowed_tabs); } catch(e) { tabs = su.allowed_tabs.split(',').map(s=>s.trim()).filter(Boolean); }
         }
 
+        let existingTabs = [];
+        if (existing?.allowed_tabs) {
+          if (typeof existing.allowed_tabs === 'string') {
+            try { existingTabs = JSON.parse(existing.allowed_tabs); } catch(e) { existingTabs = [existing.allowed_tabs]; }
+          } else if (Array.isArray(existing.allowed_tabs)) {
+            existingTabs = existing.allowed_tabs;
+          }
+        }
+
+        const existingTabsSorted = [...existingTabs].sort().join(',');
+        const newTabsSorted = [...tabs].sort().join(',');
+
         const canPrint = (su.can_print === true || String(su.can_print).toUpperCase() === 'TRUE') ? 1 : 0;
         const canDownload = (su.can_download === true || String(su.can_download).toUpperCase() === 'TRUE') ? 1 : 0;
         const assignedWards = cleanWardNumbers(su.assigned_wards || su.assignedWards || 'ALL');
 
-        upsertStmt.run(
-          uId,
-          username,
-          su.password || existing?.password || '123',
-          su.full_name || su.fullName || username,
-          su.mobile || '',
-          su.role || 'PANCHAYAT_AGENT',
-          su.status || 'ACTIVE',
-          su.assigned_panchayats || su.assignedPanchayats || 'ALL',
-          assignedWards,
-          JSON.stringify(tabs),
-          existing?.candidate_mode || 'user_edit',
-          canPrint,
-          canDownload,
-          1,
-          1,
-          existing?.created_at || now,
-          now
-        );
+        const targetPassword = String(su.password || existing?.password || '123');
+        const targetFullName = String(su.full_name || su.fullName || username);
+        const targetMobile = String(su.mobile || '');
+        const targetRole = String(su.role || 'PANCHAYAT_AGENT');
+        const targetStatus = String(su.status || 'ACTIVE').toUpperCase();
+        const targetPanchayats = String(su.assigned_panchayats || su.assignedPanchayats || 'ALL');
+        const targetWards = String(assignedWards || 'ALL').trim();
 
-        if (!existing) addedCount++;
-        else updatedCount++;
+        const isDiff = !existing ||
+          String(existing.password) !== targetPassword ||
+          String(existing.full_name) !== targetFullName ||
+          String(existing.mobile || '') !== targetMobile ||
+          String(existing.role || '') !== targetRole ||
+          String(existing.status || '').toUpperCase() !== targetStatus ||
+          String(existing.allowed_panchayats || '') !== targetPanchayats ||
+          String(existing.allowed_wards || '').trim() !== targetWards ||
+          existingTabsSorted !== newTabsSorted ||
+          (Number(existing.can_print) !== canPrint) ||
+          (Number(existing.can_download) !== canDownload);
+
+        if (isDiff) {
+          upsertStmt.run(
+            uId,
+            username,
+            targetPassword,
+            targetFullName,
+            targetMobile,
+            targetRole,
+            targetStatus,
+            targetPanchayats,
+            targetWards,
+            JSON.stringify(tabs),
+            existing?.candidate_mode || 'user_edit',
+            canPrint,
+            canDownload,
+            1,
+            1,
+            existing?.created_at || now,
+            now
+          );
+
+          if (!existing) addedCount++;
+          else updatedCount++;
+        }
       }
       db.exec('COMMIT;');
     } catch(err) {
@@ -901,14 +935,14 @@ async function checkGoogleSheetUpdatesSafe() {
   } catch(e) {}
 }
 
-// Lightweight quota-safe checker runs every 2 minutes (zero quota abuse)
-setInterval(checkGoogleSheetUpdatesSafe, 10000);
+// Lightweight quota-safe checker runs every 30 seconds (zero quota abuse)
+setInterval(checkGoogleSheetUpdatesSafe, 30000);
 
-// REGULAR 20-SECOND AUTO SYNC (Guarantees Google Sheet changes sync within 20s even without redeployment)
+// REGULAR 30-SECOND AUTO SYNC (Guarantees Google Sheet changes sync within 30s even without redeployment)
 setInterval(() => {
   syncCandidatesFromGoogleSheet(false).catch(()=>{});
   syncUsersFromGoogleSheet(false).catch(()=>{});
-}, 20000);
+}, 30000);
 
 const server = http.createServer(async (req, res) => {
   // CORS & Cache Busting Headers

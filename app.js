@@ -2982,17 +2982,19 @@ function enforceGatekeeperState() {
 
     if (!isSuperAdmin && !allowedTabs.includes(State.activeTab)) {
       if (allowedTabs.length > 0) {
-        switchTab(allowedTabs[0]);
+        switchTab(allowedTabs[0], false);
       }
     } else if (State.activeTab && document.getElementById(State.activeTab)) {
+      document.querySelectorAll('.nav-tab').forEach(t => {
+        t.classList.toggle('active', t.getAttribute('data-tab') === State.activeTab);
+      });
+      document.querySelectorAll('.bottom-nav-item').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-tab') === State.activeTab);
+      });
       document.querySelectorAll('.tab-pane').forEach(p => {
-        if (p.id === State.activeTab) {
-          p.style.display = 'block';
-          p.classList.add('active');
-        } else {
-          p.style.display = 'none';
-          p.classList.remove('active');
-        }
+        const isActive = (p.id === State.activeTab);
+        p.classList.toggle('active', isActive);
+        p.style.display = isActive ? 'block' : 'none';
       });
     }
   }
@@ -3136,7 +3138,7 @@ function updateUserScopeDisplay() {
 // ==========================================================================
 // Tab Navigation (Desktop & Mobile)
 // ==========================================================================
-function switchTab(tabId) {
+function switchTab(tabId, shouldScroll = true) {
   const curU = State.currentUser;
   const isCand = isCandidateUser(curU);
   const isVoter = (window.PORTAL_TYPE === 'voter') || 
@@ -3157,15 +3159,20 @@ function switchTab(tabId) {
     pane.classList.toggle('active', isActive);
     pane.style.display = isActive ? 'block' : 'none';
   });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (shouldScroll) {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(_) {}
+  }
 
-  if (tabId === 'dashboardTab') renderDashboard();
-  if (tabId === 'directoryTab') initDirectoryTab();
-  if (tabId === 'alphaTab') renderAlphabeticalList();
-  if (tabId === 'bulkSlipTab') updateBulkGenerator();
-
-  if (tabId === 'candidateProfileTab') initCandidateProfileTab();
-  if (tabId === 'adminControlTab') initAdminControlTab();
+  try {
+    if (tabId === 'dashboardTab' && typeof renderDashboard === 'function') renderDashboard();
+    if (tabId === 'directoryTab' && typeof initDirectoryTab === 'function') initDirectoryTab();
+    if (tabId === 'alphaTab' && typeof renderAlphabeticalList === 'function') renderAlphabeticalList();
+    if (tabId === 'bulkSlipTab' && typeof updateBulkGenerator === 'function') updateBulkGenerator();
+    if (tabId === 'candidateProfileTab' && typeof initCandidateProfileTab === 'function') initCandidateProfileTab();
+    if (tabId === 'adminControlTab' && typeof initAdminControlTab === 'function') initAdminControlTab();
+  } catch(err) {
+    console.warn('[SWITCH-TAB] Error rendering tab ' + tabId + ':', err);
+  }
 }
 
 // ==========================================================================
@@ -9748,13 +9755,17 @@ async function checkLivePermissionsUpdate() {
       const newCanDownload = (freshUser.can_download === true || freshUser.can_download === 1 || String(freshUser.can_download).toLowerCase() === 'true');
       const newStatus = (freshUser.status || 'ACTIVE').toUpperCase();
 
-      const curTabsStr = JSON.stringify(Array.isArray(u.allowed_tabs) ? u.allowed_tabs : []);
-      const newTabsStr = JSON.stringify(newTabs);
+      const sortArr = arr => Array.isArray(arr) ? [...arr].sort() : [];
+      const curTabsSorted = sortArr(u.allowed_tabs).join(',');
+      const newTabsSorted = sortArr(newTabs).join(',');
 
-      const hasTabsChanged = (curTabsStr !== newTabsStr);
-      const hasPrintChanged = (Boolean(u.can_print) !== Boolean(newCanPrint));
-      const hasDownloadChanged = (Boolean(u.can_download) !== Boolean(newCanDownload));
-      const hasStatusChanged = (u.status !== newStatus);
+      const curPrint = Boolean(u.can_print === true || u.can_print === 1 || String(u.can_print).toLowerCase() === 'true');
+      const curDownload = Boolean(u.can_download === true || u.can_download === 1 || String(u.can_download).toLowerCase() === 'true');
+
+      const hasTabsChanged = (curTabsSorted !== newTabsSorted);
+      const hasPrintChanged = (curPrint !== newCanPrint);
+      const hasDownloadChanged = (curDownload !== newCanDownload);
+      const hasStatusChanged = (String(u.status || 'ACTIVE').toUpperCase() !== newStatus);
 
       if (hasTabsChanged || hasPrintChanged || hasDownloadChanged || hasStatusChanged) {
         console.log('🔄 Live permissions updated dynamically without hard refresh:', {
@@ -9791,25 +9802,19 @@ async function checkLivePermissionsUpdate() {
   }
 }
 
-// 1. Run live check every 4 seconds when portal is in view
+// 1. Run live check every 15 seconds when portal is in view
 setInterval(() => {
   if (document.visibilityState !== 'hidden') {
     checkLivePermissionsUpdate();
   }
-}, 4000);
+}, 15000);
 
-// 2. Run immediately when user focuses back on window/tab (Zero delay after Google Sheet edit!)
+// 2. Run check on window focus (fast in-memory check without reloading)
 window.addEventListener('focus', () => {
-  if (window.location.hostname === 'localhost' || window.location.port === '3000') {
-    fetch('/api/sync-from-sheet?_t=' + Date.now(), { cache: 'no-store' }).catch(()=>{});
-  }
   setTimeout(checkLivePermissionsUpdate, 300);
 });
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    if (window.location.hostname === 'localhost' || window.location.port === '3000') {
-      fetch('/api/sync-from-sheet?_t=' + Date.now(), { cache: 'no-store' }).catch(()=>{});
-    }
     setTimeout(checkLivePermissionsUpdate, 300);
   }
 });
