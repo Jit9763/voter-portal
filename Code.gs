@@ -994,26 +994,43 @@ function setupCandidatesSheet(forceReset) {
         if (uId === "cand_b" || uId === "b" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1)) {
           if (!row[7] || row[7] === "हाथ") row[7] = "2";
           if (!row[8] || row[8] === "custom") row[8] = "हाथ";
-          if (!row[12]) row[12] = "\"काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!\"\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
+          if (!row[12]) row[12] = ""काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!"
+अपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
         }
         var stStr = String(row[15] || "").trim().toUpperCase();
         row[15] = (stStr === "INACTIVE" || stStr === "DELETED") ? stStr : "ACTIVE"; // Column 16 (Status)
 
-        // Checkbox columns 17-21, 23, 24: guaranteed boolean true/false
-        row[16] = (row[16] !== false && String(row[16]).toUpperCase() !== "FALSE");
-        row[17] = (row[17] !== false && String(row[17]).toUpperCase() !== "FALSE");
-        row[18] = (row[18] !== false && String(row[18]).toUpperCase() !== "FALSE");
-        row[19] = (row[19] !== false && String(row[19]).toUpperCase() !== "FALSE");
-        row[20] = (row[20] !== false && String(row[20]).toUpperCase() !== "FALSE");
-        row[21] = (String(row[21] || "").toLowerCase() === "view_only") ? "view_only" : "user_edit";
-        row[22] = (row[22] !== false && String(row[22]).toUpperCase() !== "FALSE");
-        row[23] = (row[23] !== false && String(row[23]).toUpperCase() !== "FALSE");
+        // If tabs are all unchecked/uninitialized, default them to TRUE so candidates are never locked out!
+        var allTabsFalse = (!row[17] || String(row[17]).toUpperCase() === "FALSE") &&
+                           (!row[18] || String(row[18]).toUpperCase() === "FALSE") &&
+                           (!row[19] || String(row[19]).toUpperCase() === "FALSE") &&
+                           (!row[20] || String(row[20]).toUpperCase() === "FALSE");
+
+        if (allTabsFalse) {
+          row[16] = true; // Show_Banner_On_Slip
+          row[17] = true; // Tab_Search
+          row[18] = true; // Tab_Alpha
+          row[19] = true; // Tab_BulkSlip
+          row[20] = true; // Tab_Profile
+          row[21] = "user_edit"; // Candidate_Mode
+          row[22] = true; // Can_Print
+          row[23] = true; // Can_Download
+        } else {
+          row[16] = (row[16] !== false && String(row[16]).toUpperCase() !== "FALSE");
+          row[17] = (row[17] !== false && String(row[17]).toUpperCase() !== "FALSE");
+          row[18] = (row[18] !== false && String(row[18]).toUpperCase() !== "FALSE");
+          row[19] = (row[19] !== false && String(row[19]).toUpperCase() !== "FALSE");
+          row[20] = (row[20] !== false && String(row[20]).toUpperCase() !== "FALSE");
+          row[21] = (String(row[21] || "").toLowerCase() === "view_only") ? "view_only" : "user_edit";
+          row[22] = (row[22] !== false && String(row[22]).toUpperCase() !== "FALSE");
+          row[23] = (row[23] !== false && String(row[23]).toUpperCase() !== "FALSE");
+        }
         if (!row[24]) row[24] = new Date().toISOString();
       }
     }
 
     sheet.getRange(2, 1, numRows, 25).setValues(rows.map(function(r) { return r.slice(0, 25); }));
-    Logger.log("✅ Re-aligned and upgraded candidate rows cleanly!");
+    Logger.log("✅ Re-aligned and upgraded candidate rows cleanly with all checkboxes enabled!");
   } else if (sheet.getLastRow() <= 1 || forceReset === true) {
     if (CANDIDATES_DEFAULT_SEED && CANDIDATES_DEFAULT_SEED.length > 0) {
       sheet.getRange(2, 1, CANDIDATES_DEFAULT_SEED.length, CANDIDATE_HEADERS.length).setValues(CANDIDATES_DEFAULT_SEED);
@@ -1249,6 +1266,10 @@ function handleGetCandidates() {
       if (isAlphaAllowed) parsedTabs.push("alphaTab");
       if (isBulkAllowed) parsedTabs.push("bulkSlipTab");
       if (isProfileAllowed) parsedTabs.push("candidateProfileTab");
+
+      if (parsedTabs.length === 0) {
+        parsedTabs = ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
+      }
     } else if (colAllowedTabs !== -1 && String(row[colAllowedTabs] || "").trim()) {
       var rawTabs = String(row[colAllowedTabs]).trim();
       if (rawTabs.toUpperCase() === "ALL") {
