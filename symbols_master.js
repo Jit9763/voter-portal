@@ -207,3 +207,13 @@ function getSymbolSvgById(symbolIdOrName) {
   sym = list.find(s => s.name_hi.toLowerCase().includes(sStr) || (s.name_en && s.name_en.toLowerCase().includes(sStr)));
   return sym ? sym.svg : (list[0] ? list[0].svg : '');
 }
+
+if (typeof window !== 'undefined') {
+  window.getSymbolSvgById = getSymbolSvgById;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    OFFICIAL_ELECTION_SYMBOLS: (typeof window !== 'undefined' ? window.OFFICIAL_ELECTION_SYMBOLS : OFFICIAL_ELECTION_SYMBOLS),
+    getSymbolSvgById
+  };
+}
