@@ -33,7 +33,8 @@
 
 // Global Sheet Tab Names
 var SHEET_USERS = "Users";
-var SHEET_CANDIDATES = "Candidates"; // Dedicated Sheet Tab for Candidates
+var SHEET_CANDIDATES = "Candidates";
+var SHEET_CANDIDATE_EDITS = "Candidate_Edits"; // Dedicated Sheet for Candidate Self-Edits (Photo, Slogan, Symbol) // Dedicated Sheet Tab for Candidates
 var SHEET_VOTERS = "Voters";
 var SHEET_DELETED = "Deleted_Voters";
 var SHEET_SUMMARY = "Summary";
@@ -760,6 +761,10 @@ function doPost(e) {
     var action = payload.action || "";
 
     switch (action) {
+      case "saveCandidateSelfEdit":
+        responseData = handleSaveCandidateSelfEdit(payload.candidateData || payload);
+        break;
+
       case "saveCandidate":
         responseData = handleSaveCandidate(payload.candidateData || payload);
         break;
@@ -822,10 +827,29 @@ var CANDIDATE_HEADERS = [
   "Election_Time",
   "Status",
   "Show_Banner_On_Slip",
-  "Allowed_Tabs",
+  "Tab_Search",
+  "Tab_Alpha",
+  "Tab_BulkSlip",
+  "Tab_Profile",
   "Candidate_Mode",
   "Can_Print",
   "Can_Download"
+];
+
+var CANDIDATE_EDITS_HEADERS = [
+  "User_ID",
+  "Candidate_Name",
+  "Mobile",
+  "Symbol_Name",
+  "Symbol_Icon",
+  "Custom_Symbol_URL",
+  "Photo_URL",
+  "Slogan",
+  "PS_ZP_Ward",
+  "Election_Date",
+  "Election_Time",
+  "Show_Banner_On_Slip",
+  "Last_Updated"
 ];
 
 /**
@@ -859,7 +883,7 @@ function setupCandidatesSheet() {
   sheet.getRange(1, 13).setNote("मतदाता अपील / नारा (मतदाता पर्ची पर छपने वाला)");
   sheet.getRange(1, 16).setNote("स्थिति: ACTIVE (सक्रिय), INACTIVE (निष्क्रिय), या DELETED (हटाया गया)");
 
-  // 3. Create Smart Dropdowns (Data Validation)
+  // 3. Create Smart Dropdowns & Interactive Checkboxes
   var maxRows = Math.max(sheet.getMaxRows(), 500);
 
   // Column E: Post (पद) Dropdown
@@ -870,7 +894,7 @@ function setupCandidatesSheet() {
     .build();
   sheet.getRange(2, 5, maxRows - 1, 1).setDataValidation(postRule);
 
-  // Column F: Panchayat (ग्राम पंचायत) Dropdown (Supports single or multiple comma-separated)
+  // Column F: Panchayat Dropdown
   var gpList = [
     "बूबकिया", "बड़ली", "बगराई", "बांदनवाड़ा", "भिनाय", "चापानेरी", "छछून्दरा", "देवपुरा", 
     "देवलियाकलां", "धांतोल", "एकलसिंहा", "घणा", "गुढाखुर्द", "हियालिया", "कनईकला", "करांटी", 
@@ -879,11 +903,11 @@ function setupCandidatesSheet() {
   ];
   var gpRule = SpreadsheetApp.newDataValidation()
     .requireValueInList(gpList, true)
-    .setAllowInvalid(true) // Allows typing multiple comma-separated panchayats
+    .setAllowInvalid(true)
     .build();
   sheet.getRange(2, 6, maxRows - 1, 1).setDataValidation(gpRule);
 
-  // Column H: Symbol Name Dropdown
+  // Column I: Symbol Name Dropdown (Official Party Symbols included)
   var symList = [
     "कमल", "हाथ", "हाथी", "बोतल", "उगता सूरज", "पतंग", "ताला चाबी", "सिलाई मशीन", "कार", 
     "गैस सिलेंडर", "कप प्लेट", "हवाई जहाज", "बल्ला", "साइकिल", "अलमारी", "छाता", "केतली", "सीटी", "हैंडपंप", "टेलीफोन", "मोमबत्ती", "तीर कमान", "कस्टम चिन्ह"
@@ -894,46 +918,47 @@ function setupCandidatesSheet() {
     .build();
   sheet.getRange(2, 9, maxRows - 1, 1).setDataValidation(symRule);
 
-  // Column O: Status Dropdown (ACTIVE / INACTIVE / DELETED)
+  // Column P: Status Dropdown
   var statusRule = SpreadsheetApp.newDataValidation()
     .requireValueInList(["ACTIVE", "INACTIVE", "DELETED"], true)
     .setAllowInvalid(false)
     .build();
   sheet.getRange(2, 16, maxRows - 1, 1).setDataValidation(statusRule);
 
-  // Column P: Show Banner Dropdown (TRUE / FALSE)
-  var bannerRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(["TRUE", "FALSE"], true)
-    .setAllowInvalid(false)
+  // Column Q: Show Banner Checkbox (TRUE / FALSE)
+  var checkboxRule = SpreadsheetApp.newDataValidation()
+    .requireCheckbox()
     .build();
-  sheet.getRange(2, 17, maxRows - 1, 1).setDataValidation(bannerRule);
+  sheet.getRange(2, 17, maxRows - 1, 1).setDataValidation(checkboxRule);
 
-  // Column R: Allowed_Tabs Note
-  sheet.getRange(1, 18).setNote("अनुमत टैब्स कॉमा लगाकर लिखें (उदा. searchTab,candidateProfileTab,bulkSlipTab या searchTab,candidateProfileTab या ALL)");
+  // Column R, S, T, U: Individual Tab Permission Checkboxes
+  sheet.getRange(1, 18).setNote("मतदाता खोज टैब (चेक करें = दिखेगा, अनचेक = छुपेगा)");
+  sheet.getRange(2, 18, maxRows - 1, 1).setDataValidation(checkboxRule);
 
-  // Column S: Candidate_Mode Dropdown (user_edit / view_only)
-  sheet.getRange(1, 19).setNote("प्रत्याशी संपादन मोड: user_edit (प्रत्याशी खुद फोटो/स्लोगन बदल सकता है) या view_only (केवल देख सकता है)");
+  sheet.getRange(1, 19).setNote("वर्णमाला सूची टैब (चेक करें = दिखेगा, अनचेक = छुपेगा)");
+  sheet.getRange(2, 19, maxRows - 1, 1).setDataValidation(checkboxRule);
+
+  sheet.getRange(1, 20).setNote("थोक पर्ची जनरेटर टैब (चेक करें = दिखेगा, अनचेक = छुपेगा)");
+  sheet.getRange(2, 20, maxRows - 1, 1).setDataValidation(checkboxRule);
+
+  sheet.getRange(1, 21).setNote("प्रत्याशी प्रोफाइल टैब (चेक करें = दिखेगा, अनचेक = छुपेगा)");
+  sheet.getRange(2, 21, maxRows - 1, 1).setDataValidation(checkboxRule);
+
+  // Column V: Candidate Mode Dropdown (user_edit / view_only)
+  sheet.getRange(1, 22).setNote("user_edit = प्रत्याशी फोटो/नारा बदल सकता है, view_only = केवल देख सकता है");
   var modeRule = SpreadsheetApp.newDataValidation()
     .requireValueInList(["user_edit", "view_only"], true)
     .setAllowInvalid(false)
     .build();
-  sheet.getRange(2, 19, maxRows - 1, 1).setDataValidation(modeRule);
+  sheet.getRange(2, 22, maxRows - 1, 1).setDataValidation(modeRule);
 
-  // Column T: Can_Print Dropdown (TRUE / FALSE)
-  sheet.getRange(1, 20).setNote("पर्ची प्रिंट करने की अनुमति");
-  var printRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(["TRUE", "FALSE"], true)
-    .setAllowInvalid(false)
-    .build();
-  sheet.getRange(2, 20, maxRows - 1, 1).setDataValidation(printRule);
+  // Column W: Can Print Checkbox
+  sheet.getRange(1, 23).setNote("पर्ची प्रिंट करने की अनुमति");
+  sheet.getRange(2, 23, maxRows - 1, 1).setDataValidation(checkboxRule);
 
-  // Column U: Can_Download Dropdown (TRUE / FALSE)
-  sheet.getRange(1, 21).setNote("मतदाता सूची/पर्ची डाउनलोड अनुमति");
-  var downloadRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(["TRUE", "FALSE"], true)
-    .setAllowInvalid(false)
-    .build();
-  sheet.getRange(2, 21, maxRows - 1, 1).setDataValidation(downloadRule);
+  // Column X: Can Download Checkbox
+  sheet.getRange(1, 24).setNote("मतदाता सूची/पर्ची डाउनलोड अनुमति");
+  sheet.getRange(2, 24, maxRows - 1, 1).setDataValidation(checkboxRule);
 
   // 4. Populate with INITIAL_CANDIDATES_SEED if sheet was empty
   if (sheet.getLastRow() <= 1) {
@@ -957,11 +982,14 @@ function setupCandidatesSheet() {
         c.election_date || "15 अक्टूबर 2026",
         c.election_time || "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
         c.status || "ACTIVE",
-        c.show_banner_on_slip !== false ? "TRUE" : "FALSE",
-        c.allowed_tabs ? (Array.isArray(c.allowed_tabs) ? c.allowed_tabs.join(",") : c.allowed_tabs) : "searchTab,alphaTab,bulkSlipTab,candidateProfileTab",
-        c.candidate_mode || "user_edit",
-        c.can_print !== false ? "TRUE" : "FALSE",
-        c.can_download !== false ? "TRUE" : "FALSE"
+        true, // Show banner
+        true, // Tab Search
+        true, // Tab Alpha
+        true, // Tab BulkSlip
+        true, // Tab Profile
+        "user_edit", // Candidate Mode
+        true, // Can Print
+        true  // Can Download
       ]);
     }
 
@@ -970,15 +998,45 @@ function setupCandidatesSheet() {
     }
   }
 
-  // Auto-fit columns
+  // Also setup separate Candidate_Edits sheet tab
+  setupCandidateEditsSheet();
+
   try {
     for (var col = 1; col <= CANDIDATE_HEADERS.length; col++) {
       sheet.autoResizeColumn(col);
     }
   } catch(e) {}
 
-  Logger.log("✅ Successfully setup Candidates sheet with Dropdowns & Data Validations!");
-  return { success: true, message: "Candidates sheet setup with smart dropdowns complete!", rowCount: sheet.getLastRow() - 1 };
+  Logger.log("✅ Successfully setup Candidates sheet with interactive Checkboxes!");
+  return { success: true, message: "Candidates sheet setup with interactive checkboxes complete!", rowCount: sheet.getLastRow() - 1 };
+}
+
+/**
+ * 1-Click Initializer for Dedicated Candidate_Edits Sheet Tab
+ * Stores live modifications done by candidates from the portal so they are NEVER lost!
+ */
+function setupCandidateEditsSheet() {
+  var sheet = getOrCreateSheet(SHEET_CANDIDATE_EDITS);
+  var headerRange = sheet.getRange(1, 1, 1, CANDIDATE_EDITS_HEADERS.length);
+  headerRange.setValues([CANDIDATE_EDITS_HEADERS]);
+  headerRange.setBackground("#1e40af");
+  headerRange.setFontColor("#ffffff");
+  headerRange.setFontWeight("bold");
+  headerRange.setHorizontalAlignment("center");
+  sheet.setFrozenRows(1);
+
+  sheet.getRange(1, 1).setNote("प्रत्याशी यूजरनेम / आईडी (पोर्टल से स्वचालित अपडेट)");
+  sheet.getRange(1, 7).setNote("प्रत्याशी द्वारा पोर्टल से अपलोड की गई लाइव फोटो URL");
+  sheet.getRange(1, 8).setNote("प्रत्याशी द्वारा लिखा गया लाइव नारा / अपील");
+  sheet.getRange(1, 13).setNote("अंतिम बदलाव दिनांक व समय");
+
+  try {
+    for (var col = 1; col <= CANDIDATE_EDITS_HEADERS.length; col++) {
+      sheet.autoResizeColumn(col);
+    }
+  } catch(e) {}
+
+  return { success: true, message: "Candidate_Edits sheet ready!" };
 }
 
 /**
@@ -986,8 +1044,6 @@ function setupCandidatesSheet() {
  */
 function handleGetCandidates() {
   var sheet = getOrCreateSheet(SHEET_CANDIDATES);
-
-  // If sheet is empty, auto-setup once
   if (sheet.getLastRow() <= 1) {
     setupCandidatesSheet();
   }
@@ -998,7 +1054,6 @@ function handleGetCandidates() {
   }
 
   var headers = data[0].map(function(h) { return String(h || "").trim().toLowerCase(); });
-  
   var findCol = function(possibleNames) {
     for (var i = 0; i < possibleNames.length; i++) {
       var idx = headers.indexOf(possibleNames[i].toLowerCase());
@@ -1024,20 +1079,74 @@ function handleGetCandidates() {
   var colTime = findCol(["election_time", "time"]);
   var colStatus = findCol(["status", "स्थिति"]);
   var colBanner = findCol(["show_banner_on_slip", "show_banner", "banner"]);
+
+  // Individual Tab Permissions Checkbox Columns
+  var colTabSearch = findCol(["tab_search", "search_tab", "खोज"]);
+  var colTabAlpha = findCol(["tab_alpha", "alpha_tab", "tab_alphabetical", "वर्णमाला"]);
+  var colTabBulk = findCol(["tab_bulkslip", "bulk_slip_tab", "tab_bulk", "थोक पर्ची"]);
+  var colTabProfile = findCol(["tab_profile", "candidate_profile_tab", "tab_candidateprofile", "प्रोफाइल"]);
   var colAllowedTabs = findCol(["allowed_tabs", "tabs", "टैब्स", "allowed_tab"]);
+
   var colCandMode = findCol(["candidate_mode", "mode", "मोड", "edit_mode"]);
   var colCanPrint = findCol(["can_print", "print", "प्रिंट"]);
   var colCanDownload = findCol(["can_download", "download", "डाउनलोड"]);
+
+  // 1. Read live Candidate_Edits sheet to overlay custom photo/slogan/symbol
+  var editsMap = {};
+  try {
+    var editsSheet = getOrCreateSheet(SHEET_CANDIDATE_EDITS);
+    if (editsSheet && editsSheet.getLastRow() > 1) {
+      var eData = editsSheet.getDataRange().getValues();
+      var eHeaders = eData[0].map(function(h) { return String(h || "").trim().toLowerCase(); });
+      var eColId = eHeaders.indexOf("user_id");
+      var eColName = eHeaders.indexOf("candidate_name");
+      var eColMob = eHeaders.indexOf("mobile");
+      var eColSym = eHeaders.indexOf("symbol_name");
+      var eColCustomSym = eHeaders.indexOf("custom_symbol_url");
+      var eColPhoto = eHeaders.indexOf("photo_url");
+      var eColSlogan = eHeaders.indexOf("slogan");
+      var eColPsZp = eHeaders.indexOf("ps_zp_ward");
+      var eColDate = eHeaders.indexOf("election_date");
+      var eColTime = eHeaders.indexOf("election_time");
+      var eColBanner = eHeaders.indexOf("show_banner_on_slip");
+
+      for (var er = 1; er < eData.length; er++) {
+        var eRow = eData[er];
+        var euId = String(eRow[eColId !== -1 ? eColId : 0] || "").trim().toLowerCase();
+        if (euId) {
+          editsMap[euId] = {
+            candidate_name: eColName !== -1 ? eRow[eColName] : "",
+            mobile: eColMob !== -1 ? eRow[eColMob] : "",
+            symbol_name: eColSym !== -1 ? eRow[eColSym] : "",
+            custom_symbol_url: eColCustomSym !== -1 ? eRow[eColCustomSym] : "",
+            photo_url: eColPhoto !== -1 ? eRow[eColPhoto] : "",
+            slogan: eColSlogan !== -1 ? eRow[eColSlogan] : "",
+            ps_zp_ward: eColPsZp !== -1 ? eRow[eColPsZp] : "",
+            election_date: eColDate !== -1 ? eRow[eColDate] : "",
+            election_time: eColTime !== -1 ? eRow[eColTime] : "",
+            show_banner_on_slip: eColBanner !== -1 ? eRow[eColBanner] : null
+          };
+          editsMap[euId.replace(/^cand_/i, "")] = editsMap[euId];
+        }
+      }
+    }
+  } catch(editsErr) {
+    Logger.log("Candidate_Edits read notice: " + editsErr.message);
+  }
 
   var candidates = [];
 
   for (var r = 1; r < data.length; r++) {
     var row = data[r];
     var uId = colUserId !== -1 ? String(row[colUserId] || "").trim() : "";
-    if (!uId) continue; // Skip blank rows
+    if (!uId) continue;
 
     var status = colStatus !== -1 ? String(row[colStatus] || "ACTIVE").trim().toUpperCase() : "ACTIVE";
-    if (status === "DELETED") continue; // Deleted candidate
+    if (status === "DELETED") continue;
+
+    var formattedId = uId.startsWith("cand_") ? uId : ("cand_" + uId);
+    var cleanUsername = uId.replace(/^cand_/i, "");
+    var uLower = cleanUsername.toLowerCase();
 
     var candName = colName !== -1 ? String(row[colName] || "").trim() : uId;
     var mobile = colMobile !== -1 ? String(row[colMobile] || "").trim() : "";
@@ -1055,17 +1164,46 @@ function handleGetCandidates() {
     var eTime = colTime !== -1 ? String(row[colTime] || "प्रातः 7:00 बजे से सायं 6:00 बजे तक").trim() : "प्रातः 7:00 बजे से सायं 6:00 बजे तक";
     var showBanner = colBanner !== -1 ? (String(row[colBanner]).toUpperCase() !== "FALSE") : true;
 
-    var formattedId = uId.startsWith("cand_") ? uId : ("cand_" + uId);
-    var cleanUsername = uId.replace(/^cand_/i, "");
+    // Overlay live edits from Candidate_Edits sheet (Candidate's changes never lost!)
+    var liveEdit = editsMap[uLower] || editsMap[formattedId.toLowerCase()];
+    if (liveEdit) {
+      if (liveEdit.photo_url && String(liveEdit.photo_url).trim()) photo = String(liveEdit.photo_url).trim();
+      if (liveEdit.slogan && String(liveEdit.slogan).trim()) slogan = String(liveEdit.slogan).trim();
+      if (liveEdit.symbol_name && String(liveEdit.symbol_name).trim()) symName = String(liveEdit.symbol_name).trim();
+      if (liveEdit.custom_symbol_url && String(liveEdit.custom_symbol_url).trim()) customSym = String(liveEdit.custom_symbol_url).trim();
+      if (liveEdit.mobile && String(liveEdit.mobile).trim()) mobile = String(liveEdit.mobile).trim();
+      if (liveEdit.ps_zp_ward && String(liveEdit.ps_zp_ward).trim()) psZpWard = String(liveEdit.ps_zp_ward).trim();
+      if (liveEdit.candidate_name && String(liveEdit.candidate_name).trim()) candName = String(liveEdit.candidate_name).trim();
+      if (liveEdit.election_date && String(liveEdit.election_date).trim()) eDate = String(liveEdit.election_date).trim();
+      if (liveEdit.election_time && String(liveEdit.election_time).trim()) eTime = String(liveEdit.election_time).trim();
+      if (liveEdit.show_banner_on_slip !== null && liveEdit.show_banner_on_slip !== undefined) {
+        showBanner = (String(liveEdit.show_banner_on_slip).toUpperCase() !== "FALSE");
+      }
+    }
 
-    var rawAllowedTabs = colAllowedTabs !== -1 ? String(row[colAllowedTabs] || "").trim() : "";
-    var parsedTabs = ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
-    if (rawAllowedTabs) {
-      if (rawAllowedTabs.toUpperCase() === "ALL") {
+    // 2. Build Allowed Tabs based on individual Checkbox columns (TRUE / FALSE)
+    var parsedTabs = [];
+    var hasCheckboxCols = (colTabSearch !== -1 || colTabAlpha !== -1 || colTabBulk !== -1 || colTabProfile !== -1);
+
+    if (hasCheckboxCols) {
+      var isSearchAllowed = colTabSearch !== -1 ? (String(row[colTabSearch]).toUpperCase() !== "FALSE") : true;
+      var isAlphaAllowed = colTabAlpha !== -1 ? (String(row[colTabAlpha]).toUpperCase() !== "FALSE") : true;
+      var isBulkAllowed = colTabBulk !== -1 ? (String(row[colTabBulk]).toUpperCase() !== "FALSE") : true;
+      var isProfileAllowed = colTabProfile !== -1 ? (String(row[colTabProfile]).toUpperCase() !== "FALSE") : true;
+
+      if (isSearchAllowed) parsedTabs.push("searchTab");
+      if (isAlphaAllowed) parsedTabs.push("alphaTab");
+      if (isBulkAllowed) parsedTabs.push("bulkSlipTab");
+      if (isProfileAllowed) parsedTabs.push("candidateProfileTab");
+    } else if (colAllowedTabs !== -1 && String(row[colAllowedTabs] || "").trim()) {
+      var rawTabs = String(row[colAllowedTabs]).trim();
+      if (rawTabs.toUpperCase() === "ALL") {
         parsedTabs = ["dashboardTab", "searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
       } else {
-        parsedTabs = rawAllowedTabs.split(",").map(function(t) { return t.trim(); }).filter(Boolean);
+        parsedTabs = rawTabs.split(",").map(function(t) { return t.trim(); }).filter(Boolean);
       }
+    } else {
+      parsedTabs = ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
     }
 
     var candMode = colCandMode !== -1 ? String(row[colCandMode] || "user_edit").trim() : "user_edit";
@@ -1099,6 +1237,10 @@ function handleGetCandidates() {
       role: "CANDIDATE",
       candidate_mode: candMode,
       allowed_tabs: parsedTabs,
+      tab_search: parsedTabs.includes("searchTab"),
+      tab_alpha: parsedTabs.includes("alphaTab"),
+      tab_bulkslip: parsedTabs.includes("bulkSlipTab"),
+      tab_profile: parsedTabs.includes("candidateProfileTab"),
       can_print: canPrint,
       can_download: canDownload
     });
@@ -1195,6 +1337,101 @@ function handleCandidateLogin(username, password) {
 /**
  * Handle Save or Update Candidate in Google Sheet
  */
+/**
+ * Handle Candidate Self-Edits (Saved into dedicated Candidate_Edits sheet)
+ * This guarantees candidate photo/slogan is NEVER wiped out on refresh or sync!
+ */
+function handleSaveCandidateSelfEdit(candData) {
+  if (!candData) return { success: false, error: "डेटा रिक्त है!" };
+  var uId = String(candData.user_id || candData.username || candData.id || "").trim();
+  if (!uId) return { success: false, error: "यूजर आईडी आवश्यक है!" };
+
+  var cleanUname = uId.replace(/^cand_/i, "");
+  var formattedId = uId.startsWith("cand_") ? uId : ("cand_" + uId);
+  var nowStr = new Date().toISOString();
+
+  // 1. Save or Update in Candidate_Edits sheet
+  var editsSheet = getOrCreateSheet(SHEET_CANDIDATE_EDITS);
+  if (editsSheet.getLastRow() <= 1) {
+    setupCandidateEditsSheet();
+  }
+
+  var eData = editsSheet.getDataRange().getValues();
+  var eRowIndex = -1;
+  var uLower = cleanUname.toLowerCase();
+
+  for (var i = 1; i < eData.length; i++) {
+    var rowUname = String(eData[i][0] || "").trim().toLowerCase().replace(/^cand_/i, "");
+    if (rowUname === uLower) {
+      eRowIndex = i + 1;
+      break;
+    }
+  }
+
+  var editRowValues = [
+    formattedId,
+    candData.candidate_name || candData.name || "",
+    candData.mobile || "",
+    candData.symbol_name || "उगता सूरज",
+    candData.symbol_icon || "sun",
+    candData.custom_symbol_url || "",
+    candData.photo_url || "",
+    candData.slogan || "",
+    candData.ps_zp_ward || "",
+    candData.election_date || "15 अक्टूबर 2026",
+    candData.election_time || "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
+    candData.show_banner_on_slip !== false ? "TRUE" : "FALSE",
+    nowStr
+  ];
+
+  if (eRowIndex !== -1) {
+    // Preserve existing photo/slogan if incoming is blank
+    if (!candData.photo_url && eData[eRowIndex - 1][6]) editRowValues[6] = eData[eRowIndex - 1][6];
+    if (!candData.slogan && eData[eRowIndex - 1][7]) editRowValues[7] = eData[eRowIndex - 1][7];
+    editsSheet.getRange(eRowIndex, 1, 1, CANDIDATE_EDITS_HEADERS.length).setValues([editRowValues]);
+  } else {
+    editsSheet.appendRow(editRowValues);
+  }
+
+  // 2. Also update in main Candidates sheet if row exists
+  try {
+    var candSheet = getOrCreateSheet(SHEET_CANDIDATES);
+    var cData = candSheet.getDataRange().getValues();
+    var cHeaders = cData[0].map(function(h) { return String(h || "").trim().toLowerCase(); });
+    var colUserId = cHeaders.indexOf("user_id");
+    if (colUserId === -1) colUserId = 0;
+
+    for (var r = 1; r < cData.length; r++) {
+      var cUname = String(cData[r][colUserId] || "").trim().toLowerCase().replace(/^cand_/i, "");
+      if (cUname === uLower) {
+        var rowNum = r + 1;
+        var colPhoto = cHeaders.indexOf("photo_url");
+        var colSlogan = cHeaders.indexOf("slogan");
+        var colSym = cHeaders.indexOf("symbol_name");
+        var colCustomSym = cHeaders.indexOf("custom_symbol_url");
+        var colMob = cHeaders.indexOf("mobile");
+        var colPsZp = cHeaders.indexOf("ps_zp_ward");
+
+        if (candData.photo_url && colPhoto !== -1) candSheet.getRange(rowNum, colPhoto + 1).setValue(candData.photo_url);
+        if (candData.slogan && colSlogan !== -1) candSheet.getRange(rowNum, colSlogan + 1).setValue(candData.slogan);
+        if (candData.symbol_name && colSym !== -1) candSheet.getRange(rowNum, colSym + 1).setValue(candData.symbol_name);
+        if (candData.custom_symbol_url && colCustomSym !== -1) candSheet.getRange(rowNum, colCustomSym + 1).setValue(candData.custom_symbol_url);
+        if (candData.mobile && colMob !== -1) candSheet.getRange(rowNum, colMob + 1).setValue(candData.mobile);
+        if (candData.ps_zp_ward && colPsZp !== -1) candSheet.getRange(rowNum, colPsZp + 1).setValue(candData.ps_zp_ward);
+        break;
+      }
+    }
+  } catch(syncErr) {
+    Logger.log("Main sheet mirror notice: " + syncErr.message);
+  }
+
+  return {
+    success: true,
+    message: "प्रत्याशी विवरण Candidate_Edits शीट में सफलतापूर्वक सुरक्षित!",
+    timestamp: nowStr
+  };
+}
+
 function handleSaveCandidate(candData) {
   if (!candData) return { success: false, error: "डेटा रिक्त है!" };
   var uId = String(candData.user_id || candData.username || candData.id || "").trim();

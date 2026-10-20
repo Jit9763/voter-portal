@@ -6437,6 +6437,22 @@ async function handleSaveCandidateProfile(event) {
     showToast('✅ प्रत्याशी प्रोफाइल सुरक्षित!');
   }
 
+  // Live Auto-Sync to Google Sheet (Candidate_Edits Sheet Tab)
+  try {
+    const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
+    if (gScriptUrl) {
+      fetch(gScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'saveCandidateSelfEdit',
+          candidateData: profileData
+        }),
+        mode: 'no-cors'
+      }).catch(err => console.warn('Candidate Sheet self-edit sync notice:', err));
+    }
+  } catch (sheetErr) {}
+
   renderLiveSpecimenSlip();
 }
 
