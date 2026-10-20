@@ -892,7 +892,21 @@ var CANDIDATE_EDITS_HEADERS = [
 function setupCandidatesSheet(forceReset) {
   var sheet = getOrCreateSheet(SHEET_CANDIDATES);
   
-  // 1. Set headers with clean green styling & frozen top row
+  // 1. Ensure sheet has at least 25 columns
+  if (sheet.getMaxColumns() < CANDIDATE_HEADERS.length) {
+    sheet.insertColumnsAfter(sheet.getMaxColumns(), CANDIDATE_HEADERS.length - sheet.getMaxColumns());
+  }
+
+  // 2. Temporarily CLEAR ALL data validations from row 2 downwards so setValues() can never be blocked!
+  var maxRows = Math.max(sheet.getMaxRows(), 500);
+  var maxCols = Math.max(sheet.getMaxColumns(), 30);
+  try {
+    sheet.getRange(2, 1, maxRows - 1, maxCols).clearDataValidations();
+  } catch(e) {
+    Logger.log("Validation clear notice: " + e.message);
+  }
+
+  // 3. Set headers with clean green styling & frozen top row
   var headerRange = sheet.getRange(1, 1, 1, CANDIDATE_HEADERS.length);
   headerRange.setValues([CANDIDATE_HEADERS]);
   headerRange.setBackground("#15803d");
@@ -901,7 +915,7 @@ function setupCandidatesSheet(forceReset) {
   headerRange.setHorizontalAlignment("center");
   sheet.setFrozenRows(1);
 
-  // 2. Set helpful cell notes on headers (Hindi tooltips)
+  // Set cell notes on headers (Hindi tooltips)
   sheet.getRange(1, 1).setNote("यूजरनेम / लॉगिन आईडी (उदा. cand_gp01, sarpanch, ramesh, b)");
   sheet.getRange(1, 2).setNote("प्रत्याशी लॉगिन पासवर्ड (उदा. cand1@2026)");
   sheet.getRange(1, 3).setNote("प्रत्याशी का पूरा नाम (मतदाता पर्ची पर छपने वाला)");
@@ -916,73 +930,21 @@ function setupCandidatesSheet(forceReset) {
   sheet.getRange(1, 13).setNote("मतदाता अपील / नारा (मतदाता पर्ची पर छपने वाला)");
   sheet.getRange(1, 16).setNote("स्थिति: ACTIVE (सक्रिय), INACTIVE (निष्क्रिय), या DELETED (हटाया गया)");
 
-  var maxRows = Math.max(sheet.getMaxRows(), 500);
-
-  // Column E: Post (पद) Dropdown
-  var postList = ["सरपंच", "वार्ड पंच", "पंचायत समिति सदस्य", "जिला परिषद सदस्य", "उप-सरपंच"];
-  var postRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(postList, true)
-    .setAllowInvalid(true)
-    .build();
-  sheet.getRange(2, 5, maxRows - 1, 1).setDataValidation(postRule);
-
-  // Column F: Panchayat Dropdown
-  var gpList = [
-    "बूबकिया", "बड़ली", "बगराई", "बांदनवाड़ा", "भिनाय", "चापानेरी", "छछून्दरा", "देवपुरा", 
-    "देवलियाकलां", "धांतोल", "एकलसिंहा", "घणा", "गुढाखुर्द", "हियालिया", "कनईकला", "करांटी", 
-    "कैरोंट", "खेडी", "कुम्हारिया", "लामगरा", "नागोला", "नान्दसी", "पड़ांगा", "पाडलिया", 
-    "राममालिया", "राताकोट", "सिंगावल", "सोबडी", "सोलखुर्द", "बड़गांव", "ALL"
-  ];
-  var gpRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(gpList, true)
-    .setAllowInvalid(true)
-    .build();
-  sheet.getRange(2, 6, maxRows - 1, 1).setDataValidation(gpRule);
-
-  // Column I: Symbol Name Dropdown (Official Party Symbols included)
   var symList = [
     "कमल", "हाथ", "हाथी", "बोतल", "उगता सूरज", "पतंग", "ताला चाबी", "सिलाई मशीन", "कार", 
     "गैस सिलेंडर", "कप प्लेट", "हवाई जहाज", "बल्ला", "साइकिल", "अलमारी", "छाता", "केतली", "सीटी", "हैंडपंप", "टेलीफोन", "मोमबत्ती", "तीर कमान", "कस्टम चिन्ह"
   ];
-  var symRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(symList, true)
-    .setAllowInvalid(true)
-    .build();
-  sheet.getRange(2, 9, maxRows - 1, 1).setDataValidation(symRule);
 
-  // Column P: Status Dropdown
-  var statusRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(["ACTIVE", "INACTIVE", "DELETED"], true)
-    .setAllowInvalid(false)
-    .build();
-  sheet.getRange(2, 16, maxRows - 1, 1).setDataValidation(statusRule);
-
-  // Interactive Checkbox Rule
-  var cbRule = SpreadsheetApp.newDataValidation().requireCheckbox().build();
-  sheet.getRange(2, 17, maxRows - 1, 1).setDataValidation(cbRule); // Show Banner
-  sheet.getRange(2, 18, maxRows - 1, 1).setDataValidation(cbRule); // Tab Search
-  sheet.getRange(2, 19, maxRows - 1, 1).setDataValidation(cbRule); // Tab Alpha
-  sheet.getRange(2, 20, maxRows - 1, 1).setDataValidation(cbRule); // Tab BulkSlip
-  sheet.getRange(2, 21, maxRows - 1, 1).setDataValidation(cbRule); // Tab Profile
-  sheet.getRange(2, 23, maxRows - 1, 1).setDataValidation(cbRule); // Can Print
-  sheet.getRange(2, 24, maxRows - 1, 1).setDataValidation(cbRule); // Can Download
-
-  // Candidate Mode Dropdown
-  var modeRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(["user_edit", "view_only"], true)
-    .setAllowInvalid(false)
-    .build();
-  sheet.getRange(2, 22, maxRows - 1, 1).setDataValidation(modeRule);
-
-  // 3. Intelligent Migration & Alignment of Existing Rows (34 candidates)
+  // 4. Intelligent Migration & Alignment of Existing Rows (e.g. 34 rows)
   if (sheet.getLastRow() > 1 && forceReset !== true) {
     var numRows = sheet.getLastRow() - 1;
     var dataRange = sheet.getRange(2, 1, numRows, Math.max(sheet.getLastColumn(), 25));
     var rows = dataRange.getValues();
-    var modified = false;
 
     for (var r = 0; r < rows.length; r++) {
       var row = rows[r];
+      while (row.length < 25) { row.push(""); }
+
       var uId = String(row[0] || "").trim().toLowerCase();
       var post = String(row[4] || "").trim();
       var gp = String(row[5] || "").trim();
@@ -1000,8 +962,8 @@ function setupCandidatesSheet(forceReset) {
         var slogan = String(row[11] || "");
         var eDate = String(row[12] || "28 अक्टूबर 2026");
         var eTime = String(row[13] || "प्रातः 7:00 बजे से सायं 6:00 बजे तक");
-        var status = String(row[14] || "ACTIVE");
-        var showBanner = (String(row[15]).toUpperCase() !== "FALSE");
+        var rawStatus = row[14];
+        var rawBanner = row[15];
 
         var psZpNo = "";
         if (post.indexOf("पंचायत समिति") !== -1 || post.indexOf("जिला परिषद") !== -1) {
@@ -1016,8 +978,10 @@ function setupCandidatesSheet(forceReset) {
         row[12] = slogan; // Column 13 (Slogan)
         row[13] = eDate; // Column 14 (Election_Date)
         row[14] = eTime; // Column 15 (Election_Time)
-        row[15] = status || "ACTIVE"; // Column 16 (Status)
-        row[16] = showBanner !== false; // Column 17 (Show_Banner_On_Slip)
+
+        var stStr = String(rawStatus || "").trim().toUpperCase();
+        row[15] = (stStr === "INACTIVE" || stStr === "DELETED") ? stStr : "ACTIVE"; // Column 16 (Status)
+        row[16] = (rawBanner !== false && String(rawBanner).toUpperCase() !== "FALSE"); // Column 17 (Show_Banner_On_Slip)
         row[17] = true; // Column 18 (Tab_Search)
         row[18] = true; // Column 19 (Tab_Alpha)
         row[19] = true; // Column 20 (Tab_BulkSlip)
@@ -1026,31 +990,71 @@ function setupCandidatesSheet(forceReset) {
         row[22] = true; // Column 23 (Can_Print)
         row[23] = true; // Column 24 (Can_Download)
         row[24] = new Date().toISOString(); // Column 25 (Updated_At)
-
-        modified = true;
       } else {
         if (uId === "cand_b" || uId === "b" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1)) {
-          if (!row[7]) { row[7] = "2"; modified = true; }
+          if (!row[7] || row[7] === "हाथ") row[7] = "2";
+          if (!row[8] || row[8] === "custom") row[8] = "हाथ";
+          if (!row[12]) row[12] = "\"काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!\"\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
         }
-        for (var c = 16; c <= 23; c++) {
-          if (c === 21) {
-            if (!row[c]) { row[c] = "user_edit"; modified = true; }
-          } else {
-            if (row[c] === "" || row[c] === null || row[c] === undefined) {
-              row[c] = true;
-              modified = true;
-            }
-          }
-        }
-        if (!row[24]) { row[24] = new Date().toISOString(); modified = true; }
+        var stStr = String(row[15] || "").trim().toUpperCase();
+        row[15] = (stStr === "INACTIVE" || stStr === "DELETED") ? stStr : "ACTIVE"; // Column 16 (Status)
+
+        // Checkbox columns 17-21, 23, 24: guaranteed boolean true/false
+        row[16] = (row[16] !== false && String(row[16]).toUpperCase() !== "FALSE");
+        row[17] = (row[17] !== false && String(row[17]).toUpperCase() !== "FALSE");
+        row[18] = (row[18] !== false && String(row[18]).toUpperCase() !== "FALSE");
+        row[19] = (row[19] !== false && String(row[19]).toUpperCase() !== "FALSE");
+        row[20] = (row[20] !== false && String(row[20]).toUpperCase() !== "FALSE");
+        row[21] = (String(row[21] || "").toLowerCase() === "view_only") ? "view_only" : "user_edit";
+        row[22] = (row[22] !== false && String(row[22]).toUpperCase() !== "FALSE");
+        row[23] = (row[23] !== false && String(row[23]).toUpperCase() !== "FALSE");
+        if (!row[24]) row[24] = new Date().toISOString();
       }
     }
 
-    if (modified) {
-      sheet.getRange(2, 1, numRows, 25).setValues(rows.map(function(r) { return r.slice(0, 25); }));
-      Logger.log("✅ Re-aligned and upgraded candidate rows with interactive checkboxes!");
+    sheet.getRange(2, 1, numRows, 25).setValues(rows.map(function(r) { return r.slice(0, 25); }));
+    Logger.log("✅ Re-aligned and upgraded candidate rows cleanly!");
+  } else if (sheet.getLastRow() <= 1 || forceReset === true) {
+    if (CANDIDATES_DEFAULT_SEED && CANDIDATES_DEFAULT_SEED.length > 0) {
+      sheet.getRange(2, 1, CANDIDATES_DEFAULT_SEED.length, CANDIDATE_HEADERS.length).setValues(CANDIDATES_DEFAULT_SEED);
     }
   }
+
+  // 5. Apply clean Data Validations AFTER data is aligned (allowInvalid=true ensures ZERO exceptions!)
+  // Column E: Post Dropdown
+  var postList = ["सरपंच", "वार्ड पंच", "पंचायत समिति सदस्य", "जिला परिषद सदस्य", "उप-सरपंच"];
+  var postRule = SpreadsheetApp.newDataValidation().requireValueInList(postList, true).setAllowInvalid(true).build();
+  sheet.getRange(2, 5, maxRows - 1, 1).setDataValidation(postRule);
+
+  // Column F: Panchayat Dropdown
+  var gpList = [
+    "बूबकिया", "बड़ली", "बगराई", "बांदनवाड़ा", "भिनाय", "चापानेरी", "छछून्दरा", "देवपुरा", 
+    "देवलियाकलां", "धांतोल", "एकलसिंहा", "घणा", "गुढाखुर्द", "हियालिया", "कनईकला", "करांटी", 
+    "कैरोंट", "खेडी", "कुम्हारिया", "लामगरा", "नागोला", "नान्दसी", "पड़ांगा", "पाडलिया", 
+    "राममालिया", "राताकोट", "सिंगावल", "सोबडी", "सोलखुर्द", "बड़गांव", "ALL"
+  ];
+  var gpRule = SpreadsheetApp.newDataValidation().requireValueInList(gpList, true).setAllowInvalid(true).build();
+  sheet.getRange(2, 6, maxRows - 1, 1).setDataValidation(gpRule);
+
+  // Column I: Symbol Dropdown
+  var symRule = SpreadsheetApp.newDataValidation().requireValueInList(symList, true).setAllowInvalid(true).build();
+  sheet.getRange(2, 9, maxRows - 1, 1).setDataValidation(symRule);
+
+  // Column P: Status Dropdown (ALLOW INVALID = TRUE to prevent exceptions!)
+  var statusRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(["ACTIVE", "INACTIVE", "DELETED"], true)
+    .setAllowInvalid(true)
+    .build();
+  sheet.getRange(2, 16, maxRows - 1, 1).setDataValidation(statusRule);
+
+  // Checkbox Rules on Columns Q, R, S, T, U (17 to 21) & W, X (23, 24)
+  var cbRule = SpreadsheetApp.newDataValidation().requireCheckbox().setAllowInvalid(true).build();
+  sheet.getRange(2, 17, maxRows - 1, 5).setDataValidation(cbRule);
+  sheet.getRange(2, 23, maxRows - 1, 2).setDataValidation(cbRule);
+
+  // Column V: Candidate Mode Dropdown
+  var modeRule = SpreadsheetApp.newDataValidation().requireValueInList(["user_edit", "view_only"], true).setAllowInvalid(true).build();
+  sheet.getRange(2, 22, maxRows - 1, 1).setDataValidation(modeRule);
 
   // Also setup separate Candidate_Edits sheet tab
   setupCandidateEditsSheet();
@@ -1061,7 +1065,7 @@ function setupCandidatesSheet(forceReset) {
     }
   } catch(e) {}
 
-  Logger.log("✅ Candidates sheet ready with interactive checkboxes & PS_ZP_Ward!");
+  Logger.log("✅ Candidates sheet setup with interactive checkboxes complete!");
   return { success: true, message: "Candidates sheet setup with interactive checkboxes complete!", rowCount: sheet.getLastRow() - 1 };
 }
 
@@ -1523,14 +1527,18 @@ function handleSaveCandidate(candData) {
     candData.custom_symbol_url || "",
     candData.photo_url || "",
     candData.slogan || "",
-    candData.election_date || "15 अक्टूबर 2026",
+    candData.election_date || "28 अक्टूबर 2026",
     candData.election_time || "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
     candData.status || "ACTIVE",
-    candData.show_banner_on_slip !== false ? "TRUE" : "FALSE",
-    candData.allowed_tabs ? (Array.isArray(candData.allowed_tabs) ? candData.allowed_tabs.join(",") : candData.allowed_tabs) : "searchTab,alphaTab,bulkSlipTab,candidateProfileTab",
+    candData.show_banner_on_slip !== false,
+    candData.tab_search !== false,
+    candData.tab_alpha !== false,
+    candData.tab_bulkslip !== false,
+    candData.tab_profile !== false,
     candData.candidate_mode || "user_edit",
-    candData.can_print !== false ? "TRUE" : "FALSE",
-    candData.can_download !== false ? "TRUE" : "FALSE"
+    candData.can_print !== false,
+    candData.can_download !== false,
+    candData.updated_at || new Date().toISOString()
   ];
 
   if (targetRow !== -1) {
@@ -5295,26 +5303,29 @@ function setupUsersSheet(forceReset) {
   sheet.getRange(1, 8).setNote("आवंटित वार्ड: वार्ड संख्या या ALL");
   sheet.getRange(1, 10).setNote("स्थिति: ACTIVE (सक्रिय) या INACTIVE (निष्क्रिय)");
 
-  // 3. Check if cell A2 is empty or forceReset
+  // 3. Clear data validations first so writing data never errors
+  var maxRows = Math.max(sheet.getMaxRows(), 500);
+  var maxCols = Math.max(sheet.getMaxColumns(), 20);
+  try {
+    sheet.getRange(2, 1, maxRows - 1, maxCols).clearDataValidations();
+  } catch(e) {}
+
+  // 4. Check if cell A2 is empty or forceReset
   var cellA2 = sheet.getRange(2, 1).getValue();
   var needsSeeding = (!cellA2 || String(cellA2).trim() === "" || forceReset === true);
 
   if (needsSeeding) {
-    // Clear any existing empty/broken rows between row 2 and 1000
     if (sheet.getLastRow() > 1) {
       sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
     }
-    // Write ALL 189 seed users starting cleanly at ROW 2!
     if (USERS_DEFAULT_SEED && USERS_DEFAULT_SEED.length > 0) {
       sheet.getRange(2, 1, USERS_DEFAULT_SEED.length, USER_HEADERS.length).setValues(USERS_DEFAULT_SEED);
       Logger.log("✅ Seeded " + USERS_DEFAULT_SEED.length + " users into Users sheet at Row 2!");
     }
   }
 
-  var maxRows = Math.max(sheet.getMaxRows(), 500);
-
-  // Checkbox Rule for columns K, L, M, N, O, P (11 to 16)
-  var cbRule = SpreadsheetApp.newDataValidation().requireCheckbox().build();
+  // Checkbox Rule for columns K, L, M, N, O, P (11 to 16) with setAllowInvalid(true)
+  var cbRule = SpreadsheetApp.newDataValidation().requireCheckbox().setAllowInvalid(true).build();
   sheet.getRange(2, 11, maxRows - 1, 6).setDataValidation(cbRule);
 
   sheet.getRange(1, 11).setNote("मतदाता खोज टैब (चेक = दिखेगा, अनचेक = छुपेगा)");
@@ -5324,10 +5335,10 @@ function setupUsersSheet(forceReset) {
   sheet.getRange(1, 15).setNote("पर्ची प्रिंट करने की अनुमति");
   sheet.getRange(1, 16).setNote("सूची/पर्ची डाउनलोड करने की अनुमति");
 
-  // Status Dropdown
+  // Status Dropdown with setAllowInvalid(true)
   var statusRule = SpreadsheetApp.newDataValidation()
     .requireValueInList(["ACTIVE", "INACTIVE", "DELETED"], true)
-    .setAllowInvalid(false)
+    .setAllowInvalid(true)
     .build();
   sheet.getRange(2, 10, maxRows - 1, 1).setDataValidation(statusRule);
 
