@@ -2624,11 +2624,13 @@ function getSessionStorageKey() {
 function syncCurrentUserWithConfiguredUsers() {
   if (!State.currentUser) return;
   const uId = String(State.currentUser.id || State.currentUser.username || '').toLowerCase();
+  const boothExact = State.currentUser.booth_no ? `blo_${String(State.currentUser.booth_no).trim().toLowerCase()}` : '';
   if (!State.adminControlUsers || State.adminControlUsers.length === 0) return;
-  const matched = State.adminControlUsers.find(x => 
-    (x.id && String(x.id).toLowerCase() === uId) || 
-    (x.username && String(x.username).toLowerCase() === uId)
-  );
+  const matched = State.adminControlUsers.find(x => {
+    const xU = String(x.username || '').toLowerCase();
+    const xId = String(x.id || '').toLowerCase();
+    return xU === uId || xId === uId || (boothExact && (xU === boothExact || xId === boothExact));
+  });
   if (matched) {
     const statusUpper = String(matched.status || 'ACTIVE').toUpperCase();
     if (statusUpper === 'INACTIVE' || statusUpper === 'DISABLED' || statusUpper === 'BLOCKED') {
@@ -7417,13 +7419,13 @@ function startLivePermissionSyncWatcher() {
     }
   });
 
-  // D. Fast live sync loop every 5 seconds (auto-applies changes from .bat pushes without manual hard refresh)
+  // D. Live sync loop every 30 seconds
   setInterval(async () => {
     if (document.visibilityState === 'hidden') return;
     try {
       await loadAdminUsersList(false);
     } catch(e) {}
-  }, 5000);
+  }, 30000);
 }
 
 function togglePasswordVisibility(inputId, btn) {
@@ -9668,11 +9670,23 @@ let isCheckingLivePerms = false;
 async function checkLivePermissionsUpdate() {
   if (isCheckingLivePerms) return;
   if (!State.currentUser) return;
+
+  const u = State.currentUser;
+  const isSuperAdmin = (u.role === 'SUPER_ADMIN' || u.role === 'admin' || (u.id && String(u.id).toLowerCase() === 'admin'));
+  if (isSuperAdmin) {
+    return;
+  }
+
   isCheckingLivePerms = true;
 
   try {
-    const u = State.currentUser;
     const uKey = String(u.username || u.id || '').toLowerCase();
+    const boothExact = u.booth_no ? `blo_${String(u.booth_no).trim().toLowerCase()}` : '';
+    const matchesUser = (x) => {
+      const xU = String(x.username || '').toLowerCase();
+      const xId = String(x.id || '').toLowerCase();
+      return xU === uKey || xId === uKey || (boothExact && (xU === boothExact || xId === boothExact));
+    };
     const bust = Date.now();
 
     let freshUser = null;
@@ -9684,11 +9698,7 @@ async function checkLivePermissionsUpdate() {
         if (res.ok) {
           const d = await res.json();
           if (d && Array.isArray(d.users)) {
-            freshUser = d.users.find(x => 
-              String(x.username || '').toLowerCase() === uKey || 
-              String(x.id || '').toLowerCase() === uKey ||
-              (u.booth_no && (String(x.username || '').includes(String(u.booth_no)) || String(x.id || '').includes(String(u.booth_no))))
-            );
+            freshUser = d.users.find(matchesUser);
             State.adminControlUsers = d.users;
           }
         }
@@ -9702,11 +9712,7 @@ async function checkLivePermissionsUpdate() {
         if (res.ok) {
           const d = await res.json();
           if (d && Array.isArray(d.users)) {
-            freshUser = d.users.find(x => 
-              String(x.username || '').toLowerCase() === uKey || 
-              String(x.id || '').toLowerCase() === uKey ||
-              (u.booth_no && (String(x.username || '').includes(String(u.booth_no)) || String(x.id || '').includes(String(u.booth_no))))
-            );
+            freshUser = d.users.find(matchesUser);
             State.adminControlUsers = d.users;
           }
         }
@@ -9720,10 +9726,7 @@ async function checkLivePermissionsUpdate() {
         if (res.ok) {
           const d = await res.json();
           if (d && Array.isArray(d.users)) {
-            freshUser = d.users.find(x => 
-              String(x.username || '').toLowerCase() === uKey || 
-              String(x.id || '').toLowerCase() === uKey
-            );
+            freshUser = d.users.find(matchesUser);
           }
         }
       } catch(_) {}
@@ -9788,10 +9791,6 @@ async function checkLivePermissionsUpdate() {
 
         if (hasStatusChanged && newStatus !== 'ACTIVE') {
           showToast('⚠️ आपका खाता निष्क्रिय (Inactive) किया गया है!');
-        } else if (hasTabsChanged) {
-          showToast('⚡ अनुमतियाँ अद्यतन हुईं (Tabs updated)!');
-        } else if (hasPrintChanged || hasDownloadChanged) {
-          showToast('⚡ प्रिंट / डाउनलोड अनुमतियाँ अद्यतन हुईं!');
         }
       }
     }
