@@ -813,7 +813,10 @@ async function syncUsersFromGoogleSheet(isManual = false) {
     if (addedCount > 0 || updatedCount > 0) {
       console.log(`[GOOGLE-SHEET-USER-SYNC] ✅ Applied Users Sheet updates: +Added: ${addedCount}, ~Updated: ${updatedCount}`);
       exportToJson();
-      bumpVersion();
+      try {
+        const vPayload = { version: Date.now(), updated_at: new Date().toISOString() };
+        fs.writeFileSync(path.join(__dirname, 'version.json'), JSON.stringify(vPayload, null, 2), 'utf8');
+      } catch(_) {}
       if (typeof executeGithubPush === 'function') {
         executeGithubPush(`Users Google Sheet Sync (+Added: ${addedCount}, ~Updated: ${updatedCount})`);
       }
