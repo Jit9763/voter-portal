@@ -2399,10 +2399,10 @@ const State = {
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
   initMasterData();
-  try { await loadTriPortalSettings(); } catch(e) {}
-  try { await loadAdminUsersList(true); } catch(e) {}
   initSession();
   initUiElements();
+  try { await loadTriPortalSettings(); } catch(e) {}
+  try { await loadAdminUsersList(true); } catch(e) {}
   startLivePermissionSyncWatcher();
 });
 
@@ -2629,7 +2629,10 @@ function syncCurrentUserWithConfiguredUsers() {
   const matched = State.adminControlUsers.find(x => {
     const xU = String(x.username || '').toLowerCase();
     const xId = String(x.id || '').toLowerCase();
-    return xU === uId || xId === uId || (boothExact && (xU === boothExact || xId === boothExact));
+    const xBooth = x.booth_no ? `blo_${String(x.booth_no).trim().toLowerCase()}` : '';
+    return xU === uId || xId === uId || 
+           (boothExact && (xU === boothExact || xId === boothExact || xBooth === boothExact)) ||
+           (uId.startsWith('blo_') && (xBooth === uId || xU === uId || xId === uId));
   });
   if (matched) {
     const statusUpper = String(matched.status || 'ACTIVE').toUpperCase();
@@ -2728,8 +2731,25 @@ function initSession() {
   const ctx = getPortalContext();
   const sessionKey = `panchayat_session_${ctx}`;
 
+  // Synchronously populate State.adminControlUsers from cached Google Sheet admins
+  const cachedAdminsStr = localStorage.getItem('panchayat_admins_cache');
+  if (cachedAdminsStr) {
+    try {
+      const parsedAdmins = JSON.parse(cachedAdminsStr);
+      if (Array.isArray(parsedAdmins) && parsedAdmins.length > 0) {
+        State.adminUsers = parsedAdmins;
+        State.adminControlUsers = parsedAdmins;
+      }
+    } catch(e) {}
+  }
+
+  // Set default activeTab based on portal
+  if (ctx === 'blo' || ctx === 'voter') {
+    State.activeTab = 'searchTab';
+  }
+
   // STRICT Portal-Isolated Session: ONLY load session intended for this specific portal!
-  const saved = localStorage.getItem(sessionKey) || sessionStorage.getItem(sessionKey);
+  let saved = localStorage.getItem(sessionKey) || sessionStorage.getItem(sessionKey);
 
   if (saved) {
     try {
@@ -2739,6 +2759,10 @@ function initSession() {
         if (ctx === 'blo') {
           if (u.role === 'BLO' || u.type === 'BLO' || u.category === 'CELL' || u.role === 'प्रकोष्ठ कार्मिक' || u.role === 'CELL_MEMBER' || u.role === 'BLOCK_PRABHARI') {
             State.currentUser = u;
+            const uId = String(u.id || u.username || '').toLowerCase();
+            if ((uId.startsWith('blo_') || u.role === 'BLO') && (!Array.isArray(u.allowed_tabs) || u.allowed_tabs.length === 0)) {
+              u.allowed_tabs = ['searchTab'];
+            }
           } else {
             State.currentUser = null;
           }
@@ -2790,10 +2814,10 @@ function initSession() {
   // Populate dropdowns and trigger background sync
   configureLoginUiForPortal();
   populateLoginUserDropdown();
-  syncLatestActiveUsersFromAppsScript();
-  syncCurrentUserWithConfiguredUsers();
+  syncCurrentUserWithConfiguredUsers(); // Sync synchronously with cached admins BEFORE rendering!
   applyGlobalElectionDateToUI();
-  enforceGatekeeperState();
+  enforceGatekeeperState(); // Render with verified permissions
+  syncLatestActiveUsersFromAppsScript(); // Background fetch updates if anything changed in Google Sheet
 }
 
 function isCandidateUser(u) {
@@ -6980,7 +7004,44 @@ async function loadAdminUsersList(force = false) {
     // API server not reachable, fallback to static JSON
   }
 
-  // 2. Try portal_users.json (with explicit cache-busting & no-store)
+  // 2. Try Google Apps Script on GitHub Pages for immediate zero-cache live updates
+  const isGitHub = window.location.hostname.includes('github.io');
+  const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
+  if (isGitHub && gScriptUrl) {
+    try {
+      const gRes = await fetch(`${gScriptUrl}?action=getUsers&_t=${bust}`);
+      if (gRes.ok) {
+        const gData = await gRes.json();
+        if (gData && Array.isArray(gData.users) && gData.users.length > 0) {
+          State.adminControlUsers = gData.users.map(u => {
+            let tabs = [];
+            if (u.tab_search !== undefined || u.tab_alpha !== undefined || u.tab_bulkslip !== undefined || u.tab_directory !== undefined) {
+              if (u.tab_search === true || String(u.tab_search).toUpperCase() === 'TRUE') tabs.push('searchTab');
+              if (u.tab_alpha === true || String(u.tab_alpha).toUpperCase() === 'TRUE') tabs.push('alphaTab');
+              if (u.tab_bulkslip === true || String(u.tab_bulkslip).toUpperCase() === 'TRUE') tabs.push('bulkSlipTab');
+              if (u.tab_directory === true || String(u.tab_directory).toUpperCase() === 'TRUE') tabs.push('directoryTab');
+            } else if (Array.isArray(u.allowed_tabs)) {
+              tabs = u.allowed_tabs;
+            } else if (typeof u.allowed_tabs === 'string') {
+              try { tabs = JSON.parse(u.allowed_tabs); } catch(e) { tabs = u.allowed_tabs.split(',').map(s=>s.trim()).filter(Boolean); }
+            }
+            return {
+              ...u,
+              allowed_tabs: tabs,
+              can_print: (u.can_print === true || String(u.can_print).toUpperCase() === 'TRUE'),
+              can_download: (u.can_download === true || String(u.can_download).toUpperCase() === 'TRUE')
+            };
+          }).map(sanitizeUserTabs);
+          if (!window.PORTAL_USERS_DATA) window.PORTAL_USERS_DATA = { users: [], candidates: {} };
+          window.PORTAL_USERS_DATA.users = State.adminControlUsers;
+          syncCurrentUserWithConfiguredUsers();
+          return;
+        }
+      }
+    } catch(_) {}
+  }
+
+  // 3. Try portal_users.json (with explicit cache-busting & no-store)
   try {
     const isMaster = window.location.hostname === 'localhost' || window.location.pathname.includes('/pan');
     // Always fetch local repo's portal_users.json first (fastest & same-origin), then fallback to master pan
@@ -9163,7 +9224,7 @@ async function handleGatekeeperLogin(event) {
       if (password === bloPass) {
         let allowedTabs = (cfgUser && Array.isArray(cfgUser.allowed_tabs))
           ? cfgUser.allowed_tabs
-          : ['searchTab', 'alphaTab', 'directoryTab'];
+          : ['searchTab'];
         let allowedGps = cfgUser?.allowed_panchayats || [bloMatch.panchayat];
         let allowedWards = cfgUser?.allowed_wards || (bloMatch.wards ? bloMatch.wards.split(',').map(w => w.trim()) : 'ALL');
 
@@ -9171,8 +9232,8 @@ async function handleGatekeeperLogin(event) {
           id: bloUname,
           username: bloUname,
           role: 'BLO',
-          full_name: `${bloMatch.name} (BLO भाग ${bloMatch.booth_no})`,
-          booth_no: bloMatch.booth_no,
+          full_name: `${bloMatch.name} (BLO भाग ${bloMatch.old_part_no || bloMatch.booth_no || username.replace('blo_', '')})`,
+          booth_no: String(bloMatch.old_part_no || bloMatch.booth_no || username.replace('blo_', '')),
           panchayat: typeof allowedGps === 'string' ? allowedGps : bloMatch.panchayat,
           allowed_panchayats: typeof allowedGps === 'string' ? allowedGps : JSON.stringify(allowedGps),
           allowed_wards: typeof allowedWards === 'string' ? allowedWards : (Array.isArray(allowedWards) ? JSON.stringify(allowedWards) : allowedWards),
@@ -9184,7 +9245,13 @@ async function handleGatekeeperLogin(event) {
           candidate_mode: 'admin_locked'
         };
         State.currentUser = bloUser;
-        localStorage.setItem(getSessionStorageKey(), JSON.stringify(bloUser));
+        const sk = getSessionStorageKey();
+        localStorage.setItem(sk, JSON.stringify(bloUser));
+        sessionStorage.setItem(sk, JSON.stringify(bloUser));
+        localStorage.setItem('panchayat_user_session', JSON.stringify(bloUser));
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.add('user-logged-in');
+        }
         enforceGatekeeperState();
         showToast(`नमस्ते ${bloMatch.name}! बी.एल.ओ. सत्र प्रारंभ हुआ।`);
         return;
@@ -9242,7 +9309,13 @@ async function handleGatekeeperLogin(event) {
           candidate_mode: 'admin_locked'
         };
         State.currentUser = cellUser;
-        localStorage.setItem(getSessionStorageKey(), JSON.stringify(cellUser));
+        const sk = getSessionStorageKey();
+        localStorage.setItem(sk, JSON.stringify(cellUser));
+        sessionStorage.setItem(sk, JSON.stringify(cellUser));
+        localStorage.setItem('panchayat_user_session', JSON.stringify(cellUser));
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.add('user-logged-in');
+        }
         enforceGatekeeperState();
         showToast(`नमस्ते ${cellMatch.name}! प्रकोष्ठ सत्र प्रारंभ हुआ।`);
         return;

@@ -1,43 +1,159 @@
 <!DOCTYPE html>
 <html lang="hi" data-portal="voter">
 <head>
-  <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261021_012218";</script>
-    <script>
+  <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261021_014146";</script>
+  <script>
     // Instant Zero-Flicker Session Persistence & Dynamic Tab Access Pre-Filter
     (function() {
-    var currentVer = window.PORTAL_DEPLOY_VERSION || null;
-
-    async function checkDeploymentUpdate() {
       try {
-        var r = await fetch('version.json?_t=' + Date.now(), { cache: 'no-store' });
-        if (r.ok) {
-          var d = await r.json();
-          var remoteVer = d.deploy_version || d.v;
-          if (!currentVer) {
-            currentVer = remoteVer;
-            return;
-          }
-          if (remoteVer && currentVer !== remoteVer) {
-            console.log('[DEPLOY-SYNC] Silent update detected (' + remoteVer + '). Updating in-memory without page reload...');
-            currentVer = remoteVer; // Update currentVer immediately to prevent loop
-            if (typeof loadConfiguredUsers === 'function') {
-              loadConfiguredUsers();
+        var s = localStorage.getItem('panchayat_session_voter') || 
+                sessionStorage.getItem('panchayat_session_voter') ||
+                localStorage.getItem('panchayat_session_blo') || 
+                sessionStorage.getItem('panchayat_session_blo') ||
+                localStorage.getItem('panchayat_session_master') || 
+                sessionStorage.getItem('panchayat_session_master') ||
+                localStorage.getItem('panchayat_session_voter') || 
+                sessionStorage.getItem('panchayat_session_voter') ||
+                localStorage.getItem('panchayat_user_session') ||
+                sessionStorage.getItem('panchayat_user_session');
+
+        var cachedAdmins = null;
+        try {
+          var ca = localStorage.getItem('panchayat_admins_cache');
+          if (ca) cachedAdmins = JSON.parse(ca);
+        } catch(e) {}
+
+        if (s) {
+          var u = JSON.parse(s);
+          if (u && (u.username || u.id)) {
+            document.documentElement.classList.add('user-logged-in');
+            var role = String(u.role || '').toUpperCase();
+            var uName = String(u.username || u.id || '').toLowerCase();
+            var isSuper = (role === 'SUPER_ADMIN' || u.id === 'admin' || u.id === 'superadmin' || u.username === 'admin' || u.username === 'superadmin');
+            var isCand = (role === 'CANDIDATE' || uName.startsWith('cand_') || u.candidate_mode === 'user_edit');
+
+            // Synchronize allowed_tabs from cached Google Sheet permissions if available
+            if (cachedAdmins && Array.isArray(cachedAdmins) && !isSuper) {
+              var found = cachedAdmins.find(function(x) {
+                var xu = String(x.username || x.id || '').toLowerCase();
+                return xu === uName || (u.booth_no && (xu === ('blo_' + u.booth_no) || xu === String(u.booth_no)));
+              });
+              if (found && Array.isArray(found.allowed_tabs)) {
+                u.allowed_tabs = found.allowed_tabs;
+              }
             }
-            if (typeof syncCurrentUserWithConfiguredUsers === 'function') {
-              syncCurrentUserWithConfiguredUsers();
+
+            if (isCand && !isSuper) {
+              document.documentElement.classList.add('is-candidate-session');
+            } else if (!isSuper) {
+              document.documentElement.classList.add('is-restricted-session');
+            }
+
+            // Real-time allowed_tabs filter (Google Sheet & Super Admin permission enforcement)
+            var rawTabs = u.allowed_tabs;
+            var allowed = null;
+            if (Array.isArray(rawTabs)) allowed = rawTabs;
+            else if (typeof rawTabs === 'string') {
+              try { allowed = JSON.parse(rawTabs); } catch(e) { allowed = rawTabs.split(',').map(function(x){return x.trim();}).filter(Boolean); }
+            }
+            if (isCand && (!allowed || allowed.length === 0)) {
+              allowed = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+            }
+            if (!allowed && (uName.startsWith('blo_') || role === 'BLO')) {
+              allowed = ['searchTab'];
+            }
+
+            if (allowed && Array.isArray(allowed) && !isSuper) {
+              var allTabIds = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab', 'candidateProfileTab', 'adminControlTab', 'settingsTab'];
+              var css = '';
+              allTabIds.forEach(function(t) {
+                if (allowed.indexOf(t) === -1) {
+                  css += '.nav-tab[data-tab="' + t + '"], .bottom-nav-item[data-tab="' + t + '"], #' + t + ' { display: none !important; } ';
+                }
+              });
+              if (css) {
+                var styleEl = document.createElement('style');
+                styleEl.id = 'instant-allowed-tabs-filter';
+                styleEl.textContent = css;
+                document.head.appendChild(styleEl);
+              }
             }
           }
         }
       } catch(e) {}
+
+      // Silent deployment update checker
+      var currentVer = window.PORTAL_DEPLOY_VERSION || null;
+      async function checkDeploymentUpdate() {
+        try {
+          var r = await fetch('version.json?_t=' + Date.now(), { cache: 'no-store' });
+          if (r.ok) {
+            var d = await r.json();
+            var remoteVer = d.deploy_version || d.v;
+            if (!currentVer) {
+              currentVer = remoteVer;
+              return;
+            }
+            if (remoteVer && currentVer !== remoteVer) {
+              console.log('[DEPLOY-SYNC] Silent update detected (' + remoteVer + '). Updating in-memory without page reload...');
+              currentVer = remoteVer;
+              if (typeof loadConfiguredUsers === 'function') loadConfiguredUsers();
+              if (typeof syncCurrentUserWithConfiguredUsers === 'function') syncCurrentUserWithConfiguredUsers();
+            }
+          }
+        } catch(e) {}
+      }
+      setInterval(checkDeploymentUpdate, 60000);
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') checkDeploymentUpdate();
+      });
+    })();
+  </script>
+  <style>
+    /* Prevent login screen bounce & enforce zero-flicker permissions */
+    html.user-logged-in #welcomeGatekeeper { display: none !important; }
+    html.user-logged-in #mainPortalApp { display: block !important; }
+
+    /* Candidate Session: Never render Dashboard, Ward Directory, Admin Control, or Settings */
+    html.is-candidate-session .nav-tab[data-tab="dashboardTab"],
+    html.is-candidate-session .nav-tab[data-tab="directoryTab"],
+    html.is-candidate-session .nav-tab[data-tab="adminControlTab"],
+    html.is-candidate-session .nav-tab[data-tab="settingsTab"],
+    html.is-candidate-session .bottom-nav-item[data-tab="dashboardTab"],
+    html.is-candidate-session .bottom-nav-item[data-tab="directoryTab"],
+    html.is-candidate-session #dashboardTab,
+    html.is-candidate-session #directoryTab,
+    html.is-candidate-session #adminControlTab,
+    html.is-candidate-session #settingsTab,
+    html.is-candidate-session #adminCandidateModal {
+      display: none !important;
     }
 
-    // Check periodically at 60s and when returning to the tab (NO hard page reload)
-    setInterval(checkDeploymentUpdate, 60000);
-    document.addEventListener('visibilitychange', function() {
-      if (document.visibilityState === 'visible') checkDeploymentUpdate();
-    });
-  })();
-  </script>
+    /* Voter Portal: Strictly hide Dashboard, Directory, Admin Control, and Settings */
+    html[data-portal="voter"] .nav-tab[data-tab="dashboardTab"],
+    html[data-portal="voter"] .nav-tab[data-tab="directoryTab"],
+    html[data-portal="voter"] .nav-tab[data-tab="adminControlTab"],
+    html[data-portal="voter"] .nav-tab[data-tab="settingsTab"],
+    html[data-portal="voter"] .bottom-nav-item[data-tab="dashboardTab"],
+    html[data-portal="voter"] .bottom-nav-item[data-tab="directoryTab"],
+    html[data-portal="voter"] #dashboardTab,
+    html[data-portal="voter"] #directoryTab,
+    html[data-portal="voter"] #adminControlTab,
+    html[data-portal="voter"] #settingsTab {
+      display: none !important;
+    }
+
+    /* BLO Portal: Strictly hide Dashboard, Admin Control, and Settings */
+    html[data-portal="blo"] .nav-tab[data-tab="dashboardTab"],
+    html[data-portal="blo"] .nav-tab[data-tab="adminControlTab"],
+    html[data-portal="blo"] .nav-tab[data-tab="settingsTab"],
+    html[data-portal="blo"] .bottom-nav-item[data-tab="dashboardTab"],
+    html[data-portal="blo"] #dashboardTab,
+    html[data-portal="blo"] #adminControlTab,
+    html[data-portal="blo"] #settingsTab {
+      display: none !important;
+    }
+  </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -48,7 +164,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261021_012218">
+  <link rel="stylesheet" href="styles.css?v=20261021_014146">
 </head>
 <body>
 
@@ -174,7 +290,7 @@
 
         <!-- Navigation Tabs -->
         <div class="nav-tabs-wrapper">
-          <button class="nav-tab" data-tab="dashboardTab" style="display:none;" onclick="switchTab('dashboardTab')">
+          <button class="nav-tab" data-tab="dashboardTab" onclick="switchTab('dashboardTab')" style="display:none;">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
             होम / डैशबोर्ड (Home)
           </button>
@@ -182,19 +298,19 @@
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             मतदाता खोज (Search)
           </button>
-          <button class="nav-tab" data-tab="alphaTab" onclick="switchTab('alphaTab')">
+          <button class="nav-tab" data-tab="alphaTab" onclick="switchTab('alphaTab')" style="display:none;">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
             वर्णमाला सूची (A-Z / अ-ज्ञ)
           </button>
-          <button class="nav-tab" data-tab="bulkSlipTab" onclick="switchTab('bulkSlipTab')">
+          <button class="nav-tab" data-tab="bulkSlipTab" onclick="switchTab('bulkSlipTab')" style="display:none;">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
             मत पर्ची डाउनलोड (9/12/15)
           </button>
-          <button class="nav-tab" data-tab="directoryTab" onclick="switchTab('directoryTab')">
+          <button class="nav-tab" data-tab="directoryTab" onclick="switchTab('directoryTab')" style="display:none;">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
             वार्डवार सूची (Directory)
           </button>
-                    <button class="nav-tab" data-tab="candidateProfileTab" id="candidateNavTab" onclick="switchTab('candidateProfileTab')">
+                    <button class="nav-tab" data-tab="candidateProfileTab" id="candidateNavTab" onclick="switchTab('candidateProfileTab')" style="display:none;">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span>👤 प्रत्याशी प्रोफाइल</span>
           </button>
@@ -202,7 +318,7 @@
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
             <span>🌐 त्रि-पोर्टल मास्टर कमांड हब</span>
           </button>
-          <button class="nav-tab" data-tab="settingsTab" id="settingsNavTab" onclick="switchTab('settingsTab')">
+          <button class="nav-tab" data-tab="settingsTab" id="settingsNavTab" onclick="switchTab('settingsTab')" style="display:none;">
             <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
             Google Sheet सिंक
           </button>
@@ -233,7 +349,7 @@
       <!-- ==============================================
            TAB 1: SMART VOTER SEARCH
            ============================================== -->
-      <section id="searchTab" class="tab-pane">
+      <section id="searchTab" class="tab-pane active">
         <div class="search-hero card">
           <div class="search-hero-content">
             <h2 class="section-title">🔍 मतदाता खोजें (Search Voter)</h2>
@@ -670,7 +786,7 @@
       <!-- ==============================================
            TAB: DASHBOARD & STATS (ACTIVE HOMEPAGE)
            ============================================== -->
-      <section id="dashboardTab" class="tab-pane active">
+      <section id="dashboardTab" class="tab-pane">
         <!-- Distribution Meter (As featured in Video) -->
         <div class="meter-card">
           <div class="meter-header-row">
@@ -1521,23 +1637,23 @@
   <!-- Mobile Bottom Navigation Bar (Matches mobile view in Video) -->
   <nav class="mobile-bottom-nav no-print">
     <div class="bottom-nav-inner">
-      <button class="bottom-nav-item active" data-tab="dashboardTab" onclick="switchTab('dashboardTab')">
+      <button class="bottom-nav-item" data-tab="dashboardTab" onclick="switchTab('dashboardTab')" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
         <span>होम</span>
       </button>
-      <button class="bottom-nav-item" data-tab="searchTab" onclick="switchTab('searchTab')">
+      <button class="bottom-nav-item active" data-tab="searchTab" onclick="switchTab('searchTab')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <span>खोज</span>
       </button>
-      <button class="bottom-nav-item" data-tab="alphaTab" onclick="switchTab('alphaTab')">
+      <button class="bottom-nav-item" data-tab="alphaTab" onclick="switchTab('alphaTab')" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
         <span>वर्णमाला</span>
       </button>
-      <button class="bottom-nav-item" data-tab="bulkSlipTab" onclick="switchTab('bulkSlipTab')">
+      <button class="bottom-nav-item" data-tab="bulkSlipTab" onclick="switchTab('bulkSlipTab')" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
         <span>पर्ची प्रिंट</span>
       </button>
-      <button class="bottom-nav-item" data-tab="directoryTab" onclick="switchTab('directoryTab')">
+      <button class="bottom-nav-item" data-tab="directoryTab" onclick="switchTab('directoryTab')" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
         <span>नामावली</span>
       </button>
@@ -1972,10 +2088,10 @@
   <div id="toastContainer" class="toast-container no-print"></div>
 
   <!-- Scripts -->
-    <script src="symbols_master.js?v=20261021_012218"></script>
-  <script src="master_directory.js?v=20261021_012218"></script>
+    <script src="symbols_master.js?v=20261021_014146"></script>
+  <script src="master_directory.js?v=20261021_014146"></script>
   <script src="master_data.js?v=20261016_012604"></script>
-  <script src="app.js?v=20261021_012218"></script>
+  <script src="app.js?v=20261021_014146"></script>
 
   <!-- Super Admin: Add New User Modal -->
   <div id="addUserModal" class="modal-overlay no-print" style="display:none;" onclick="if(event.target===this) closeAddUserModal()">
