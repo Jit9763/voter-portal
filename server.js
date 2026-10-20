@@ -684,6 +684,182 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
   }
 }
 
+
+// ================================================================================================
+// GOOGLE APPS SCRIPT BIDIRECTIONAL SYNC & FORWARDING ENGINE
+// ================================================================================================
+
+async function forwardToAppsScript(action, payload) {
+  try {
+    const url = getAppsScriptUrl();
+    if (!url) return null;
+    const postUrl = `${url}${url.includes('?') ? '&' : '?'}action=${action}`;
+    const res = await fetch(postUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const d = await res.json().catch(() => null);
+    console.log(`[GOOGLE-SHEET-FORWARD] action=${action} response:`, d?.message || d?.success || res.status);
+    return d;
+  } catch(e) {
+    console.warn(`[GOOGLE-SHEET-FORWARD] Error forwarding ${action}:`, e.message);
+    return null;
+  }
+}
+
+let isUserSyncing = false;
+async function syncUsersFromGoogleSheet(isManual = false) {
+  if (isUserSyncing) {
+    console.log('[GOOGLE-SHEET-USER-SYNC] Sync already in progress, skipping.');
+    return { success: false, message: 'Sync in progress' };
+  }
+  const url = getAppsScriptUrl();
+  if (!url) return { success: false, message: 'Apps Script URL not configured' };
+
+  isUserSyncing = true;
+  console.log(`[GOOGLE-SHEET-USER-SYNC] ${isManual ? 'Manual' : 'Safe-Check'} syncing users from Google Sheet...`);
+
+  try {
+    const fetchUrl = `${url}${url.includes('?') ? '&' : '?'}action=getUsers&_t=${Date.now()}`;
+    const res = await fetch(fetchUrl, {
+      redirect: 'follow',
+      headers: { 'Cache-Control': 'no-cache' }
+    });
+    if (!res.ok) throw new Error(`HTTP error ${res.status}: ${res.statusText}`);
+    const data = await res.json();
+    if (!data || !data.success || !Array.isArray(data.users)) {
+      throw new Error(data?.error || 'Invalid users data from Google Sheet');
+    }
+
+    const sheetUsers = data.users;
+    console.log(`[GOOGLE-SHEET-USER-SYNC] Fetched ${sheetUsers.length} user rows from Google Sheet.`);
+
+    const currentUsers = db.prepare('SELECT * FROM users').all();
+    const currentUserMap = new Map();
+    currentUsers.forEach(u => {
+      currentUserMap.set(String(u.id).toLowerCase(), u);
+      currentUserMap.set(String(u.username).toLowerCase(), u);
+    });
+
+    const upsertStmt = db.prepare(`
+      INSERT OR REPLACE INTO users (
+        id, username, password, full_name, mobile, role, status,
+        allowed_panchayats, allowed_wards, allowed_tabs, candidate_mode,
+        can_print, can_download, can_search, can_view, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    let updatedCount = 0;
+    let addedCount = 0;
+
+    db.exec('BEGIN TRANSACTION;');
+    try {
+      for (const su of sheetUsers) {
+        const uId = String(su.id || su.username).trim().toLowerCase();
+        const username = String(su.username || su.id).trim();
+        const existing = currentUserMap.get(uId) || currentUserMap.get(username.toLowerCase());
+
+        // Timestamp Last-Write-Wins Rule:
+        const sheetTime = su.updated_at ? new Date(su.updated_at).getTime() : 0;
+        const localTime = existing?.updated_at ? new Date(existing.updated_at).getTime() : 0;
+
+        // If local is strictly newer (e.g. pushed via .bat or edited locally), preserve local!
+        if (existing && localTime > 0 && sheetTime > 0 && localTime > sheetTime) {
+          continue;
+        }
+
+        const now = su.updated_at || new Date().toISOString();
+        let tabs = su.allowed_tabs;
+        if (typeof tabs === 'string') {
+          try { tabs = JSON.parse(tabs); } catch(e) { tabs = tabs.split(',').map(s=>s.trim()).filter(Boolean); }
+        }
+        if (!Array.isArray(tabs) || tabs.length === 0) {
+          tabs = ['searchTab'];
+          if (su.tab_alpha) tabs.push('alphaTab');
+          if (su.tab_bulkslip) tabs.push('bulkSlipTab');
+          if (su.tab_directory) tabs.push('directoryTab');
+        }
+
+        const canPrint = su.can_print !== false ? 1 : 0;
+        const canDownload = su.can_download !== false ? 1 : 0;
+
+        upsertStmt.run(
+          uId,
+          username,
+          su.password || existing?.password || '123',
+          su.full_name || su.fullName || username,
+          su.mobile || '',
+          su.role || 'PANCHAYAT_AGENT',
+          su.status || 'ACTIVE',
+          su.assigned_panchayats || su.assignedPanchayats || 'ALL',
+          su.assigned_wards || su.assignedWards || 'ALL',
+          JSON.stringify(tabs),
+          existing?.candidate_mode || 'user_edit',
+          canPrint,
+          canDownload,
+          1,
+          1,
+          existing?.created_at || now,
+          now
+        );
+
+        if (!existing) addedCount++;
+        else updatedCount++;
+      }
+      db.exec('COMMIT;');
+    } catch(err) {
+      db.exec('ROLLBACK;');
+      throw err;
+    }
+
+    if (addedCount > 0 || updatedCount > 0) {
+      console.log(`[GOOGLE-SHEET-USER-SYNC] ✅ Applied Users Sheet updates: +Added: ${addedCount}, ~Updated: ${updatedCount}`);
+      exportToJson();
+      bumpVersion();
+      if (typeof executeGithubPush === 'function') {
+        executeGithubPush(`Users Google Sheet Sync (+Added: ${addedCount}, ~Updated: ${updatedCount})`);
+      }
+    } else {
+      console.log('[GOOGLE-SHEET-USER-SYNC] ✨ All users are already up to date with Google Sheet.');
+    }
+
+    return { success: true, added: addedCount, updated: updatedCount };
+  } catch(e) {
+    console.error('[GOOGLE-SHEET-USER-SYNC] Error:', e.message);
+    return { success: false, error: e.message };
+  } finally {
+    isUserSyncing = false;
+  }
+}
+
+let lastKnownSheetFingerprint = '';
+async function checkGoogleSheetUpdatesSafe() {
+  const url = getAppsScriptUrl();
+  if (!url) return;
+  try {
+    const res = await fetch(`${url}${url.includes('?') ? '&' : '?'}action=getLastModified&_t=${Date.now()}`);
+    if (!res.ok) return;
+    const d = await res.json();
+    if (!d || !d.fingerprint) return;
+
+    if (!lastKnownSheetFingerprint) {
+      lastKnownSheetFingerprint = d.fingerprint;
+      return;
+    }
+
+    if (d.fingerprint !== lastKnownSheetFingerprint) {
+      console.log(`[GOOGLE-SHEET-SAFE-CHECK] 🔄 Change detected in Google Sheet! Fingerprint changed: ${lastKnownSheetFingerprint} -> ${d.fingerprint}`);
+      lastKnownSheetFingerprint = d.fingerprint;
+      await syncCandidatesFromGoogleSheet(false);
+      await syncUsersFromGoogleSheet(false);
+    }
+  } catch(e) {}
+}
+
+// Lightweight quota-safe checker runs every 2 minutes (zero quota abuse)
+setInterval(checkGoogleSheetUpdatesSafe, 120000);
+
 const server = http.createServer(async (req, res) => {
   // CORS & Cache Busting Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -1258,6 +1434,17 @@ const server = http.createServer(async (req, res) => {
     // Entire State Sync
     
     // Sync Candidates with Google Sheet
+    if (pathname === '/api/sync-users') {
+      try {
+        const syncResult = await syncUsersFromGoogleSheet(true);
+        res.end(JSON.stringify(syncResult));
+      } catch (err) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+      return;
+    }
+
     if (pathname === '/api/sync-candidates') {
       try {
         const syncResult = await syncCandidatesFromGoogleSheet(true);

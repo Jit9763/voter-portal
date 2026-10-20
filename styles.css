@@ -5506,3 +5506,11 @@ body.layout-9 .bw-booth-box,
   margin-top: 1.5px !important;
   padding: 1.5px 3px !important;
 }
+
+/* Topbar Sync Button Restricted Strictly to Super Admin */
+#topbarSyncButton {
+  display: none !important;
+}
+html.is-superadmin-session #topbarSyncButton {
+  display: inline-flex !important;
+}

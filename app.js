@@ -9455,3 +9455,44 @@ function onNewUserGpChanged(gpName) {
     wardInp.value = (gpName === 'ALL') ? 'ALL' : '1';
   }
 }
+
+
+// ================================================================================================
+// ZERO HARD-REFRESH SILENT BACKGROUND DATA UPDATER
+// Polls lightweight version.json (from CDN/same origin) every 30s with zero Apps Script quota use!
+// ================================================================================================
+let lastSeenVersionTimestamp = 0;
+async function checkSilentDataUpdates() {
+  try {
+    const res = await fetch(`version.json?_t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) return;
+    const vData = await res.json();
+    if (!vData || !vData.timestamp) return;
+
+    if (!lastSeenVersionTimestamp) {
+      lastSeenVersionTimestamp = vData.timestamp;
+      return;
+    }
+
+    if (vData.timestamp > lastSeenVersionTimestamp) {
+      console.log('🔄 Live data update detected via version.json! Silently refreshing permissions & candidate profiles in-memory...');
+      lastSeenVersionTimestamp = vData.timestamp;
+      if (typeof loadConfiguredUsers === 'function') {
+        await loadConfiguredUsers();
+      }
+      if (typeof syncCurrentUserWithConfiguredUsers === 'function') {
+        syncCurrentUserWithConfiguredUsers();
+      }
+      if (typeof enforceGatekeeperState === 'function') {
+        enforceGatekeeperState();
+      }
+      if (typeof renderCandidateBanner === 'function') {
+        renderCandidateBanner();
+      }
+      if (typeof renderAdminControlTab === 'function' && document.getElementById('adminControlTab')?.classList.contains('active')) {
+        renderAdminControlTab();
+      }
+    }
+  } catch (e) {}
+}
+setInterval(checkSilentDataUpdates, 30000);
