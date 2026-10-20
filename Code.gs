@@ -1608,6 +1608,11 @@ function handleLogin(username, password) {
 // USERS & BLO MANAGEMENT ENGINE (SYNCED WITH GOOGLE SHEET & PORTAL)
 // ================================================================================================
 
+
+// ================================================================================================
+// USERS & BLO MANAGEMENT ENGINE (SYNCED WITH GOOGLE SHEET & PORTAL)
+// ================================================================================================
+
 var USER_HEADERS = [
   "User_ID",
   "Username",
@@ -5227,12 +5232,12 @@ var USERS_DEFAULT_SEED = [
  * Run this function in Apps Script to setup all 3 sheets with smart checkboxes in 1 second!
  */
 function setupAllSheets() {
-  var r1 = setupCandidatesSheet();
+  var r1 = setupCandidatesSheet(false);
   var r2 = setupCandidateEditsSheet();
-  var r3 = setupUsersSheet();
+  var r3 = setupUsersSheet(true); // forceReset = true ensures rows 2 to 190 are filled cleanly!
   return {
     success: true,
-    message: "समस्त 3 शीट्स (Candidates, Candidate_Edits, Users) चेकबॉक्स व ड्रॉपडाउन सहित तैयार!",
+    message: "समस्त 3 शीट्स (Candidates, Candidate_Edits, Users) चेकबॉक्स, ड्रॉपडाउन व 189 उपयोगकर्ताओं सहित तैयार!",
     candidates: r1,
     candidateEdits: r2,
     users: r3
@@ -5241,7 +5246,7 @@ function setupAllSheets() {
 
 /**
  * Setup Users Sheet (BLOs, Incharge, Vyavasthapak, Block Prabhari, Cells, Admin)
- * Features Interactive Checkboxes for Instant Permission Control from Mobile or PC!
+ * Populates all 189 users starting at Row 2 with Interactive Checkboxes!
  */
 function setupUsersSheet(forceReset) {
   var sheet = getOrCreateSheet(SHEET_USERS);
@@ -5266,30 +5271,34 @@ function setupUsersSheet(forceReset) {
   sheet.getRange(1, 8).setNote("आवंटित वार्ड: वार्ड संख्या या ALL");
   sheet.getRange(1, 10).setNote("स्थिति: ACTIVE (सक्रिय) या INACTIVE (निष्क्रिय)");
 
+  // 3. Check if cell A2 is empty or forceReset
+  var cellA2 = sheet.getRange(2, 1).getValue();
+  var needsSeeding = (!cellA2 || String(cellA2).trim() === "" || forceReset === true);
+
+  if (needsSeeding) {
+    // Clear any existing empty/broken rows between row 2 and 1000
+    if (sheet.getLastRow() > 1) {
+      sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
+    }
+    // Write ALL 189 seed users starting cleanly at ROW 2!
+    if (USERS_DEFAULT_SEED && USERS_DEFAULT_SEED.length > 0) {
+      sheet.getRange(2, 1, USERS_DEFAULT_SEED.length, USER_HEADERS.length).setValues(USERS_DEFAULT_SEED);
+      Logger.log("✅ Seeded " + USERS_DEFAULT_SEED.length + " users into Users sheet at Row 2!");
+    }
+  }
+
   var maxRows = Math.max(sheet.getMaxRows(), 500);
 
-  // Checkbox Rule
+  // Checkbox Rule for columns K, L, M, N, O, P (11 to 16)
   var cbRule = SpreadsheetApp.newDataValidation().requireCheckbox().build();
+  sheet.getRange(2, 11, maxRows - 1, 6).setDataValidation(cbRule);
 
-  // Columns K, L, M, N: Tab Checkboxes
   sheet.getRange(1, 11).setNote("मतदाता खोज टैब (चेक = दिखेगा, अनचेक = छुपेगा)");
-  sheet.getRange(2, 11, maxRows - 1, 1).setDataValidation(cbRule);
-
   sheet.getRange(1, 12).setNote("वर्णमाला सूची टैब (चेक = दिखेगा, अनचेक = छुपेगा)");
-  sheet.getRange(2, 12, maxRows - 1, 1).setDataValidation(cbRule);
-
   sheet.getRange(1, 13).setNote("थोक पर्ची जनरेटर टैब (चेक = दिखेगा, अनचेक = छुपेगा)");
-  sheet.getRange(2, 13, maxRows - 1, 1).setDataValidation(cbRule);
-
   sheet.getRange(1, 14).setNote("वार्ड डायरेक्टरी टैब (चेक = दिखेगा, अनचेक = छुपेगा)");
-  sheet.getRange(2, 14, maxRows - 1, 1).setDataValidation(cbRule);
-
-  // Columns O, P: Print & Download Checkboxes
   sheet.getRange(1, 15).setNote("पर्ची प्रिंट करने की अनुमति");
-  sheet.getRange(2, 15, maxRows - 1, 1).setDataValidation(cbRule);
-
   sheet.getRange(1, 16).setNote("सूची/पर्ची डाउनलोड करने की अनुमति");
-  sheet.getRange(2, 16, maxRows - 1, 1).setDataValidation(cbRule);
 
   // Status Dropdown
   var statusRule = SpreadsheetApp.newDataValidation()
@@ -5305,34 +5314,24 @@ function setupUsersSheet(forceReset) {
     .build();
   sheet.getRange(2, 6, maxRows - 1, 1).setDataValidation(roleRule);
 
-  // Populate Seed Rows if empty or forceReset
-  if (sheet.getLastRow() <= 1 || forceReset === true) {
-    if (forceReset === true && sheet.getLastRow() > 1) {
-      sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
-    }
-    if (USERS_DEFAULT_SEED && USERS_DEFAULT_SEED.length > 0) {
-      sheet.getRange(2, 1, USERS_DEFAULT_SEED.length, USER_HEADERS.length).setValues(USERS_DEFAULT_SEED);
-      Logger.log("✅ Seeded " + USERS_DEFAULT_SEED.length + " users into Users sheet!");
-    }
-  }
-
   try {
     for (var col = 1; col <= USER_HEADERS.length; col++) {
       sheet.autoResizeColumn(col);
     }
   } catch(e) {}
 
-  Logger.log("✅ Users sheet ready with interactive checkboxes!");
+  Logger.log("✅ Users sheet ready with interactive checkboxes at Row 2!");
   return { success: true, message: "Users sheet setup complete!", rowCount: sheet.getLastRow() - 1 };
 }
 
 /**
- * Handle Get Users (With Checkbox Permissions & Timestamps)
+ * Handle Get Users (Auto-initializes if empty)
  */
 function handleGetUsers(adminUsername, adminPassword) {
   var sheet = getOrCreateSheet(SHEET_USERS);
-  if (sheet.getLastRow() <= 1) {
-    setupUsersSheet();
+  var cellA2 = sheet.getRange(2, 1).getValue();
+  if (!cellA2 || String(cellA2).trim() === "") {
+    setupUsersSheet(true);
   }
 
   var data = sheet.getDataRange().getValues();
@@ -5437,7 +5436,8 @@ function handleSaveUser(userData) {
   if (!uName) return { success: false, error: "यूजरनेम आवश्यक है!" };
 
   var sheet = getOrCreateSheet(SHEET_USERS);
-  if (sheet.getLastRow() <= 1) setupUsersSheet();
+  var cellA2 = sheet.getRange(2, 1).getValue();
+  if (!cellA2 || String(cellA2).trim() === "") setupUsersSheet(true);
 
   var data = sheet.getDataRange().getValues();
   var headers = data[0].map(function(h) { return String(h || "").trim().toLowerCase(); });
@@ -5478,7 +5478,7 @@ function handleSaveUser(userData) {
 
   if (targetRow !== -1) {
     if (!userData.password && data[targetRow - 1][2]) {
-      rowValues[2] = data[targetRow - 1][2]; // Preserve password if blank
+      rowValues[2] = data[targetRow - 1][2]; // Preserve password
     }
     sheet.getRange(targetRow, 1, 1, USER_HEADERS.length).setValues([rowValues]);
     return { success: true, message: "उपयोगकर्ता '" + uName + "' Google Sheet में अपडेट हुआ!", row: targetRow, timestamp: nowStr };
