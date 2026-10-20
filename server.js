@@ -764,10 +764,7 @@ async function syncUsersFromGoogleSheet(isManual = false) {
         const sheetTime = su.updated_at ? new Date(su.updated_at).getTime() : 0;
         const localTime = existing?.updated_at ? new Date(existing.updated_at).getTime() : 0;
 
-        // If local is strictly newer (e.g. pushed via .bat or edited locally), preserve local!
-        if (existing && localTime > 0 && sheetTime > 0 && localTime > sheetTime) {
-          continue;
-        }
+        // Google Sheet is the Master for Permissions & Status - always apply updates!
 
         const now = su.updated_at || new Date().toISOString();
         let tabs = su.allowed_tabs;
@@ -858,7 +855,7 @@ async function checkGoogleSheetUpdatesSafe() {
 }
 
 // Lightweight quota-safe checker runs every 2 minutes (zero quota abuse)
-setInterval(checkGoogleSheetUpdatesSafe, 120000);
+setInterval(checkGoogleSheetUpdatesSafe, 15000);
 
 const server = http.createServer(async (req, res) => {
   // CORS & Cache Busting Headers
@@ -903,10 +900,10 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // Password Change Endpoint (Self BLO or User password reset)
+    // Password Change Endpoint (Self BLO or User password reset - 1 field simplicity)
     if (pathname === '/api/change-password' && req.method === 'POST') {
       try {
-        const { username, currentPassword, newPassword } = await parseJsonBody(req);
+        const { username, newPassword } = await parseJsonBody(req);
         if (!username || !newPassword) {
           res.writeHead(400);
           res.end(JSON.stringify({ success: false, error: 'यूजरनेम एवं नया पासवर्ड आवश्यक हैं।' }));
@@ -920,15 +917,18 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
-        if (currentPassword && user.password !== currentPassword.trim()) {
-          res.writeHead(401);
-          res.end(JSON.stringify({ success: false, error: 'वर्तमान पासवर्ड गलत है!' }));
-          return;
-        }
-
-        db.prepare('UPDATE users SET password = ?, updated_at = ? WHERE id = ?').run(newPassword.trim(), new Date().toISOString(), user.id);
+        const nowIso = new Date().toISOString();
+        db.prepare('UPDATE users SET password = ?, updated_at = ? WHERE id = ?').run(newPassword.trim(), nowIso, user.id);
         exportToJson();
-        res.end(JSON.stringify({ success: true, message: 'पासवर्ड सफलतापूर्वक बदल दिया गया!' }));
+
+        // Forward immediately to Google Apps Script (Live Google Sheet)
+        forwardToAppsScript('updatePassword', {
+          username: user.username || username,
+          newPassword: newPassword.trim(),
+          adminUsername: username
+        }).catch(e => console.warn('Google Sheet password forward notice:', e.message));
+
+        res.end(JSON.stringify({ success: true, message: 'पासवर्ड लोकल एवं गूगल शीट दोनों में सुरक्षित!' }));
       } catch (err) {
         res.writeHead(500);
         res.end(JSON.stringify({ success: false, error: err.message }));
@@ -937,6 +937,26 @@ const server = http.createServer(async (req, res) => {
     }
 
     // Multi-Portal Settings & Master Sync Endpoints
+    // On-Demand Live Google Sheet Sync Endpoint
+    if (pathname === '/api/sync-from-sheet' && (req.method === 'GET' || req.method === 'POST')) {
+      try {
+        console.log('[API-SYNC] ⚡ Instant sync from Google Sheet triggered...');
+        const uSync = await syncUsersFromGoogleSheet(true);
+        const cSync = await syncCandidatesFromGoogleSheet(true);
+        res.end(JSON.stringify({
+          success: true,
+          message: 'गूगल शीट से समस्त उपयोगकर्ता व प्रत्याशी डेटा तुरंत सिंक हुआ!',
+          users: uSync,
+          candidates: cSync,
+          timestamp: new Date().toISOString()
+        }));
+      } catch(e) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+      return;
+    }
+
     if (pathname === '/api/portal-settings' && req.method === 'GET') {
       const p = path.join(__dirname, 'portal_settings.json');
       if (fs.existsSync(p)) {
@@ -1566,55 +1586,21 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.log(`⚠️ Port ${PORT} already in use. Cleaning up lingering process on port ${PORT}...`);
-    try {
-      const { execSync } = require('node:child_process');
-      const out = execSync(`netstat -ano | findstr :${PORT} | findstr LISTENING`, { encoding: 'utf8' });
-      const lines = out.trim().split('\n');
-      for (const line of lines) {
-        const parts = line.trim().split(/\s+/);
-        const pid = parts[parts.length - 1];
-        if (pid && pid !== '0' && pid !== String(process.pid)) {
-          try { execSync(`taskkill /F /PID ${pid}`); } catch(_) {}
-        }
-      }
-      setTimeout(() => {
-        server.listen(PORT, () => {
-          console.log(`🚀 Panchayat Chunav 2026 High-Speed Node & SQLite Server is LIVE on port ${PORT}!`);
-          console.log(`📁 Local DB: ${DB_PATH}`);
-          console.log(`🌐 URL: http://localhost:${PORT}`);
-
-// =========================================================================
-// CANDIDATE GOOGLE SHEET HOURLY RECURRING SYNC TIMER
-// =========================================================================
-const CANDIDATE_HOURLY_SYNC_MS = 60 * 60 * 1000; // 1 Hour
-
-// Initial sync 3 seconds after server start
-setTimeout(() => {
-  syncCandidatesFromGoogleSheet(false).catch(e => console.warn('[GOOGLE-SHEET-SYNC] Initial sync notice:', e.message));
-}, 3000);
-
-// Recurring hourly sync
-setInterval(() => {
-  syncCandidatesFromGoogleSheet(false).catch(e => console.warn('[GOOGLE-SHEET-SYNC] Hourly sync notice:', e.message));
-}, CANDIDATE_HOURLY_SYNC_MS);
-
-console.log('⏰ Candidate Google Sheet hourly sync active (Interval: 1 Hour / 3600000ms)');
-
-        });
-      }, 800);
-      return;
-    } catch(e) {
-      console.error(`Could not auto-kill port ${PORT}:`, e.message);
-    }
-  }
-  console.error('Server error:', err);
+  console.error('Server error:', err.message);
   process.exit(1);
 });
 
 server.listen(PORT, () => {
-  console.log(`🚀 Panchayat Chunav 2026 High-Speed Node & SQLite Server is LIVE on port ${PORT}!`);
-  console.log(`📁 Local DB: ${DB_PATH}`);
-  console.log(`🌐 URL: http://localhost:${PORT}`);
+  console.log('🚀 Panchayat Chunav 2026 High-Speed Node & SQLite Server is LIVE on port ' + PORT + '!');
+  console.log('📁 Local DB: ' + DB_PATH);
+  console.log('🌐 URL: http://localhost:' + PORT);
+
+  const CANDIDATE_HOURLY_SYNC_MS = 60 * 60 * 1000;
+  setTimeout(() => {
+    syncCandidatesFromGoogleSheet(false).catch(e => console.warn('[GOOGLE-SHEET-SYNC] Initial sync notice:', e.message));
+  }, 3000);
+
+  setInterval(() => {
+    syncCandidatesFromGoogleSheet(false).catch(e => console.warn('[GOOGLE-SHEET-SYNC] Hourly sync notice:', e.message));
+  }, CANDIDATE_HOURLY_SYNC_MS);
 });

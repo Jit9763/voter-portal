@@ -994,8 +994,7 @@ function setupCandidatesSheet(forceReset) {
         if (uId === "cand_b" || uId === "b" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1)) {
           if (!row[7] || row[7] === "हाथ") row[7] = "2";
           if (!row[8] || row[8] === "custom") row[8] = "हाथ";
-          if (!row[12]) row[12] = ""काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!"
-अपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
+          if (!row[12]) row[12] = "काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!\\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
         }
         var stStr = String(row[15] || "").trim().toUpperCase();
         row[15] = (stStr === "INACTIVE" || stStr === "DELETED") ? stStr : "ACTIVE"; // Column 16 (Status)

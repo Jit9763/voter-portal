@@ -1,6 +1,6 @@
 /**
  * Rajasthan State Election Commission (SEC) Official Election Symbols
- * Approved for Panchayati Raj Elections (Sarpanch & Ward Panch)
+ * Approved for Panchayati Raj Elections (Sarpanch, Ward Panch, PS, ZP)
  */
 
 window.OFFICIAL_ELECTION_SYMBOLS = [
@@ -9,136 +9,124 @@ window.OFFICIAL_ELECTION_SYMBOLS = [
     name_hi: "कमल (Lotus / BJP)",
     name_en: "Lotus",
     party: "BJP",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M50,88 C50,75 50,72 50,70" stroke="#15803d" stroke-width="3" stroke-linecap="round"/><path d="M22,78 Q50,92 78,78 Q50,76 22,78 Z" fill="#16a34a" stroke="#15803d" stroke-width="1.5"/><path d="M50,22 C44,38 44,58 50,70 C56,58 56,38 50,22 Z" fill="#ec4899" stroke="#be185d" stroke-width="2"/><path d="M50,70 C40,58 36,42 40,32 C45,45 49,60 50,70 Z" fill="#f43f5e" stroke="#e11d48" stroke-width="1.5"/><path d="M50,70 C60,58 64,42 60,32 C55,45 51,60 50,70 Z" fill="#f43f5e" stroke="#e11d48" stroke-width="1.5"/><path d="M50,70 C34,65 24,52 26,42 C34,54 44,64 50,70 Z" fill="#fb7185" stroke="#f43f5e" stroke-width="1.5"/><path d="M50,70 C66,65 76,52 74,42 C66,54 56,64 50,70 Z" fill="#fb7185" stroke="#f43f5e" stroke-width="1.5"/><path d="M50,70 C28,72 16,62 18,54 C28,62 42,68 50,70 Z" fill="#fda4af" stroke="#fb7185" stroke-width="1.5"/><path d="M50,70 C72,72 84,62 82,54 C72,62 58,68 50,70 Z" fill="#fda4af" stroke="#fb7185" stroke-width="1.5"/></svg>`
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M50,88 C50,75 50,72 50,70" stroke="#15803d" stroke-width="3" stroke-linecap="round"/><path d="M22,78 Q50,92 78,78 Q50,76 22,78 Z" fill="#16a34a" stroke="#15803d" stroke-width="1.5"/><path d="M50,22 C44,38 44,58 50,70 C56,58 56,38 50,22 Z" fill="#ec4899" stroke="#be185d" stroke-width="2"/><path d="M50,70 C40,58 32,45 35,32 C38,45 44,58 50,70 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.5"/><path d="M50,70 C60,58 68,45 65,32 C62,45 56,58 50,70 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.5"/><path d="M50,70 C35,62 20,52 24,42 C30,52 40,62 50,70 Z" fill="#fbcfe8" stroke="#be185d" stroke-width="1.5"/><path d="M50,70 C65,62 80,52 76,42 C70,52 60,62 50,70 Z" fill="#fbcfe8" stroke="#be185d" stroke-width="1.5"/><path d="M50,70 C30,68 12,62 16,56 C24,62 36,68 50,70 Z" fill="#fdf2f8" stroke="#be185d" stroke-width="1.2"/><path d="M50,70 C70,68 88,62 84,56 C76,62 64,68 50,70 Z" fill="#fdf2f8" stroke="#be185d" stroke-width="1.2"/></svg>`
   },
   {
     id: "hand",
     name_hi: "हाथ (Hand / Congress)",
     name_en: "Hand",
-    party: "Congress",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M35,84 C32,76 32,66 33,52 C33,48 37,48 37,52 L37,35 C37,32 41,32 41,35 L41,25 C41,22 45,22 45,25 L45,22 C45,19 49,19 49,22 L49,42 C49,45 51,45 51,42 L51,28 C51,25 55,25 55,28 L55,45 C55,48 57,48 57,45 L57,35 C57,32 61,32 61,35 L61,54 C61,58 65,54 69,54 C73,54 73,59 69,65 C64,73 57,84 49,86 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2"/><path d="M41,58 Q51,63 57,56" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/><path d="M40,67 Q47,71 55,65" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/></svg>`
+    party: "INC",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><g transform="translate(15, 8) scale(0.72)"><path d="M48,88 L34,70 C30,65 24,65 20,70 C16,75 18,82 24,88 L46,108 C56,118 70,122 84,116 L94,110 C104,104 108,92 106,80 L100,42 C99,34 92,28 84,29 C76,30 71,37 72,45 L74,52 L74,20 C74,12 67,6 59,6 C51,6 45,12 45,20 L45,54 L44,22 C43,14 36,9 28,10 C20,11 15,18 16,26 L18,58 L16,34 C15,26 9,21 2,23 C-5,25 -9,33 -7,41 L-2,72 C2,94 18,114 38,124" fill="#0284c7" stroke="#0369a1" stroke-width="3" stroke-linejoin="round"/></g></svg>`
   },
   {
     id: "elephant",
     name_hi: "हाथी (Elephant / BSP)",
     name_en: "Elephant",
     party: "BSP",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M20,52 C18,38 30,24 48,24 C64,24 73,30 78,38 C82,44 85,52 83,62 C81,70 75,68 75,63 C75,56 73,48 68,46 C66,54 63,58 63,68 L63,82 L55,82 L55,68 C51,68 45,68 43,68 L43,82 L35,82 L35,68 C27,68 22,64 20,52 Z" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/><path d="M52,32 C60,32 65,42 61,54 C55,58 48,52 50,38 Z" fill="#60a5fa" stroke="#2563eb" stroke-width="1.5"/><path d="M73,55 Q82,56 84,50" fill="none" stroke="#f8fafc" stroke-width="2.5" stroke-linecap="round"/><circle cx="67" cy="36" r="2.5" fill="#ffffff"/><path d="M20,48 Q15,56 18,65" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"/></svg>`
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><g transform="translate(10, 15) scale(0.8)"><path d="M72,25 C64,14 48,12 36,18 C24,24 16,38 15,52 C14,64 12,74 6,80 C4,82 6,86 10,85 C14,84 18,78 20,68 C22,66 25,68 28,68 L28,88 L38,88 L38,68 L52,68 L52,88 L62,88 L62,64 C66,62 72,56 75,48 C78,54 84,52 86,46 C88,40 85,34 80,32 C78,28 75,26 72,25 Z" fill="#475569" stroke="#1e293b" stroke-width="2.5"/><circle cx="32" cy="30" r="3" fill="#ffffff"/><circle cx="32" cy="30" r="1.5" fill="#0f172a"/><path d="M18,52 C22,54 24,58 24,62" stroke="#ffffff" stroke-width="2" fill="none"/></g></svg>`
   },
   {
     id: "bottle",
     name_hi: "बोतल (Bottle / RLP)",
     name_en: "Bottle",
     party: "RLP",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="44" y="12" width="12" height="7" rx="2" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/><path d="M46,19 L46,34 L34,48 L34,82 A4,4 0 0,0 38,86 L62,86 A4,4 0 0,0 66,82 L66,48 L54,34 L54,19 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2.5"/><rect x="36" y="52" width="28" height="22" rx="2" fill="#ffffff" stroke="#0369a1" stroke-width="1.5"/><line x1="40" y1="58" x2="60" y2="58" stroke="#dc2626" stroke-width="2"/><line x1="42" y1="64" x2="58" y2="64" stroke="#0284c7" stroke-width="2"/><path d="M38,48 L40,80" stroke="#bae6fd" stroke-width="2" stroke-linecap="round"/></svg>`
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="44" y="10" width="12" height="12" rx="2" fill="#059669" stroke="#047857" stroke-width="2"/><path d="M46,22 L46,32 C46,38 34,44 34,54 L34,84 C34,88 38,92 44,92 L56,92 C62,92 66,88 66,84 L66,54 C66,44 54,38 54,32 L54,22 Z" fill="#10b981" stroke="#047857" stroke-width="2.5"/><rect x="37" y="56" width="26" height="20" rx="2" fill="#ffffff" stroke="#047857" stroke-width="1.5"/><line x1="41" y1="64" x2="59" y2="64" stroke="#047857" stroke-width="2"/><line x1="44" y1="70" x2="56" y2="70" stroke="#047857" stroke-width="1.5"/></svg>`
   },
   {
     id: "sun",
     name_hi: "उगता सूरज (Rising Sun)",
     name_en: "Rising Sun",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><circle cx="50" cy="50" r="22" fill="#ea580c" stroke="#c2410c" stroke-width="2"/><g stroke="#f97316" stroke-width="4" stroke-linecap="round"><line x1="50" y1="12" x2="50" y2="20"/><line x1="50" y1="80" x2="50" y2="88"/><line x1="12" y1="50" x2="20" y2="50"/><line x1="80" y1="50" x2="88" y2="50"/><line x1="23" y1="23" x2="29" y2="29"/><line x1="71" y1="71" x2="77" y2="77"/><line x1="23" y1="77" x2="29" y2="71"/><line x1="71" y1="29" x2="77" y2="23"/></g><path d="M10 75 Q50 68 90 75 L90 90 L10 90 Z" fill="#0284c7"/></svg>`
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><circle cx="50" cy="50" r="20" fill="#f59e0b" stroke="#d97706" stroke-width="2.5"/><g stroke="#d97706" stroke-width="3" stroke-linecap="round"><line x1="50" y1="18" x2="50" y2="24"/><line x1="50" y1="76" x2="50" y2="82"/><line x1="18" y1="50" x2="24" y2="50"/><line x1="76" y1="50" x2="82" y2="50"/><line x1="27" y1="27" x2="32" y2="32"/><line x1="68" y1="68" x2="73" y2="73"/><line x1="27" y1="73" x2="32" y2="68"/><line x1="68" y1="32" x2="73" y2="27"/></g></svg>`
   },
   {
     id: "kite",
     name_hi: "पतंग (Kite)",
     name_en: "Kite",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><polygon points="50,10 88,48 50,86 12,48" fill="#dc2626" stroke="#991b1b" stroke-width="3"/><line x1="50" y1="10" x2="50" y2="86" stroke="#ffffff" stroke-width="2.5"/><path d="M12,48 Q50,75 88,48" fill="none" stroke="#ffffff" stroke-width="2.5"/><polygon points="50,86 42,96 58,96" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/></svg>`
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><polygon points="50,15 85,50 50,85 15,50" fill="#ec4899" stroke="#be185d" stroke-width="2.5"/><line x1="50" y1="15" x2="50" y2="85" stroke="#be185d" stroke-width="2"/><path d="M15,50 Q50,68 85,50" fill="none" stroke="#be185d" stroke-width="2"/><polygon points="44,85 56,85 50,96" fill="#f59e0b"/></svg>`
   },
   {
     id: "lock_key",
-    name_hi: "ताला और चाबी (Lock & Key)",
+    name_hi: "ताला चाबी (Lock & Key)",
     name_en: "Lock and Key",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="25" y="42" width="42" height="38" rx="6" fill="#f59e0b" stroke="#b45309" stroke-width="3"/><path d="M34,42 V28 A12,12 0 0,1 58,28 V42" fill="none" stroke="#475569" stroke-width="6" stroke-linecap="round"/><circle cx="46" cy="58" r="4" fill="#1e293b"/><polygon points="44,58 48,58 47,70 45,70" fill="#1e293b"/><path d="M72,25 A8,8 0 1,0 80,33 L92,33 L92,38 L88,38 L88,43 L84,43 L84,33 Z" fill="#0284c7" stroke="#0369a1" stroke-width="1.5"/></svg>`
-  },
-  {
-    id: "batsman",
-    name_hi: "बल्लेबाज (Batsman / Cricket)",
-    name_en: "Batsman",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><circle cx="40" cy="22" r="9" fill="#f59e0b" stroke="#b45309" stroke-width="2"/><path d="M40,31 L38,58 L24,78" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/><path d="M38,58 L52,78 L65,92" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/><path d="M39,38 L60,48 L72,35" stroke="#1e3a8a" stroke-width="5" stroke-linecap="round"/><rect x="68" y="24" width="8" height="42" rx="3" transform="rotate(35 68 24)" fill="#b45309" stroke="#78350f" stroke-width="2"/></svg>`
-  },
-  {
-    id: "umbrella",
-    name_hi: "छाता (Umbrella)",
-    name_en: "Umbrella",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M12,50 A38,38 0 0,1 88,50 Q69,45 50,50 Q31,45 12,50 Z" fill="#4f46e5" stroke="#3730a3" stroke-width="2.5"/><line x1="50" y1="12" x2="50" y2="80" stroke="#475569" stroke-width="4"/><path d="M50,80 A6,6 0 0,0 62,80" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round"/></svg>`
-  },
-  {
-    id: "kettle",
-    name_hi: "केतली (Kettle)",
-    name_en: "Kettle",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><ellipse cx="50" cy="62" rx="28" ry="22" fill="#0284c7" stroke="#0369a1" stroke-width="3"/><rect x="42" y="34" width="16" height="7" rx="2" fill="#0369a1"/><circle cx="50" cy="30" r="4" fill="#f59e0b"/><path d="M72,50 Q94,36 78,72" fill="none" stroke="#334155" stroke-width="5" stroke-linecap="round"/><path d="M26,56 L12,42 L12,50 L24,66 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2"/><path d="M30,40 Q50,15 70,40" fill="none" stroke="#334155" stroke-width="5" stroke-linecap="round"/></svg>`
-  },
-  {
-    id: "whistle",
-    name_hi: "सीटी (Whistle)",
-    name_en: "Whistle",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M22,35 L60,35 A22,22 0 1,1 60,75 A22,22 0 0,1 42,65 L22,65 Z" fill="#e11d48" stroke="#be123c" stroke-width="3"/><circle cx="62" cy="55" r="9" fill="#ffffff" stroke="#be123c" stroke-width="2"/><rect x="36" y="27" width="10" height="8" rx="2" fill="#881337"/><circle cx="22" cy="50" r="3" fill="#ffffff"/></svg>`
-  },
-  {
-    id: "almirah",
-    name_hi: "अलमारी (Cupboard / Almirah)",
-    name_en: "Almirah",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="22" y="14" width="56" height="72" rx="3" fill="#78350f" stroke="#451a03" stroke-width="3"/><line x1="50" y1="14" x2="50" y2="86" stroke="#451a03" stroke-width="2.5"/><circle cx="45" cy="50" r="3" fill="#f59e0b"/><circle cx="55" cy="50" r="3" fill="#f59e0b"/><line x1="28" y1="86" x2="28" y2="92" stroke="#451a03" stroke-width="4"/><line x1="72" y1="86" x2="72" y2="92" stroke="#451a03" stroke-width="4"/></svg>`
-  },
-  {
-    id: "table_fan",
-    name_hi: "टेबल पंखा (Table Fan)",
-    name_en: "Table Fan",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><circle cx="50" cy="40" r="26" fill="none" stroke="#059669" stroke-width="3"/><circle cx="50" cy="40" r="6" fill="#047857"/><ellipse cx="50" cy="24" rx="5" ry="12" fill="#10b981"/><ellipse cx="50" cy="56" rx="5" ry="12" fill="#10b981"/><ellipse cx="34" cy="40" rx="12" ry="5" fill="#10b981"/><ellipse cx="66" cy="40" rx="12" ry="5" fill="#10b981"/><line x1="50" y1="66" x2="50" y2="84" stroke="#334155" stroke-width="5"/><ellipse cx="50" cy="87" rx="20" ry="5" fill="#475569"/></svg>`
-  },
-  {
-    id: "cup_plate",
-    name_hi: "कप और प्लेट (Cup & Plate)",
-    name_en: "Cup and Plate",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M26,38 L74,38 L68,68 A16,16 0 0,1 32,68 Z" fill="#d97706" stroke="#b45309" stroke-width="2.5"/><path d="M74,44 Q88,44 88,54 Q88,64 71,64" fill="none" stroke="#b45309" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="50" cy="74" rx="36" ry="6" fill="#f59e0b" stroke="#b45309" stroke-width="2.5"/><path d="M40,30 Q43,22 40,16 M50,30 Q53,22 50,16 M60,30 Q63,22 60,16" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`
-  },
-  {
-    id: "tractor",
-    name_hi: "ट्रैक्टर (Tractor)",
-    name_en: "Tractor",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><circle cx="32" cy="68" r="18" fill="#1e293b" stroke="#0f172a" stroke-width="2"/><circle cx="32" cy="68" r="7" fill="#cbd5e1"/><circle cx="78" cy="72" r="12" fill="#1e293b" stroke="#0f172a" stroke-width="2"/><circle cx="78" cy="72" r="5" fill="#cbd5e1"/><rect x="25" y="42" width="22" height="18" fill="#dc2626"/><rect x="47" y="46" width="36" height="18" rx="3" fill="#dc2626"/><line x1="72" y1="46" x2="72" y2="34" stroke="#334155" stroke-width="4"/></svg>`
-  },
-  {
-    id: "gas_cylinder",
-    name_hi: "गैस सिलेंडर (Gas Cylinder)",
-    name_en: "Gas Cylinder",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="34" y="28" width="32" height="52" rx="10" fill="#dc2626" stroke="#991b1b" stroke-width="3"/><rect x="42" y="16" width="16" height="12" rx="3" fill="#991b1b"/><rect x="46" y="10" width="8" height="6" fill="#e2e8f0"/><line x1="34" y1="54" x2="66" y2="54" stroke="#ffffff" stroke-width="3"/><rect x="38" y="80" width="24" height="6" rx="2" fill="#991b1b"/></svg>`
-  },
-  {
-    id: "bucket",
-    name_hi: "बाल्टी (Bucket)",
-    name_en: "Bucket",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><polygon points="26,32 74,32 66,82 34,82" fill="#2563eb" stroke="#1d4ed8" stroke-width="3"/><ellipse cx="50" cy="32" rx="24" ry="5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/><path d="M26,32 Q50,8 74,32" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round"/></svg>`
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="25" y="45" width="40" height="38" rx="6" fill="#f59e0b" stroke="#b45309" stroke-width="2.5"/><path d="M33,45 L33,30 C33,18 57,18 57,30 L57,45" fill="none" stroke="#64748b" stroke-width="5" stroke-linecap="round"/><circle cx="45" cy="60" r="4" fill="#78350f"/><polygon points="43,62 47,62 48,72 42,72" fill="#78350f"/><path d="M68,32 L85,32 L85,38 L78,38 L78,44 L72,44 L72,32 Z" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/></svg>`
   },
   {
     id: "sewing_machine",
     name_hi: "सिलाई मशीन (Sewing Machine)",
     name_en: "Sewing Machine",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="18" y="70" width="64" height="10" rx="2" fill="#047857"/><rect x="62" y="32" width="12" height="40" fill="#065f46"/><rect x="30" y="32" width="40" height="10" rx="3" fill="#065f46"/><circle cx="74" cy="46" r="10" fill="#cbd5e1" stroke="#475569" stroke-width="2.5"/><line x1="26" y1="36" x2="26" y2="68" stroke="#334155" stroke-width="3"/></svg>`
-  },
-  {
-    id: "lantern",
-    name_hi: "लालटेन (Lantern)",
-    name_en: "Lantern",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><ellipse cx="50" cy="74" rx="22" ry="7" fill="#b45309"/><rect x="34" y="42" width="32" height="30" rx="6" fill="#fef08a" stroke="#ca8a04" stroke-width="2.5"/><ellipse cx="50" cy="42" rx="18" ry="6" fill="#b45309"/><path d="M30,42 Q50,14 70,42" fill="none" stroke="#78350f" stroke-width="4" stroke-linecap="round"/></svg>`
-  },
-  {
-    id: "handpump",
-    name_hi: "हैंडपंप (Hand Pump)",
-    name_en: "Hand Pump",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="42" y="30" width="16" height="54" rx="3" fill="#0284c7" stroke="#0369a1" stroke-width="2.5"/><rect x="36" y="80" width="28" height="8" rx="2" fill="#0369a1"/><line x1="50" y1="34" x2="84" y2="48" stroke="#334155" stroke-width="5" stroke-linecap="round"/><polygon points="42,50 24,56 24,62 42,56" fill="#0284c7" stroke="#0369a1" stroke-width="1.5"/></svg>`
-  },
-  {
-    id: "telephone",
-    name_hi: "टेलीफोन (Telephone)",
-    name_en: "Telephone",
-    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M22,34 Q50,18 78,34 Q82,42 74,44 Q62,40 60,46 L60,54 Q50,56 40,54 L40,46 Q38,40 26,44 Q18,42 22,34 Z" fill="#1e293b"/><rect x="28" y="52" width="44" height="34" rx="6" fill="#dc2626" stroke="#991b1b" stroke-width="2.5"/><circle cx="50" cy="69" r="10" fill="#ffffff" stroke="#991b1b" stroke-width="2"/></svg>`
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="18" y="70" width="64" height="8" rx="2" fill="#334155"/><path d="M30,70 L30,42 Q30,32 44,32 L68,32 Q74,32 74,42 L74,70" fill="none" stroke="#0f172a" stroke-width="5" stroke-linecap="round"/><circle cx="68" cy="46" r="8" fill="#94a3b8" stroke="#475569" stroke-width="2"/><line x1="34" y1="48" x2="34" y2="66" stroke="#475569" stroke-width="2"/></svg>`
   },
   {
     id: "car",
     name_hi: "कार (Car)",
     name_en: "Car",
     svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M18,60 L24,44 Q30,34 46,34 L64,34 Q76,34 82,44 L88,60 L88,72 L18,72 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2.5"/><circle cx="32" cy="74" r="8" fill="#1e293b"/><circle cx="74" cy="74" r="8" fill="#1e293b"/><polygon points="46,38 62,38 64,48 42,48" fill="#e0f2fe"/></svg>`
+  },
+  {
+    id: "gas_cylinder",
+    name_hi: "गैस सिलेंडर (Gas Cylinder)",
+    name_en: "Gas Cylinder",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="36" y="32" width="28" height="52" rx="10" fill="#dc2626" stroke="#991b1b" stroke-width="2.5"/><path d="M42,32 L42,24 C42,20 58,20 58,24 L58,32" fill="none" stroke="#991b1b" stroke-width="3"/><rect x="46" y="16" width="8" height="6" fill="#64748b"/></svg>`
+  },
+  {
+    id: "cup_plate",
+    name_hi: "कप प्लेट (Cup & Plate)",
+    name_en: "Cup and Plate",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><ellipse cx="50" cy="74" rx="34" ry="8" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/><path d="M30,42 L34,68 Q50,72 66,68 L70,42 Z" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/><path d="M70,48 Q82,54 70,62" fill="none" stroke="#1d4ed8" stroke-width="3"/></svg>`
+  },
+  {
+    id: "aeroplane",
+    name_hi: "हवाई जहाज (Aeroplane)",
+    name_en: "Aeroplane",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M50,12 L56,38 L88,52 L88,60 L56,52 L56,74 L68,82 L68,88 L50,84 L32,88 L32,82 L44,74 L44,52 L12,60 L12,52 L44,38 Z" fill="#0284c7" stroke="#0369a1" stroke-width="2" stroke-linejoin="round"/></svg>`
+  },
+  {
+    id: "bat",
+    name_hi: "बल्ला (Cricket Bat)",
+    name_en: "Cricket Bat",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="44" y="14" width="12" height="24" rx="3" fill="#f59e0b" stroke="#78350f" stroke-width="2"/><line x1="44" y1="22" x2="56" y2="22" stroke="#78350f" stroke-width="1.5"/><line x1="44" y1="28" x2="56" y2="28" stroke="#78350f" stroke-width="1.5"/><path d="M41,38 L59,38 L56,86 Q50,90 44,86 Z" fill="#d97706" stroke="#78350f" stroke-width="2.5"/><circle cx="76" cy="74" r="10" fill="#dc2626" stroke="#991b1b" stroke-width="2"/><path d="M70,69 Q76,74 82,79" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="2,2"/></svg>`
+  },
+  {
+    id: "bicycle",
+    name_hi: "साइकिल (Bicycle)",
+    name_en: "Bicycle",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><circle cx="28" cy="65" r="18" fill="none" stroke="#1e293b" stroke-width="4"/><circle cx="72" cy="65" r="18" fill="none" stroke="#1e293b" stroke-width="4"/><circle cx="28" cy="65" r="3" fill="#1e293b"/><circle cx="72" cy="65" r="3" fill="#1e293b"/><circle cx="50" cy="65" r="5" fill="#f59e0b" stroke="#1e293b" stroke-width="2"/><line x1="28" y1="65" x2="44" y2="44" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/><line x1="44" y1="44" x2="68" y2="44" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/><line x1="44" y1="44" x2="50" y2="65" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="65" x2="72" y2="65" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/><line x1="28" y1="65" x2="50" y2="65" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/><line x1="72" y1="65" x2="66" y2="35" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/><path d="M60,35 L72,35 L74,38" fill="none" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/><line x1="44" y1="44" x2="42" y2="38" stroke="#1e293b" stroke-width="3"/><rect x="36" y="34" width="14" height="4" rx="2" fill="#1e293b"/></svg>`
+  },
+  {
+    id: "almirah",
+    name_hi: "अलमारी (Cupboard / Almirah)",
+    name_en: "Cupboard",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="28" y="20" width="44" height="64" rx="3" fill="#64748b" stroke="#334155" stroke-width="2.5"/><line x1="50" y1="20" x2="50" y2="84" stroke="#334155" stroke-width="2"/><circle cx="45" cy="52" r="2.5" fill="#f8fafc"/><circle cx="55" cy="52" r="2.5" fill="#f8fafc"/><rect x="32" y="84" width="6" height="6" fill="#334155"/><rect x="62" y="84" width="6" height="6" fill="#334155"/></svg>`
+  },
+  {
+    id: "umbrella",
+    name_hi: "छाता (Umbrella)",
+    name_en: "Umbrella",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M20,54 C20,26 80,26 80,54 Z" fill="#6366f1" stroke="#4338ca" stroke-width="2.5"/><line x1="50" y1="54" x2="50" y2="76" stroke="#1e293b" stroke-width="3"/><path d="M50,76 C50,84 42,84 42,78" fill="none" stroke="#1e293b" stroke-width="3"/></svg>`
+  },
+  {
+    id: "kettle",
+    name_hi: "केतली (Kettle)",
+    name_en: "Kettle",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M30,48 L34,76 C34,80 66,80 66,76 L70,48 Z" fill="#94a3b8" stroke="#475569" stroke-width="2.5"/><path d="M36,48 Q50,42 64,48" stroke="#475569" stroke-width="2" fill="none"/><path d="M34,48 Q50,22 66,48" fill="none" stroke="#0f172a" stroke-width="3.5"/><path d="M70,54 Q84,58 80,68 Q76,74 66,72" fill="none" stroke="#475569" stroke-width="2.5"/><path d="M30,58 L20,44 L24,42 L32,54 Z" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/></svg>`
+  },
+  {
+    id: "whistle",
+    name_hi: "सीटी (Whistle)",
+    name_en: "Whistle",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><circle cx="62" cy="55" r="18" fill="#f59e0b" stroke="#d97706" stroke-width="2.5"/><rect x="22" y="44" width="28" height="14" rx="2" fill="#f59e0b" stroke="#d97706" stroke-width="2"/><line x1="38" y1="44" x2="38" y2="38" stroke="#d97706" stroke-width="2.5"/></svg>`
+  },
+  {
+    id: "handpump",
+    name_hi: "हैंडपंप (Hand Pump)",
+    name_en: "Hand Pump",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><rect x="42" y="32" width="16" height="52" fill="#0284c7" stroke="#0369a1" stroke-width="2"/><path d="M42,42 L22,50 L20,46 L42,38 Z" fill="#334155"/><line x1="58" y1="40" x2="82" y2="30" stroke="#334155" stroke-width="4" stroke-linecap="round"/><rect x="36" y="84" width="28" height="6" fill="#64748b"/></svg>`
+  },
+  {
+    id: "telephone",
+    name_hi: "टेलीफोन (Telephone)",
+    name_en: "Telephone",
+    svg: `<svg viewBox="0 0 100 100" class="symbol-svg"><path d="M22,34 Q50,18 78,34 Q82,42 74,44 Q62,40 60,46 L60,54 Q50,56 40,54 L40,46 Q38,40 26,44 Q18,42 22,34 Z" fill="#1e293b"/><rect x="28" y="52" width="44" height="34" rx="6" fill="#dc2626" stroke="#991b1b" stroke-width="2.5"/><circle cx="50" cy="69" r="10" fill="#ffffff" stroke="#991b1b" stroke-width="2"/></svg>`
   },
   {
     id: "candle",
@@ -154,23 +142,68 @@ window.OFFICIAL_ELECTION_SYMBOLS = [
   }
 ];
 
-function getSymbolSvgById(symbolId) {
-  if (!symbolId) return (window.OFFICIAL_ELECTION_SYMBOLS && window.OFFICIAL_ELECTION_SYMBOLS[0].svg) || '';
-  const sStr = String(symbolId).trim().toLowerCase();
-  const sym = window.OFFICIAL_ELECTION_SYMBOLS.find(s => 
-    s.id === sStr || 
-    s.id === symbolId || 
-    s.name_hi.toLowerCase().includes(sStr) || 
-    s.name_en.toLowerCase() === sStr ||
-    (s.party && s.party.toLowerCase() === sStr) ||
-    (sStr.includes('कमल') && s.id === 'lotus') ||
-    (sStr.includes('हाथ') && s.id === 'hand') ||
-    (sStr.includes('हाथी') && s.id === 'elephant') ||
-    (sStr.includes('बोतल') && s.id === 'bottle')
-  );
-  return sym ? sym.svg : (window.OFFICIAL_ELECTION_SYMBOLS[0].svg);
-}
-function _orig_getSymbolSvgById_old(symbolId) {
-  const sym = window.OFFICIAL_ELECTION_SYMBOLS.find(s => s.id === symbolId || s.name_hi.includes(symbolId) || s.name_en.toLowerCase() === String(symbolId).toLowerCase());
-  return sym ? sym.svg : (window.OFFICIAL_ELECTION_SYMBOLS[0].svg);
+/**
+ * Universal Symbol Resolver: Matches by Hindi Name, English Name, ID, or Keywords
+ */
+function getSymbolSvgById(symbolIdOrName) {
+  if (!symbolIdOrName) return (window.OFFICIAL_ELECTION_SYMBOLS && window.OFFICIAL_ELECTION_SYMBOLS[0].svg) || '';
+  const sStr = String(symbolIdOrName).trim().toLowerCase();
+  const list = window.OFFICIAL_ELECTION_SYMBOLS || [];
+
+  // 1. Direct ID match
+  let sym = list.find(s => s.id.toLowerCase() === sStr);
+  if (sym) return sym.svg;
+
+  // 2. Keyword & Hindi Name matching (Matches whatever is selected in Google Sheet!)
+  if (sStr.includes('हाथ') || sStr.includes('hand') || sStr.includes('hath') || sStr.includes('congress')) {
+    sym = list.find(s => s.id === 'hand');
+  } else if (sStr.includes('कमल') || sStr.includes('lotus') || sStr.includes('bjp')) {
+    sym = list.find(s => s.id === 'lotus');
+  } else if (sStr.includes('हाथी') || sStr.includes('elephant') || sStr.includes('bsp')) {
+    sym = list.find(s => s.id === 'elephant');
+  } else if (sStr.includes('बोतल') || sStr.includes('bottle') || sStr.includes('rlp')) {
+    sym = list.find(s => s.id === 'bottle');
+  } else if (sStr.includes('सूरज') || sStr.includes('sun')) {
+    sym = list.find(s => s.id === 'sun');
+  } else if (sStr.includes('पतंग') || sStr.includes('kite')) {
+    sym = list.find(s => s.id === 'kite');
+  } else if (sStr.includes('ताला') || sStr.includes('lock') || sStr.includes('चाबी')) {
+    sym = list.find(s => s.id === 'lock_key');
+  } else if (sStr.includes('मशीन') || sStr.includes('sewing')) {
+    sym = list.find(s => s.id === 'sewing_machine');
+  } else if (sStr.includes('कार') || sStr.includes('car') || sStr.includes('गाड़ी')) {
+    sym = list.find(s => s.id === 'car');
+  } else if (sStr.includes('सिलेंडर') || sStr.includes('cylinder') || sStr.includes('गैस')) {
+    sym = list.find(s => s.id === 'gas_cylinder');
+  } else if (sStr.includes('कप') || sStr.includes('plate') || sStr.includes('cup')) {
+    sym = list.find(s => s.id === 'cup_plate');
+  } else if (sStr.includes('जहाज') || sStr.includes('plane') || sStr.includes('aero') || sStr.includes('हवाई')) {
+    sym = list.find(s => s.id === 'aeroplane');
+  } else if (sStr.includes('बल्ला') || sStr.includes('bat') || sStr.includes('बल्लेबाज') || sStr.includes('cricket')) {
+    sym = list.find(s => s.id === 'bat');
+  } else if (sStr.includes('साइकिल') || sStr.includes('cycle') || sStr.includes('bicycle')) {
+    sym = list.find(s => s.id === 'bicycle');
+  } else if (sStr.includes('अलमारी') || sStr.includes('almirah') || sStr.includes('cupboard')) {
+    sym = list.find(s => s.id === 'almirah');
+  } else if (sStr.includes('छाता') || sStr.includes('umbrella')) {
+    sym = list.find(s => s.id === 'umbrella');
+  } else if (sStr.includes('केतली') || sStr.includes('kettle')) {
+    sym = list.find(s => s.id === 'kettle');
+  } else if (sStr.includes('सीटी') || sStr.includes('whistle')) {
+    sym = list.find(s => s.id === 'whistle');
+  } else if (sStr.includes('पंप') || sStr.includes('pump') || sStr.includes('हैंडपंप')) {
+    sym = list.find(s => s.id === 'handpump');
+  } else if (sStr.includes('फोन') || sStr.includes('phone') || sStr.includes('टेलीफोन')) {
+    sym = list.find(s => s.id === 'telephone');
+  } else if (sStr.includes('मोमबत्ती') || sStr.includes('candle')) {
+    sym = list.find(s => s.id === 'candle');
+  } else if (sStr.includes('तीर') || sStr.includes('bow') || sStr.includes('arrow') || sStr.includes('कमान')) {
+    sym = list.find(s => s.id === 'bow_arrow');
+  }
+
+  if (sym) return sym.svg;
+
+  // 3. Fallback contains search
+  sym = list.find(s => s.name_hi.toLowerCase().includes(sStr) || (s.name_en && s.name_en.toLowerCase().includes(sStr)));
+  return sym ? sym.svg : (list[0] ? list[0].svg : '');
 }
