@@ -692,6 +692,12 @@ function doGet(e) {
         };
         break;
 
+      case "setupAllSheets":
+      case "setupCandidatesSheet":
+      case "setupUsersSheet":
+        responseData = setupAllSheets();
+        break;
+
       case "getLastModified":
         responseData = handleGetLastModified();
         break;
@@ -841,7 +847,8 @@ var CANDIDATE_HEADERS = [
   "Tab_Profile",
   "Candidate_Mode",
   "Can_Print",
-  "Can_Download"
+  "Can_Download",
+  "Updated_At"
 ];
 
 var CANDIDATE_EDITS_HEADERS = [
@@ -1052,8 +1059,8 @@ function setupCandidateEditsSheet() {
  */
 function handleGetCandidates() {
   var sheet = getOrCreateSheet(SHEET_CANDIDATES);
-  if (sheet.getLastRow() <= 1) {
-    setupCandidatesSheet();
+  if (sheet.getLastRow() <= 1 || sheet.getLastColumn() < CANDIDATE_HEADERS.length || String(sheet.getRange(1, 18).getValue()).toLowerCase() !== "tab_search") {
+    setupCandidatesSheet(false);
   }
 
   var data = sheet.getDataRange().getValues();

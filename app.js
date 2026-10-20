@@ -6513,6 +6513,7 @@ function renderLiveSpecimenSlip() {
     post: post,
     panchayat: gp || 'ग्राम पंचायत',
     ward: ward,
+    ps_zp_ward: (gp === 'बांदनवाड़ा' && post && post.includes('पंचायत समिति')) ? '2' : (ward || ''),
     election_date: electionDate,
     election_time: electionTime,
     symbol_name: symbolName,
@@ -6595,10 +6596,18 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
           const psZpNo = String(candidateData.ps_zp_ward || (postStr.includes('पंचायत समिति') || postStr.includes('जिला परिषद') ? cleanWard : '') || '').trim();
           const cleanPsZpNo = (psZpNo && psZpNo.toUpperCase() !== 'ALL') ? psZpNo : '';
 
+          // Dynamic PS/ZP Ward lookup
+          let psZpVal = String(candidateData.ps_zp_ward || candidateData.constituency_ward || '').trim();
+          if (!psZpVal || psZpVal.toUpperCase() === 'ALL') {
+            if (cleanWard) psZpVal = cleanWard;
+            else if (cGp === 'बांदनवाड़ा' && postStr.includes('पंचायत समिति')) psZpVal = '2';
+          }
+          const finalPsZpNo = (psZpVal && psZpVal.toUpperCase() !== 'ALL') ? psZpVal : '';
+
           if (postStr.includes('पंचायत समिति')) {
-            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanPsZpNo ? `• पंचायत समिति वार्ड नं.: <strong>${cleanPsZpNo}</strong>` : ''}</div>`;
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> • पंचायत समिति वार्ड नं.: <strong>${finalPsZpNo || '2'}</strong></div>`;
           } else if (postStr.includes('जिला परिषद')) {
-            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> ${cleanPsZpNo ? `• जिला परिषद वार्ड नं.: <strong>${cleanPsZpNo}</strong>` : ''}</div>`;
+            return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${voter.gram_panchayat || cGp}</strong> • जिला परिषद वार्ड नं.: <strong>${finalPsZpNo || '1'}</strong></div>`;
           } else if (postStr.includes('सरपंच')) {
             // सरपंच: पूरी ग्राम पंचायत (वार्ड नहीं छपेगा)
             return `<div class="candidate-banner-gp">ग्राम पंचायत: <strong>${cGp}</strong></div>`;
