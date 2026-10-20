@@ -1589,8 +1589,18 @@ const server = http.createServer(async (req, res) => {
   // HIGH-SPEED STATIC FILE SERVING WITH GZIP COMPRESSION & ZERO-CACHE HOT RELOAD
   // =========================================================================
   const portalParam = (url.searchParams.get('portal') || '').toLowerCase();
-  const voterRepoDir = path.resolve(__dirname, '..', 'voter-portal');
-  const bloRepoDir = path.resolve(__dirname, '..', 'blo-portal');
+  const voterRepoDirs = [
+    'C:\\Users\\jiten\\OneDrive\\Documents\\GitHub\\voter-portal',
+    'C:\\Users\\jiten\\Documents\\GitHub\\voter-portal',
+    path.resolve(__dirname, '..', 'voter-portal')
+  ];
+  const bloRepoDirs = [
+    'C:\\Users\\jiten\\OneDrive\\Documents\\GitHub\\blo-portal',
+    'C:\\Users\\jiten\\Documents\\GitHub\\blo-portal',
+    path.resolve(__dirname, '..', 'blo-portal')
+  ];
+  const voterRepoDir = voterRepoDirs.find(d => fs.existsSync(d)) || path.resolve(__dirname, '..', 'voter-portal');
+  const bloRepoDir = bloRepoDirs.find(d => fs.existsSync(d)) || path.resolve(__dirname, '..', 'blo-portal');
 
   let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
   const isVoterRoute = portalParam === 'voter' || pathname.startsWith('/voter');

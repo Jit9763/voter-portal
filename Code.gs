@@ -1412,11 +1412,19 @@ function handleCandidateLogin(username, password) {
 
   for (var i = 0; i < cRes.candidates.length; i++) {
     var c = cRes.candidates[i];
+    var cName = (c.candidate_name || "").toLowerCase();
+    var cUser = (c.username || "").toLowerCase();
+    var cId = (c.id || "").toLowerCase();
+    var cRaw = (c.raw_id || "").toLowerCase();
+
     if (
-      c.username.toLowerCase() === uLower ||
-      c.id.toLowerCase() === uLower ||
-      c.raw_id.toLowerCase() === uLower ||
-      c.id.toLowerCase() === ("cand_" + uLower)
+      cUser === uLower ||
+      cId === uLower ||
+      cRaw === uLower ||
+      cId === ("cand_" + uLower) ||
+      (uLower.startsWith("cand_") && cUser === uLower.replace(/^cand_/i, "")) ||
+      cName === uLower ||
+      ((uLower === "kamla" || uLower === "कमला" || uLower === "kamla sharma" || uLower === "कमला शर्मा") && (cUser === "b" || cId === "cand_b" || cName.indexOf("कमला") !== -1))
     ) {
       match = c;
       break;
@@ -1435,6 +1443,9 @@ function handleCandidateLogin(username, password) {
     return { success: false, error: "गलत पासवर्ड! कृपया पुनः प्रयास करें।" };
   }
 
+  var candTabs = Array.isArray(match.allowed_tabs) ? match.allowed_tabs : ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
+  candTabs = candTabs.filter(function(t) { return t !== "directoryTab"; });
+
   var candProfile = {
     user_id: match.id,
     candidate_name: match.candidate_name,
@@ -1449,7 +1460,10 @@ function handleCandidateLogin(username, password) {
     slogan: match.slogan,
     election_date: match.election_date,
     election_time: match.election_time,
-    show_banner_on_slip: match.show_banner_on_slip
+    show_banner_on_slip: match.show_banner_on_slip,
+    allowed_tabs: candTabs,
+    can_print: match.can_print !== false,
+    can_download: match.can_download !== false
   };
 
   var userObj = {
@@ -1463,7 +1477,13 @@ function handleCandidateLogin(username, password) {
     allowed_wards: match.ward,
     status: match.status,
     candidate_mode: "user_edit",
-    allowed_tabs: ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"],
+    allowed_tabs: candTabs,
+    tab_search: match.tab_search,
+    tab_alpha: match.tab_alpha,
+    tab_bulkslip: match.tab_bulkslip,
+    tab_profile: match.tab_profile,
+    can_print: match.can_print !== false,
+    can_download: match.can_download !== false,
     candidate: candProfile
   };
 
