@@ -1,99 +1,10 @@
 <!DOCTYPE html>
 <html lang="hi" data-portal="voter">
 <head>
-  <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261020_041247";</script>
+  <script>window.PORTAL_TYPE = "voter"; window.PORTAL_DEPLOY_VERSION = "20261020142643.";</script>
     <script>
     // Instant Zero-Flicker Session Persistence & Dynamic Tab Access Pre-Filter
     (function() {
-      try {
-        var s = localStorage.getItem('panchayat_session_master') || 
-                sessionStorage.getItem('panchayat_session_master') ||
-                localStorage.getItem('panchayat_session_voter') || 
-                sessionStorage.getItem('panchayat_session_voter') ||
-                localStorage.getItem('panchayat_user_session');
-        if (s) {
-          var u = JSON.parse(s);
-          if (u && (u.username || u.id)) {
-            document.documentElement.classList.add('user-logged-in');
-            var role = String(u.role || '').toUpperCase();
-            var isSuper = (role === 'SUPER_ADMIN' || u.id === 'admin' || u.id === 'superadmin' || u.username === 'admin' || u.username === 'superadmin');
-            var isCand = (role === 'CANDIDATE' || String(u.id||'').startsWith('cand_') || String(u.username||'').startsWith('cand_') || u.candidate_mode);
-
-            if (isCand && !isSuper) {
-              document.documentElement.classList.add('is-candidate-session');
-            } else if (!isSuper) {
-              document.documentElement.classList.add('is-restricted-session');
-            }
-
-            // Real-time allowed_tabs filter (Google Sheet & Super Admin permission enforcement)
-            var rawTabs = u.allowed_tabs;
-            var allowed = null;
-            if (Array.isArray(rawTabs)) allowed = rawTabs;
-            else if (typeof rawTabs === 'string') {
-              try { allowed = JSON.parse(rawTabs); } catch(e) { allowed = rawTabs.split(',').map(function(x){return x.trim();}).filter(Boolean); }
-            }
-            if (isCand && (!allowed || allowed.length === 0)) {
-              allowed = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
-            }
-
-            if (allowed && Array.isArray(allowed) && !isSuper) {
-              var allTabIds = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab', 'candidateProfileTab', 'adminControlTab', 'settingsTab'];
-              var css = '';
-              allTabIds.forEach(function(t) {
-                if (allowed.indexOf(t) === -1) {
-                  css += '.nav-tab[data-tab="' + t + '"], .bottom-nav-item[data-tab="' + t + '"], #' + t + ' { display: none !important; } ';
-                }
-              });
-              if (css) {
-                var styleEl = document.createElement('style');
-                styleEl.id = 'instant-allowed-tabs-filter';
-                styleEl.textContent = css;
-                document.head.appendChild(styleEl);
-              }
-            }
-          }
-        }
-      } catch(e) {}
-    })();
-  </script>
-  <style>
-    /* Prevent login screen bounce & enforce zero-flicker permissions */
-    html.user-logged-in #welcomeGatekeeper { display: none !important; }
-    html.user-logged-in #mainPortalApp { display: block !important; }
-
-    /* Candidate Session: Never render Dashboard, Ward Directory, Admin Control, or Settings */
-    html.is-candidate-session .nav-tab[data-tab="dashboardTab"],
-    html.is-candidate-session .nav-tab[data-tab="directoryTab"],
-    html.is-candidate-session .nav-tab[data-tab="adminControlTab"],
-    html.is-candidate-session .nav-tab[data-tab="settingsTab"],
-    html.is-candidate-session .bottom-nav-item[data-tab="dashboardTab"],
-    html.is-candidate-session .bottom-nav-item[data-tab="directoryTab"],
-    html.is-candidate-session #dashboardTab,
-    html.is-candidate-session #directoryTab,
-    html.is-candidate-session #adminControlTab,
-    html.is-candidate-session #settingsTab,
-    html.is-candidate-session #adminCandidateModal {
-      display: none !important;
-    }
-
-    /* Voter Portal (Public Search Only): Strictly hide Dashboard, Directory, Admin Control, and Settings */
-    html[data-portal="voter"] .nav-tab[data-tab="dashboardTab"],
-    html[data-portal="voter"] .nav-tab[data-tab="directoryTab"],
-    html[data-portal="voter"] .nav-tab[data-tab="adminControlTab"],
-    html[data-portal="voter"] .nav-tab[data-tab="settingsTab"],
-    html[data-portal="voter"] .bottom-nav-item[data-tab="dashboardTab"],
-    html[data-portal="voter"] .bottom-nav-item[data-tab="directoryTab"],
-    html[data-portal="voter"] #dashboardTab,
-    html[data-portal="voter"] #directoryTab,
-    html[data-portal="voter"] #adminControlTab,
-    html[data-portal="voter"] #settingsTab {
-      display: none !important;
-    }
-  </style>
-
-  <script id="autoLiveUpdater">
-  // DEDICATED GITHUB DEPLOYMENT DETECTOR (NO LOOPING / NO LOGIN FLICKER)
-  (function() {
     var currentVer = window.PORTAL_DEPLOY_VERSION || null;
 
     async function checkDeploymentUpdate() {
@@ -102,26 +13,29 @@
         if (r.ok) {
           var d = await r.json();
           var remoteVer = d.deploy_version || d.v;
-          if (currentVer && remoteVer && currentVer !== remoteVer) {
-            console.log('[DEPLOY-SYNC] New GitHub deployment detected (' + remoteVer + '). Applying updates seamlessly...');
-            var tag = (document.activeElement && document.activeElement.tagName) || '';
-            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
-              console.log('[DEPLOY-SYNC] Input active, delaying update...');
-              return;
-            }
-            window.location.reload();
-          } else if (!currentVer && remoteVer) {
+          if (!currentVer) {
             currentVer = remoteVer;
+            return;
+          }
+          if (remoteVer && currentVer !== remoteVer) {
+            console.log('[DEPLOY-SYNC] Silent update detected (' + remoteVer + '). Updating in-memory without page reload...');
+            currentVer = remoteVer; // Update currentVer immediately to prevent loop
+            if (typeof loadConfiguredUsers === 'function') {
+              loadConfiguredUsers();
+            }
+            if (typeof syncCurrentUserWithConfiguredUsers === 'function') {
+              syncCurrentUserWithConfiguredUsers();
+            }
           }
         }
       } catch(e) {}
     }
-    checkDeploymentUpdate();
-    setInterval(checkDeploymentUpdate, 4000);
+
+    // Check periodically at 60s and when returning to the tab (NO hard page reload)
+    setInterval(checkDeploymentUpdate, 60000);
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible') checkDeploymentUpdate();
     });
-    window.addEventListener('focus', checkDeploymentUpdate);
   })();
   </script>
   <meta charset="UTF-8">
