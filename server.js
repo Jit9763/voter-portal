@@ -530,7 +530,7 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
         id, username, password, full_name, mobile, role, status,
         allowed_panchayats, allowed_wards, allowed_tabs, candidate_mode,
         can_print, can_download, can_search, can_view, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 1, 1, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?)
     `);
 
     const upsertCand = db.prepare(`
