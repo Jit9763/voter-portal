@@ -5732,37 +5732,49 @@ function handleGetLastModified() {
   var userRows = userSheet ? userSheet.getLastRow() : 0;
   var editRows = editsSheet ? editsSheet.getLastRow() : 0;
 
-  var lastUserTime = "";
+  // Compute live content hash of Users checkboxes (columns 10 to 16)
+  var userPermHash = 0;
   if (userSheet && userRows > 1) {
     try {
-      var uTimes = userSheet.getRange(2, 17, Math.min(userRows - 1, 100), 1).getValues();
-      for (var i = 0; i < uTimes.length; i++) {
-        var t = String(uTimes[i][0] || "");
-        if (t > lastUserTime) lastUserTime = t;
+      var uVals = userSheet.getRange(2, 1, Math.min(userRows - 1, 250), 16).getValues();
+      for (var i = 0; i < uVals.length; i++) {
+        for (var c = 0; c < uVals[i].length; c++) {
+          var valStr = String(uVals[i][c] || "");
+          for (var k = 0; k < valStr.length; k++) {
+            userPermHash = ((userPermHash << 5) - userPermHash) + valStr.charCodeAt(k);
+            userPermHash |= 0;
+          }
+        }
       }
     } catch(e) {}
   }
 
-  var lastEditTime = "";
-  if (editsSheet && editRows > 1) {
+  // Compute live content hash of Candidates checkboxes (columns 16 to 24)
+  var candPermHash = 0;
+  if (candSheet && candRows > 1) {
     try {
-      var eTimes = editsSheet.getRange(2, 13, Math.min(editRows - 1, 100), 1).getValues();
-      for (var j = 0; j < eTimes.length; j++) {
-        var et = String(eTimes[j][0] || "");
-        if (et > lastEditTime) lastEditTime = et;
+      var cVals = candSheet.getRange(2, 1, Math.min(candRows - 1, 50), 24).getValues();
+      for (var i = 0; i < cVals.length; i++) {
+        for (var c = 0; c < cVals[i].length; c++) {
+          var valStr = String(cVals[i][c] || "");
+          for (var k = 0; k < valStr.length; k++) {
+            candPermHash = ((candPermHash << 5) - candPermHash) + valStr.charCodeAt(k);
+            candPermHash |= 0;
+          }
+        }
       }
     } catch(e) {}
   }
 
-  var fingerprint = candRows + "_" + userRows + "_" + editRows + "_" + (lastUserTime ? lastUserTime.substring(0, 19) : "") + "_" + (lastEditTime ? lastEditTime.substring(0, 19) : "");
+  var fingerprint = candRows + "_" + userRows + "_" + userPermHash + "_" + candPermHash;
 
   return {
     success: true,
     candRows: candRows,
     userRows: userRows,
     editRows: editRows,
-    lastUserTime: lastUserTime,
-    lastEditTime: lastEditTime,
+    userPermHash: userPermHash,
+    candPermHash: candPermHash,
     fingerprint: fingerprint,
     timestamp: new Date().toISOString()
   };

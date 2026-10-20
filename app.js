@@ -2936,32 +2936,67 @@ function enforceGatekeeperState() {
     btn.style.display = isAllowed ? 'flex' : 'none';
   });
 
-  // If current tab is not allowed, switch to first allowed tab
+  // Handle Zero Allowed Tabs: Clean lock screen with ONLY 1 message!
   const noAccessEl = document.getElementById('noPermissionsNotice');
-  if (!isSuperAdmin && !allowedTabs.includes(State.activeTab)) {
-    if (allowedTabs.length > 0) {
-      if (noAccessEl) noAccessEl.style.display = 'none';
-      switchTab(allowedTabs[0]);
+  const scopeBanner = document.getElementById('userScopeBanner');
+
+  if (!isSuperAdmin && (!allowedTabs || allowedTabs.length === 0)) {
+    // 1. Hide ALL tab panes so no search bar, filters, or voter details show
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.style.display = 'none';
+      pane.classList.remove('active');
+    });
+
+    // 2. Hide ALL navigation tab buttons
+    document.querySelectorAll('.nav-tab').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.bottom-nav-item').forEach(b => b.style.display = 'none');
+
+    // 3. Hide user scope banner so no confusing extra details appear
+    if (scopeBanner) scopeBanner.style.display = 'none';
+
+    // 4. Show ONLY the single, clean, centered permission notice
+    if (noAccessEl) {
+      noAccessEl.style.display = 'block';
     } else {
-      document.querySelectorAll('.tab-section').forEach(sec => sec.style.display = 'none');
-      if (noAccessEl) {
-        noAccessEl.style.display = 'block';
-      } else {
-        const div = document.createElement('div');
-        div.id = 'noPermissionsNotice';
-        div.style.cssText = 'padding: 40px 20px; text-align: center; background: #fff; margin: 20px; border-radius: 12px; border: 2px dashed #ef4444; box-shadow: 0 4px 12px rgba(0,0,0,0.05);';
-        div.innerHTML = `
-          <div style="font-size: 48px; margin-bottom: 12px;">🔒</div>
-          <h3 style="color: #b91c1c; margin: 0 0 8px 0; font-size: 20px;">अनुमतियाँ बंद हैं (Permissions Disabled)</h3>
-          <p style="color: #4b5563; margin: 0; font-size: 15px;">मुख्य व्यवस्थापक (Admin) द्वारा गूगल शीट में आपके सभी टैब अनचेक (Unchecked) कर दिए गए हैं।</p>
-          <p style="color: #6b7280; margin: 8px 0 0 0; font-size: 13px;">कृपया व्यवस्थापक से संपर्क करके आवश्यक अनुमतियाँ चालू करवाएं।</p>
-        `;
-        const container = document.querySelector('.main-content') || document.getElementById('mainPortalApp');
-        if (container) container.appendChild(div);
-      }
+      const div = document.createElement('div');
+      div.id = 'noPermissionsNotice';
+      div.style.cssText = 'max-width: 580px; margin: 60px auto 40px auto; padding: 48px 32px; text-align: center; background: #ffffff; border-radius: 20px; border: 2px dashed #f87171; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);';
+      div.innerHTML = `
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px auto; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">🔒</div>
+        <h2 style="color: #991b1b; margin: 0 0 12px 0; font-size: 24px; font-weight: 800; font-family: sans-serif;">पोर्टल अनुमतियाँ बंद हैं</h2>
+        <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 8px 0;">
+          मुख्य व्यवस्थापक द्वारा गूगल शीट में आपके खाते की सभी टैब अनुमतियाँ अनचेक (बंद) कर दी गई हैं।
+        </p>
+        <p style="color: #9ca3af; font-size: 14px; margin: 0 0 28px 0;">
+          कृपया मुख्य व्यवस्थापक से संपर्क करके आवश्यक टैब अनुमतियाँ चालू करवाएं।
+        </p>
+        <button onclick="logoutUser()" class="btn btn-primary" style="padding: 12px 32px; font-size: 15px; font-weight: 700; border-radius: 10px; background: #dc2626; border: none; color: white; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);">
+          🚪 लॉगआउट करें (Logout)
+        </button>
+      `;
+      const container = document.querySelector('main.app-content') || document.querySelector('.main-content') || document.getElementById('mainPortalApp');
+      if (container) container.appendChild(div);
     }
-  } else if (noAccessEl) {
-    noAccessEl.style.display = 'none';
+  } else {
+    // Normal state when tabs are allowed
+    if (noAccessEl) noAccessEl.style.display = 'none';
+    if (scopeBanner) scopeBanner.style.display = '';
+
+    if (!isSuperAdmin && !allowedTabs.includes(State.activeTab)) {
+      if (allowedTabs.length > 0) {
+        switchTab(allowedTabs[0]);
+      }
+    } else if (State.activeTab && document.getElementById(State.activeTab)) {
+      document.querySelectorAll('.tab-pane').forEach(p => {
+        if (p.id === State.activeTab) {
+          p.style.display = 'block';
+          p.classList.add('active');
+        } else {
+          p.style.display = 'none';
+          p.classList.remove('active');
+        }
+      });
+    }
   }
 
   // Candidate Bulk Slip options on voter-portal: keep 9, 21, and Thermal
