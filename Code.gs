@@ -886,6 +886,38 @@ var CANDIDATE_EDITS_HEADERS = [
 ];
 
 /**
+ * Sanitizes ward numbers so accidental Google Sheet date conversions
+ * like "2, 3, 2004", "1, 7, 2008", "1, 2, 2003", "4, 5, 2006", "7, 8, 2009"
+ * are immediately restored back to clean text like "2, 3, 4", "1, 7, 8", "1, 2, 3", etc.
+ */
+function sanitizeWardValue(val) {
+  if (val === null || val === undefined) return "ALL";
+  if (val instanceof Date) {
+    var m = val.getMonth() + 1;
+    var d = val.getDate();
+    var y = val.getFullYear();
+    var w3 = (y >= 2000 && y <= 2099) ? (y - 2000) : y;
+    return m + ", " + d + ", " + w3;
+  }
+  var s = String(val).trim();
+  if (!s || s.toUpperCase() === "ALL") return "ALL";
+  if (s.indexOf("GMT") !== -1 || s.indexOf("T00:00:00") !== -1 || s.indexOf("T18:30:00") !== -1) {
+    try {
+      var dt = new Date(s);
+      if (!isNaN(dt.getTime())) {
+        var m = dt.getMonth() + 1;
+        var d = dt.getDate();
+        var y = dt.getFullYear();
+        var w3 = (y >= 2000 && y <= 2099) ? (y - 2000) : y;
+        return m + ", " + d + ", " + w3;
+      }
+    } catch(e) {}
+  }
+  s = s.replace(/,\s*20(\d{2})/g, function(m, p1) { return ", " + parseInt(p1, 10); });
+  return s;
+}
+
+/**
  * 1-Click Initializer for Candidates Sheet Tab
  * Run this function once in Apps Script to setup headers & populate with 33 candidates!
  */
@@ -914,6 +946,10 @@ function setupCandidatesSheet(forceReset) {
   headerRange.setFontWeight("bold");
   headerRange.setHorizontalAlignment("center");
   sheet.setFrozenRows(1);
+  try {
+    var maxRows = Math.max(sheet.getMaxRows(), 500);
+    sheet.getRange(2, 1, maxRows - 1, 15).setNumberFormat("@");
+  } catch(e) {}
 
   // Set cell notes on headers (Hindi tooltips)
   sheet.getRange(1, 1).setNote("यूजरनेम / लॉगिन आईडी (उदा. cand_gp01, sarpanch, ramesh, b)");
@@ -994,36 +1030,30 @@ function setupCandidatesSheet(forceReset) {
         if (uId === "cand_b" || uId === "b" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1)) {
           if (!row[7] || row[7] === "हाथ") row[7] = "2";
           if (!row[8] || row[8] === "custom") row[8] = "हाथ";
-          if (!row[12]) row[12] = "काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!\\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
+          // If Photo_URL (row[11]) has slogan text, clear it and move to slogan (row[12])
+          if (row[11] && !String(row[11]).startsWith("http") && !String(row[11]).startsWith("data:")) {
+            if (!row[12] || String(row[12]).includes("विश्वास पर खरे")) row[12] = String(row[11]);
+            row[11] = "";
+          }
+          if (!row[12]) row[12] = "काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
         }
+
+        // Clean ward and ps_zp_ward values
+        row[6] = sanitizeWardValue(row[6]);
+        row[7] = sanitizeWardValue(row[7]);
+
         var stStr = String(row[15] || "").trim().toUpperCase();
         row[15] = (stStr === "INACTIVE" || stStr === "DELETED") ? stStr : "ACTIVE"; // Column 16 (Status)
 
-        // If tabs are all unchecked/uninitialized, default them to TRUE so candidates are never locked out!
-        var allTabsFalse = (!row[17] || String(row[17]).toUpperCase() === "FALSE") &&
-                           (!row[18] || String(row[18]).toUpperCase() === "FALSE") &&
-                           (!row[19] || String(row[19]).toUpperCase() === "FALSE") &&
-                           (!row[20] || String(row[20]).toUpperCase() === "FALSE");
-
-        if (allTabsFalse) {
-          row[16] = true; // Show_Banner_On_Slip
-          row[17] = true; // Tab_Search
-          row[18] = true; // Tab_Alpha
-          row[19] = true; // Tab_BulkSlip
-          row[20] = true; // Tab_Profile
-          row[21] = "user_edit"; // Candidate_Mode
-          row[22] = true; // Can_Print
-          row[23] = true; // Can_Download
-        } else {
-          row[16] = (row[16] !== false && String(row[16]).toUpperCase() !== "FALSE");
-          row[17] = (row[17] !== false && String(row[17]).toUpperCase() !== "FALSE");
-          row[18] = (row[18] !== false && String(row[18]).toUpperCase() !== "FALSE");
-          row[19] = (row[19] !== false && String(row[19]).toUpperCase() !== "FALSE");
-          row[20] = (row[20] !== false && String(row[20]).toUpperCase() !== "FALSE");
-          row[21] = (String(row[21] || "").toLowerCase() === "view_only") ? "view_only" : "user_edit";
-          row[22] = (row[22] !== false && String(row[22]).toUpperCase() !== "FALSE");
-          row[23] = (row[23] !== false && String(row[23]).toUpperCase() !== "FALSE");
-        }
+        // NEVER override unchecked checkboxes! Faithfully preserve user's Google Sheet checkboxes:
+        row[16] = (row[16] === true || String(row[16]).toUpperCase() === "TRUE");
+        row[17] = (row[17] === true || String(row[17]).toUpperCase() === "TRUE");
+        row[18] = (row[18] === true || String(row[18]).toUpperCase() === "TRUE");
+        row[19] = (row[19] === true || String(row[19]).toUpperCase() === "TRUE");
+        row[20] = (row[20] === true || String(row[20]).toUpperCase() === "TRUE");
+        row[21] = (String(row[21] || "").toLowerCase() === "view_only") ? "view_only" : "user_edit";
+        row[22] = (row[22] === true || String(row[22]).toUpperCase() === "TRUE");
+        row[23] = (row[23] === true || String(row[23]).toUpperCase() === "TRUE");
         if (!row[24]) row[24] = new Date().toISOString();
       }
     }
@@ -1222,14 +1252,18 @@ function handleGetCandidates() {
     var mobile = colMobile !== -1 ? String(row[colMobile] || "").trim() : "";
     var post = colPost !== -1 ? String(row[colPost] || "सरपंच").trim() : "सरपंच";
     var gp = colGp !== -1 ? String(row[colGp] || "").trim() : "";
-    var ward = colWard !== -1 ? String(row[colWard] || "ALL").trim() : "ALL";
-    var psZpWard = colPsZpWard !== -1 ? String(row[colPsZpWard] || "").trim() : "";
+    var ward = colWard !== -1 ? sanitizeWardValue(row[colWard]) : "ALL";
+    var psZpWard = colPsZpWard !== -1 ? sanitizeWardValue(row[colPsZpWard]) : "";
     var pass = colPass !== -1 ? String(row[colPass] || "cand@2026").trim() : "cand@2026";
     var symName = colSymName !== -1 ? String(row[colSymName] || "उगता सूरज").trim() : "उगता सूरज";
     var symIcon = colSymIcon !== -1 ? String(row[colSymIcon] || "sun").trim() : "sun";
     var customSym = colCustomSym !== -1 ? String(row[colCustomSym] || "").trim() : "";
     var photo = colPhoto !== -1 ? String(row[colPhoto] || "").trim() : "";
     var slogan = colSlogan !== -1 ? String(row[colSlogan] || "").trim() : "";
+    if (photo && !photo.startsWith("http://") && !photo.startsWith("https://") && !photo.startsWith("data:")) {
+      if (!slogan || slogan.includes("विश्वास पर खरे") || slogan === photo) slogan = photo;
+      photo = "";
+    }
     var eDate = colDate !== -1 ? String(row[colDate] || "15 अक्टूबर 2026").trim() : "15 अक्टूबर 2026";
     var eTime = colTime !== -1 ? String(row[colTime] || "प्रातः 7:00 बजे से सायं 6:00 बजे तक").trim() : "प्रातः 7:00 बजे से सायं 6:00 बजे तक";
     var showBanner = colBanner !== -1 ? (String(row[colBanner]).toUpperCase() !== "FALSE") : true;
@@ -1265,10 +1299,7 @@ function handleGetCandidates() {
       if (isAlphaAllowed) parsedTabs.push("alphaTab");
       if (isBulkAllowed) parsedTabs.push("bulkSlipTab");
       if (isProfileAllowed) parsedTabs.push("candidateProfileTab");
-
-      if (parsedTabs.length === 0) {
-        parsedTabs = ["searchTab", "alphaTab", "bulkSlipTab", "candidateProfileTab"];
-      }
+      // Faithfully respect unchecked checkboxes! If user unchecked all in sheet, parsedTabs remains []
     } else if (colAllowedTabs !== -1 && String(row[colAllowedTabs] || "").trim()) {
       var rawTabs = String(row[colAllowedTabs]).trim();
       if (rawTabs.toUpperCase() === "ALL") {
@@ -5323,6 +5354,29 @@ function setupUsersSheet(forceReset) {
   sheet.getRange(1, 8).setNote("आवंटित वार्ड: वार्ड संख्या या ALL");
   sheet.getRange(1, 10).setNote("स्थिति: ACTIVE (सक्रिय) या INACTIVE (निष्क्रिय)");
 
+  // Set plain text format on columns 1-10 so ward numbers are NEVER converted to dates
+  try {
+    sheet.getRange(2, 1, maxRows - 1, 10).setNumberFormat("@");
+    var lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      var wardRange = sheet.getRange(2, 8, lastRow - 1, 1);
+      var wardVals = wardRange.getValues();
+      var fixedWards = false;
+      for (var w = 0; w < wardVals.length; w++) {
+        var origW = wardVals[w][0];
+        var cleanW = sanitizeWardValue(origW);
+        if (cleanW !== origW) {
+          wardVals[w][0] = cleanW;
+          fixedWards = true;
+        }
+      }
+      if (fixedWards) {
+        wardRange.setValues(wardVals);
+        Logger.log("✅ Fixed ward numbers in Users sheet from date format back to clean text!");
+      }
+    }
+  } catch(e) {}
+
   // 3. Clear data validations first so writing data never errors
   var maxRows = Math.max(sheet.getMaxRows(), 500);
   var maxCols = Math.max(sheet.getMaxColumns(), 20);
@@ -5459,8 +5513,8 @@ function handleGetUsers(adminUsername, adminPassword) {
       role: role,
       assigned_panchayats: colGp !== -1 ? String(row[colGp] || "ALL") : "ALL",
       assignedPanchayats: colGp !== -1 ? String(row[colGp] || "ALL") : "ALL",
-      assigned_wards: colWard !== -1 ? String(row[colWard] || "ALL") : "ALL",
-      assignedWards: colWard !== -1 ? String(row[colWard] || "ALL") : "ALL",
+      assigned_wards: colWard !== -1 ? sanitizeWardValue(row[colWard]) : "ALL",
+      assignedWards: colWard !== -1 ? sanitizeWardValue(row[colWard]) : "ALL",
       booth_no: colBooth !== -1 ? String(row[colBooth] || "") : "",
       status: status,
       allowed_tabs: allowedTabs,

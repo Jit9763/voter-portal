@@ -2673,10 +2673,6 @@ function syncCurrentUserWithConfiguredUsers() {
       const isVoter = (typeof getPortalContext === 'function' && getPortalContext() === 'voter') || (window.PORTAL_TYPE === 'voter');
       if (isCand || isVoter) {
         parsedTabs = parsedTabs.filter(t => t !== 'directoryTab');
-        // Candidate must ALWAYS keep candidateProfileTab
-        if (isCand && !parsedTabs.includes('candidateProfileTab')) {
-          parsedTabs.push('candidateProfileTab');
-        }
       }
       State.currentUser.allowed_tabs = parsedTabs;
     }
@@ -2758,8 +2754,8 @@ function initSession() {
               u.category = 'CANDIDATE';
               u.candidate_mode = 'user_edit';
             }
-            if (!u.allowed_tabs || !Array.isArray(u.allowed_tabs) || u.allowed_tabs.length === 0 || !u.allowed_tabs.includes('candidateProfileTab')) {
-              u.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+            if (!u.allowed_tabs || !Array.isArray(u.allowed_tabs)) {
+              u.allowed_tabs = [];
             }
             u.allowed_tabs = u.allowed_tabs.filter(t => t !== 'directoryTab');
             State.currentUser = u;
@@ -2871,8 +2867,8 @@ function enforceGatekeeperState() {
 
   if (isSuperAdmin) {
     allowedTabs = ['dashboardTab', 'searchTab', 'alphaTab', 'bulkSlipTab', 'directoryTab', 'adminControlTab', 'settingsTab'];
-  } else if (Array.isArray(userConfiguredTabs) && userConfiguredTabs.length > 0) {
-    // If Admin explicitly assigned custom tabs to this user, ALWAYS RESPECT IT!
+  } else if (Array.isArray(userConfiguredTabs)) {
+    // If Admin explicitly assigned custom tabs to this user (even if empty []), ALWAYS RESPECT IT!
     allowedTabs = userConfiguredTabs;
   } else if (isIncharge) {
     // Incharge default view rights across all normal tabs for all 30 GPs (NO EDIT)
@@ -2941,9 +2937,31 @@ function enforceGatekeeperState() {
   });
 
   // If current tab is not allowed, switch to first allowed tab
+  const noAccessEl = document.getElementById('noPermissionsNotice');
   if (!isSuperAdmin && !allowedTabs.includes(State.activeTab)) {
-    const firstAllowed = allowedTabs[0] || 'searchTab';
-    switchTab(firstAllowed);
+    if (allowedTabs.length > 0) {
+      if (noAccessEl) noAccessEl.style.display = 'none';
+      switchTab(allowedTabs[0]);
+    } else {
+      document.querySelectorAll('.tab-section').forEach(sec => sec.style.display = 'none');
+      if (noAccessEl) {
+        noAccessEl.style.display = 'block';
+      } else {
+        const div = document.createElement('div');
+        div.id = 'noPermissionsNotice';
+        div.style.cssText = 'padding: 40px 20px; text-align: center; background: #fff; margin: 20px; border-radius: 12px; border: 2px dashed #ef4444; box-shadow: 0 4px 12px rgba(0,0,0,0.05);';
+        div.innerHTML = `
+          <div style="font-size: 48px; margin-bottom: 12px;">🔒</div>
+          <h3 style="color: #b91c1c; margin: 0 0 8px 0; font-size: 20px;">अनुमतियाँ बंद हैं (Permissions Disabled)</h3>
+          <p style="color: #4b5563; margin: 0; font-size: 15px;">मुख्य व्यवस्थापक (Admin) द्वारा गूगल शीट में आपके सभी टैब अनचेक (Unchecked) कर दिए गए हैं।</p>
+          <p style="color: #6b7280; margin: 8px 0 0 0; font-size: 13px;">कृपया व्यवस्थापक से संपर्क करके आवश्यक अनुमतियाँ चालू करवाएं।</p>
+        `;
+        const container = document.querySelector('.main-content') || document.getElementById('mainPortalApp');
+        if (container) container.appendChild(div);
+      }
+    }
+  } else if (noAccessEl) {
+    noAccessEl.style.display = 'none';
   }
 
   // Candidate Bulk Slip options on voter-portal: keep 9, 21, and Thermal
@@ -8623,8 +8641,8 @@ async function handleGatekeeperLogin(event) {
             } catch(_) {}
           }
           if (isCandidateUser(State.currentUser)) {
-            if (!State.currentUser.allowed_tabs || !State.currentUser.allowed_tabs.includes('candidateProfileTab')) {
-              State.currentUser.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
+            if (!Array.isArray(State.currentUser.allowed_tabs)) {
+              State.currentUser.allowed_tabs = [];
             }
           }
           syncCurrentUserWithConfiguredUsers();
@@ -8852,13 +8870,11 @@ async function handleGatekeeperLogin(event) {
         panchayat: candMatch.allowed_panchayats || candMatch.panchayat || candMatch.assigned_panchayats || '',
         allowed_panchayats: candMatch.allowed_panchayats || candMatch.panchayat || candMatch.assigned_panchayats || '',
         allowed_wards: candMatch.allowed_wards || candMatch.ward || candMatch.assigned_wards || 'ALL',
-        allowed_tabs: (Array.isArray(candMatch.allowed_tabs) && candMatch.allowed_tabs.length > 0)
+        allowed_tabs: Array.isArray(candMatch.allowed_tabs)
           ? candMatch.allowed_tabs.filter(t => t !== 'directoryTab')
-          : ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'],
+          : [],
         candidate_mode: 'user_edit'
       };
-      // Ensure candidate has full suite of candidate tabs
-      candUser.allowed_tabs = ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
       State.currentUser = candUser;
 
       // Initialize candidate profile

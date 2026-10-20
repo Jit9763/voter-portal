@@ -471,6 +471,26 @@ function getAppsScriptUrl() {
   return url;
 }
 
+function cleanWardNumbers(raw) {
+  if (raw === null || raw === undefined) return 'ALL';
+  let s = String(raw).trim();
+  if (!s || s.toUpperCase() === 'ALL') return 'ALL';
+  if (s.includes('T00:00:00') || s.includes('T18:30:00') || s.includes('GMT') || s.includes('Z')) {
+    try {
+      const dt = new Date(s);
+      if (!isNaN(dt.getTime())) {
+        const m = dt.getMonth() + 1;
+        const d = dt.getDate();
+        const y = dt.getFullYear();
+        const w3 = (y >= 2000 && y <= 2099) ? (y - 2000) : y;
+        return `${m}, ${d}, ${w3}`;
+      }
+    } catch(_) {}
+  }
+  s = s.replace(/,\s*20(\d{2})/g, (m, p1) => ', ' + parseInt(p1, 10));
+  return s;
+}
+
 async function syncCandidatesFromGoogleSheet(isManual = false) {
   if (isCandidateSyncing) {
     console.log('[GOOGLE-SHEET-SYNC] Sync already running in background, skipping.');
@@ -572,18 +592,42 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
         const mobile = sc.mobile || '';
         const post = sc.post || 'सरपंच';
         const gp = sc.panchayat || sc.allowed_panchayats || '';
-        const ward = sc.ward || sc.allowed_wards || 'ALL';
+        const ward = cleanWardNumbers(sc.ward || sc.allowed_wards || 'ALL');
         const symName = sc.symbol_name || 'उगता सूरज';
         const symIcon = sc.symbol_icon || (sc.custom_symbol_url ? 'custom' : 'sun');
-        const psZpWard = (sc.ps_zp_ward || sc.constituency_ward || existingCand?.ps_zp_ward || '').trim();
+        const psZpWard = cleanWardNumbers((sc.ps_zp_ward || sc.constituency_ward || existingCand?.ps_zp_ward || '').trim());
         const customSym = (sc.custom_symbol_url && sc.custom_symbol_url.trim()) ? sc.custom_symbol_url.trim() : (existingCand?.custom_symbol_url || '');
-        const photo = (sc.photo_url && sc.photo_url.trim()) ? sc.photo_url.trim() : (existingCand?.photo_url || '');
-        const slogan = (sc.slogan && sc.slogan.trim()) ? sc.slogan.trim() : (existingCand?.slogan || '');
+        let photo = (sc.photo_url && sc.photo_url.trim()) ? sc.photo_url.trim() : (existingCand?.photo_url || '');
+        let slogan = (sc.slogan && sc.slogan.trim()) ? sc.slogan.trim() : (existingCand?.slogan || '');
+        
+        // Auto-fix: If photo column contains slogan text instead of a URL, move it to slogan
+        if (photo && !photo.startsWith('http://') && !photo.startsWith('https://') && !photo.startsWith('data:')) {
+          if (!slogan || slogan.includes('विश्वास पर खरे') || slogan === photo) slogan = photo;
+          photo = '';
+        }
+
         const eDate = sc.election_date || '15 अक्टूबर 2026';
         const eTime = sc.election_time || 'प्रातः 7:00 बजे से सायं 6:00 बजे तक';
         const status = (sc.status || 'ACTIVE').toUpperCase();
         const showBanner = sc.show_banner_on_slip !== false ? 1 : 0;
         const now = new Date().toISOString();
+
+        // 100% Faithful Checkbox & Tab Permissions: Never force default tabs if unchecked
+        let candTabs = [];
+        if (sc.tab_search !== undefined || sc.tab_alpha !== undefined || sc.tab_bulkslip !== undefined || sc.tab_profile !== undefined) {
+          if (sc.tab_search === true || String(sc.tab_search).toUpperCase() === 'TRUE') candTabs.push('searchTab');
+          if (sc.tab_alpha === true || String(sc.tab_alpha).toUpperCase() === 'TRUE') candTabs.push('alphaTab');
+          if (sc.tab_bulkslip === true || String(sc.tab_bulkslip).toUpperCase() === 'TRUE') candTabs.push('bulkSlipTab');
+          if (sc.tab_profile === true || String(sc.tab_profile).toUpperCase() === 'TRUE') candTabs.push('candidateProfileTab');
+        } else if (Array.isArray(sc.allowed_tabs)) {
+          candTabs = sc.allowed_tabs.filter(t => t !== 'directoryTab');
+        } else if (typeof sc.allowed_tabs === 'string') {
+          try { candTabs = JSON.parse(sc.allowed_tabs); } catch(e) { candTabs = sc.allowed_tabs.split(',').map(s=>s.trim()).filter(Boolean); }
+        }
+        const allowedTabsJson = JSON.stringify(candTabs);
+        const candMode = sc.candidate_mode || existingUser?.candidate_mode || 'user_edit';
+        const canPrint = (sc.can_print === true || String(sc.can_print).toUpperCase() === 'TRUE') ? 1 : 0;
+        const canDownload = (sc.can_download === true || String(sc.can_download).toUpperCase() === 'TRUE') ? 1 : 0;
 
         let isDiff = false;
         if (!existingUser) {
@@ -596,14 +640,17 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
           existingUser.allowed_panchayats !== gp ||
           existingUser.allowed_wards !== ward ||
           existingUser.status !== status ||
+          existingUser.allowed_tabs !== allowedTabsJson ||
+          existingUser.can_print !== canPrint ||
+          existingUser.can_download !== canDownload ||
           !existingCand ||
           existingCand.candidate_name !== candName ||
           existingCand.post !== post ||
           existingCand.symbol_name !== symName ||
           existingCand.symbol_icon !== symIcon ||
           (customSym && existingCand.custom_symbol_url !== customSym) ||
-          (sc.photo_url && sc.photo_url.trim() && existingCand.photo_url !== photo) ||
-          (sc.slogan && sc.slogan.trim() && existingCand.slogan !== slogan) ||
+          existingCand.photo_url !== photo ||
+          existingCand.slogan !== slogan ||
           (psZpWard && existingCand.ps_zp_ward !== psZpWard) ||
           existingCand.election_date !== eDate ||
           existingCand.election_time !== eTime ||
@@ -615,17 +662,6 @@ async function syncCandidatesFromGoogleSheet(isManual = false) {
 
         if (isDiff) {
           hasChanges = true;
-          let candTabs = sc.allowed_tabs;
-          if (typeof candTabs === 'string') {
-            try { candTabs = JSON.parse(candTabs); } catch(e) { candTabs = candTabs.split(',').map(s=>s.trim()).filter(Boolean); }
-          }
-          if (!Array.isArray(candTabs) || candTabs.length === 0) {
-            candTabs = existingUser?.allowed_tabs ? (() => { try { return JSON.parse(existingUser.allowed_tabs); } catch(e) { return ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab']; } })() : ['searchTab', 'alphaTab', 'bulkSlipTab', 'candidateProfileTab'];
-          }
-          const allowedTabsJson = JSON.stringify(candTabs);
-          const candMode = sc.candidate_mode || existingUser?.candidate_mode || 'user_edit';
-          const canPrint = sc.can_print !== false && sc.can_print !== 'FALSE' ? 1 : 0;
-          const canDownload = sc.can_download !== false && sc.can_download !== 'FALSE' ? 1 : 0;
           const createdAt = existingUser?.created_at || now;
 
           upsertUser.run(uId, username, password, candName, mobile, 'CANDIDATE', status, gp, ward, allowedTabsJson, candMode, canPrint, canDownload, createdAt, now);
@@ -767,19 +803,21 @@ async function syncUsersFromGoogleSheet(isManual = false) {
         // Google Sheet is the Master for Permissions & Status - always apply updates!
 
         const now = su.updated_at || new Date().toISOString();
-        let tabs = su.allowed_tabs;
-        if (typeof tabs === 'string') {
-          try { tabs = JSON.parse(tabs); } catch(e) { tabs = tabs.split(',').map(s=>s.trim()).filter(Boolean); }
-        }
-        if (!Array.isArray(tabs) || tabs.length === 0) {
-          tabs = ['searchTab'];
-          if (su.tab_alpha) tabs.push('alphaTab');
-          if (su.tab_bulkslip) tabs.push('bulkSlipTab');
-          if (su.tab_directory) tabs.push('directoryTab');
+        let tabs = [];
+        if (su.tab_search !== undefined || su.tab_alpha !== undefined || su.tab_bulkslip !== undefined || su.tab_directory !== undefined) {
+          if (su.tab_search === true || String(su.tab_search).toUpperCase() === 'TRUE') tabs.push('searchTab');
+          if (su.tab_alpha === true || String(su.tab_alpha).toUpperCase() === 'TRUE') tabs.push('alphaTab');
+          if (su.tab_bulkslip === true || String(su.tab_bulkslip).toUpperCase() === 'TRUE') tabs.push('bulkSlipTab');
+          if (su.tab_directory === true || String(su.tab_directory).toUpperCase() === 'TRUE') tabs.push('directoryTab');
+        } else if (Array.isArray(su.allowed_tabs)) {
+          tabs = su.allowed_tabs;
+        } else if (typeof su.allowed_tabs === 'string') {
+          try { tabs = JSON.parse(su.allowed_tabs); } catch(e) { tabs = su.allowed_tabs.split(',').map(s=>s.trim()).filter(Boolean); }
         }
 
-        const canPrint = su.can_print !== false ? 1 : 0;
-        const canDownload = su.can_download !== false ? 1 : 0;
+        const canPrint = (su.can_print === true || String(su.can_print).toUpperCase() === 'TRUE') ? 1 : 0;
+        const canDownload = (su.can_download === true || String(su.can_download).toUpperCase() === 'TRUE') ? 1 : 0;
+        const assignedWards = cleanWardNumbers(su.assigned_wards || su.assignedWards || 'ALL');
 
         upsertStmt.run(
           uId,
@@ -790,7 +828,7 @@ async function syncUsersFromGoogleSheet(isManual = false) {
           su.role || 'PANCHAYAT_AGENT',
           su.status || 'ACTIVE',
           su.assigned_panchayats || su.assignedPanchayats || 'ALL',
-          su.assigned_wards || su.assignedWards || 'ALL',
+          assignedWards,
           JSON.stringify(tabs),
           existing?.candidate_mode || 'user_edit',
           canPrint,
@@ -1170,7 +1208,7 @@ const server = http.createServer(async (req, res) => {
 
         const candidate = db.prepare('SELECT * FROM candidates WHERE user_id = ?').get(user.id) || null;
         let allowed_tabs = [];
-        try { allowed_tabs = JSON.parse(user.allowed_tabs); } catch(e) { allowed_tabs = ['searchTab']; }
+        try { allowed_tabs = JSON.parse(user.allowed_tabs); } catch(e) { allowed_tabs = []; }
 
         res.end(JSON.stringify({
           success: true,
