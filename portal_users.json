@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "election_date": "30 अक्टूबर 2026",
   "election_time": "प्रातः 7:00 बजे से सायं 6:00 बजे तक",
-  "last_updated": "2026-10-20T20:15:19Z",
+  "last_updated": "2026-10-20T20:18:18Z",
   "users": [
     {
       "id": "cand_sarpanch",
@@ -5345,8 +5345,7 @@
       "allowed_panchayats": "एकलसिंहा",
       "allowed_wards": "1, 2, 3,4",
       "allowed_tabs": [
-        "searchTab",
-        "directoryTab"
+        "searchTab"
       ],
       "candidate_mode": "admin_locked",
       "created_at": "2026-10-20T20:11:46.564Z",
