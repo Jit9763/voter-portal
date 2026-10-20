@@ -3003,8 +3003,6 @@ function enforceGatekeeperState() {
       }
     }
   });
-    btn.style.display = isAllowed ? 'flex' : 'none';
-  });
 
   // Handle Zero Allowed Tabs: Clean lock screen with ONLY 1 message!
   const noAccessEl = document.getElementById('noPermissionsNotice');
