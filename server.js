@@ -241,6 +241,8 @@ function exportToJson() {
 
     // Synchronously copy updated portal_users.json to sibling repos (blo-portal and voter-portal)
     const siblingRepos = [
+      'C:\\Users\\jiten\\OneDrive\\Documents\\GitHub\\pan',
+      'C:\\Users\\jiten\\Documents\\GitHub\\pan',
       'C:\\Users\\jiten\\OneDrive\\Documents\\GitHub\\blo-portal',
       'C:\\Users\\jiten\\OneDrive\\Documents\\GitHub\\voter-portal',
       'C:\\Users\\jiten\\Documents\\GitHub\\blo-portal',
@@ -340,6 +342,8 @@ function executeGithubPush(reason = 'update', callback = null) {
 
     // Tri-Repo Paths with forward slashes to avoid escaping issues
     const candidateDirs = [
+      'C:/Users/jiten/OneDrive/Documents/GitHub/pan',
+      'C:/Users/jiten/Documents/GitHub/pan',
       'C:/Users/jiten/OneDrive/Documents/GitHub/blo-portal',
       'C:/Users/jiten/Documents/GitHub/blo-portal',
       'C:/Users/jiten/OneDrive/Documents/GitHub/voter-portal',

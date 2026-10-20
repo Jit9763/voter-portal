@@ -3169,7 +3169,10 @@ function switchTab(tabId, shouldScroll = true) {
     if (tabId === 'dashboardTab' && typeof renderDashboard === 'function') renderDashboard();
     if (tabId === 'directoryTab' && typeof initDirectoryTab === 'function') initDirectoryTab();
     if (tabId === 'alphaTab' && typeof renderAlphabeticalList === 'function') renderAlphabeticalList();
-    if (tabId === 'bulkSlipTab' && typeof updateBulkGenerator === 'function') updateBulkGenerator();
+    if (tabId === 'bulkSlipTab') {
+      if (typeof onBulkGpChanged === 'function') onBulkGpChanged();
+      else if (typeof updateBulkGenerator === 'function') updateBulkGenerator();
+    }
     if (tabId === 'candidateProfileTab' && typeof initCandidateProfileTab === 'function') initCandidateProfileTab();
     if (tabId === 'adminControlTab' && typeof initAdminControlTab === 'function') initAdminControlTab();
   } catch(err) {
@@ -9691,8 +9694,11 @@ async function checkLivePermissionsUpdate() {
 
     let freshUser = null;
 
-    // 1. If running on Node.js server, trigger fast sheet sync on focus & fetch live /api/users
-    if (window.location.hostname === 'localhost' || window.location.port === '3000' || (window.location.protocol.startsWith('http') && !window.location.hostname.includes('github.io'))) {
+    const isLocalNode = window.location.hostname === 'localhost' || window.location.port === '3000' || (window.location.protocol.startsWith('http') && !window.location.hostname.includes('github.io'));
+    const gScriptUrl = State.config?.appsScriptUrl || localStorage.getItem('panchayat_apps_script_url') || 'https://script.google.com/macros/s/AKfycbwtgz2L5QC_95Jsf1r0Kum_LcTI-bJwwiBQS_O74vthHcbPD_KatsN69ytY2yqlayiM/exec';
+
+    if (isLocalNode) {
+      // 1. Local Node.js server: ultra-fast in-memory / SQLite API
       try {
         const res = await fetch(`/api/users?_t=${bust}`, { cache: 'no-store' });
         if (res.ok) {
@@ -9703,33 +9709,34 @@ async function checkLivePermissionsUpdate() {
           }
         }
       } catch(_) {}
-    }
-
-    // 2. If static GitHub Pages or fallback, check portal_users.json
-    if (!freshUser) {
-      try {
-        const res = await fetch(`portal_users.json?_t=${bust}`, { cache: 'no-store' });
-        if (res.ok) {
-          const d = await res.json();
-          if (d && Array.isArray(d.users)) {
-            freshUser = d.users.find(matchesUser);
-            State.adminControlUsers = d.users;
+    } else {
+      // 2. Static GitHub Pages: Query Google Apps Script FIRST for real-time live permission updates straight from Google Sheet!
+      if (gScriptUrl) {
+        try {
+          const res = await fetch(`${gScriptUrl}?action=getUsers&_t=${bust}`);
+          if (res.ok) {
+            const d = await res.json();
+            if (d && Array.isArray(d.users)) {
+              freshUser = d.users.find(matchesUser);
+              State.adminControlUsers = d.users;
+            }
           }
-        }
-      } catch(_) {}
-    }
+        } catch(_) {}
+      }
 
-    // 3. Fallback direct to Google Apps Script
-    if (!freshUser && State.config?.appsScriptUrl) {
-      try {
-        const res = await fetch(`${State.config.appsScriptUrl}?action=getUsers&_t=${bust}`);
-        if (res.ok) {
-          const d = await res.json();
-          if (d && Array.isArray(d.users)) {
-            freshUser = d.users.find(matchesUser);
+      // 3. Fallback to portal_users.json if Google Apps Script is slow/offline
+      if (!freshUser) {
+        try {
+          const res = await fetch(`portal_users.json?_t=${bust}`, { cache: 'no-store' });
+          if (res.ok) {
+            const d = await res.json();
+            if (d && Array.isArray(d.users)) {
+              freshUser = d.users.find(matchesUser);
+              State.adminControlUsers = d.users;
+            }
           }
-        }
-      } catch(_) {}
+        } catch(_) {}
+      }
     }
 
     if (freshUser) {
