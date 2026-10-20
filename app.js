@@ -5645,20 +5645,58 @@ async function syncLatestActiveUsersFromAppsScript() {
     const res = await fetch(`${url}?action=getUsers`);
     const data = await res.json();
     if (data && data.success && Array.isArray(data.users) && data.users.length > 0) {
-      State.adminUsers = data.users.map(u => ({
-        user_id: u.userId || u.user_id || `USR${u.rowIndex || ''}`,
-        username: u.username,
-        fullName: u.fullName || u.full_name || u.username,
-        full_name: u.fullName || u.full_name || u.username,
-        mobile: u.mobile || '',
-        role: u.role || 'PANCHAYAT_AGENT',
-        assigned_panchayats: u.assignedPanchayats || u.assigned_panchayats || 'ALL',
-        assignedPanchayats: u.assignedPanchayats || u.assigned_panchayats || 'ALL',
-        assigned_wards: u.assignedWards || u.assigned_wards || 'ALL',
-        assignedWards: u.assignedWards || u.assigned_wards || 'ALL',
-        status: (u.status || 'ACTIVE').toUpperCase(),
-        created_at: u.createdAt || u.created_at || ''
-      }));
+      State.adminUsers = data.users.map(u => {
+        let tabs = [];
+        if (u.tab_search !== undefined || u.tab_alpha !== undefined || u.tab_bulkslip !== undefined || u.tab_directory !== undefined) {
+          if (u.tab_search === true || String(u.tab_search).toUpperCase() === 'TRUE') tabs.push('searchTab');
+          if (u.tab_alpha === true || String(u.tab_alpha).toUpperCase() === 'TRUE') tabs.push('alphaTab');
+          if (u.tab_bulkslip === true || String(u.tab_bulkslip).toUpperCase() === 'TRUE') tabs.push('bulkSlipTab');
+          if (u.tab_directory === true || String(u.tab_directory).toUpperCase() === 'TRUE') tabs.push('directoryTab');
+        } else if (Array.isArray(u.allowed_tabs)) {
+          tabs = u.allowed_tabs;
+        } else if (typeof u.allowed_tabs === 'string') {
+          try { tabs = JSON.parse(u.allowed_tabs); } catch(e) { tabs = u.allowed_tabs.split(',').map(s=>s.trim()).filter(Boolean); }
+        }
+        return {
+          id: u.id || u.userId || u.user_id || u.username,
+          user_id: u.userId || u.user_id || u.username,
+          username: u.username,
+          fullName: u.fullName || u.full_name || u.username,
+          full_name: u.fullName || u.full_name || u.username,
+          mobile: u.mobile || '',
+          role: u.role || 'PANCHAYAT_AGENT',
+          assigned_panchayats: u.assignedPanchayats || u.assigned_panchayats || 'ALL',
+          assignedPanchayats: u.assignedPanchayats || u.assigned_panchayats || 'ALL',
+          assigned_wards: u.assignedWards || u.assigned_wards || 'ALL',
+          assignedWards: u.assignedWards || u.assigned_wards || 'ALL',
+          status: (u.status || 'ACTIVE').toUpperCase(),
+          allowed_tabs: tabs,
+          can_print: (u.can_print === true || String(u.can_print).toUpperCase() === 'TRUE'),
+          can_download: (u.can_download === true || String(u.can_download).toUpperCase() === 'TRUE'),
+          created_at: u.createdAt || u.created_at || ''
+        };
+      });
+
+      // Synchronize live into State.adminControlUsers so all permission changes immediately take effect!
+      if (!State.adminControlUsers) State.adminControlUsers = [];
+      State.adminUsers.forEach(freshUser => {
+        const uKey = String(freshUser.username || freshUser.id).toLowerCase();
+        const existingIdx = State.adminControlUsers.findIndex(x => 
+          (x.id && String(x.id).toLowerCase() === uKey) || 
+          (x.username && String(x.username).toLowerCase() === uKey)
+        );
+        if (existingIdx >= 0) {
+          State.adminControlUsers[existingIdx] = {
+            ...State.adminControlUsers[existingIdx],
+            ...freshUser,
+            allowed_tabs: freshUser.allowed_tabs
+          };
+        } else {
+          State.adminControlUsers.push(freshUser);
+        }
+      });
+      syncCurrentUserWithConfiguredUsers();
+      enforceGatekeeperState();
       localStorage.setItem('panchayat_admins_cache', JSON.stringify(State.adminUsers));
       populateLoginUserDropdown();
       if (document.getElementById('superAdminUsersTable')) {
@@ -6058,6 +6096,7 @@ async function initCandidateProfileTab() {
     if (sloganText) sloganText.value = cand.slogan || '';
     
     // Photo restore
+    if (photoPreview && !cand.photo_url && (u.username === 'b' || (cand.candidate_name && cand.candidate_name.includes('कमला')))) { cand.photo_url = KAMLA_DEFAULT_PHOTO; }
     if (photoPreview && cand.photo_url) {
       photoPreview.src = cand.photo_url;
       if (!cand.photo_url.includes('dicebear')) {
@@ -6622,7 +6661,7 @@ function buildDetachableCandidateSlipHtml(voter, candidateData) {
     }
   }
 
-  const cPhoto = candidateData.photo_url || 'https://api.dicebear.com/7.x/identicon/svg?seed=candidate';
+  const cPhoto = candidateData.photo_url || ((candidateData.candidate_name && candidateData.candidate_name.includes('कमला')) || (State.currentUser && State.currentUser.username === 'b') ? KAMLA_DEFAULT_PHOTO : 'https://api.dicebear.com/7.x/identicon/svg?seed=candidate');
   const cSlogan = (candidateData.slogan || 'अपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।').replace(/\n/g, '<br>');
 
   return `
@@ -9058,7 +9097,9 @@ async function handleGatekeeperLogin(event) {
       const bloUname = bloMatch.username || bloMatch.id || ('blo_' + bloMatch.booth_no);
       const cfgUser = (State.adminControlUsers || []).find(u => 
         (u.id && String(u.id).toLowerCase() === bloUname.toLowerCase()) || 
-        (u.username && String(u.username).toLowerCase() === bloUname.toLowerCase())
+        (u.username && String(u.username).toLowerCase() === bloUname.toLowerCase()) ||
+        (bloMatch.user_id && (String(u.id).toLowerCase() === String(bloMatch.user_id).toLowerCase() || String(u.username).toLowerCase() === String(bloMatch.user_id).toLowerCase())) ||
+        (bloMatch.old_part_no && (String(u.id).toLowerCase() === ('blo_' + bloMatch.old_part_no) || String(u.username).toLowerCase() === ('blo_' + bloMatch.old_part_no)))
       );
       
       const bloStatus = cfgUser?.status || getCustomUserStatus(bloUname) || 'ACTIVE';
