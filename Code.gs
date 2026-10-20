@@ -896,24 +896,41 @@ function sanitizeWardValue(val) {
     var m = val.getMonth() + 1;
     var d = val.getDate();
     var y = val.getFullYear();
-    var w3 = (y >= 2000 && y <= 2099) ? (y - 2000) : y;
-    return m + ", " + d + ", " + w3;
+    if (y === 2026) {
+      var w1 = Math.min(m, d);
+      var w2 = Math.max(m, d);
+      return w1 + ", " + w2;
+    } else if (y >= 2000 && y <= 2025) {
+      var w3 = y - 2000;
+      var arr = [m, d, w3].sort(function(a, b) { return a - b; });
+      return arr.join(", ");
+    }
+    return m + ", " + d + ", " + ((y >= 2000 && y <= 2099) ? (y - 2000) : y);
   }
   var s = String(val).trim();
   if (!s || s.toUpperCase() === "ALL") return "ALL";
-  if (s.indexOf("GMT") !== -1 || s.indexOf("T00:00:00") !== -1 || s.indexOf("T18:30:00") !== -1) {
+  if (s.indexOf("GMT") !== -1 || s.indexOf("T00:00:00") !== -1 || s.indexOf("T18:30:00") !== -1 || s.indexOf("Z") !== -1) {
     try {
       var dt = new Date(s);
       if (!isNaN(dt.getTime())) {
         var m = dt.getMonth() + 1;
         var d = dt.getDate();
         var y = dt.getFullYear();
-        var w3 = (y >= 2000 && y <= 2099) ? (y - 2000) : y;
-        return m + ", " + d + ", " + w3;
+        if (y === 2026) {
+          return Math.min(m, d) + ", " + Math.max(m, d);
+        } else if (y >= 2000 && y <= 2025) {
+          var arr = [m, d, y - 2000].sort(function(a, b) { return a - b; });
+          return arr.join(", ");
+        }
       }
     } catch(e) {}
   }
-  s = s.replace(/,\s*20(\d{2})/g, function(m, p1) { return ", " + parseInt(p1, 10); });
+  s = s.replace(/,\s*20(\d{2})/g, function(match, p1) {
+    var num = parseInt(p1, 10);
+    if (num === 26) return "";
+    return ", " + num;
+  });
+  s = s.replace(/,\s*26\b/g, "");
   return s;
 }
 
@@ -1027,15 +1044,28 @@ function setupCandidatesSheet(forceReset) {
         row[23] = true; // Column 24 (Can_Download)
         row[24] = new Date().toISOString(); // Column 25 (Updated_At)
       } else {
-        if (uId === "cand_b" || uId === "b" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1)) {
-          if (!row[7] || row[7] === "हाथ") row[7] = "2";
-          if (!row[8] || row[8] === "custom") row[8] = "हाथ";
-          // If Photo_URL (row[11]) has slogan text, clear it and move to slogan (row[12])
-          if (row[11] && !String(row[11]).startsWith("http") && !String(row[11]).startsWith("data:")) {
-            if (!row[12] || String(row[12]).includes("विश्वास पर खरे")) row[12] = String(row[11]);
-            row[11] = "";
+        // Auto-repair shifted columns (e.g. when slogan is in photo or time is in date)
+        if (String(row[13] || "").includes("बजे") || String(row[13] || "").includes("प्रातः") || String(row[13] || "").includes("सायं")) {
+          var shiftedTime = String(row[13]);
+          row[14] = shiftedTime; // Put Election_Time in Column 15
+          row[13] = "28 अक्टूबर 2026"; // Put clean Election_Date in Column 14
+        }
+        if (String(row[14] || "").toUpperCase() === "ACTIVE") {
+          row[14] = "प्रातः 7:00 बजे से सायं 6:00 बजे तक";
+        }
+        if (row[11] && !String(row[11]).startsWith("http://") && !String(row[11]).startsWith("https://") && !String(row[11]).startsWith("data:")) {
+          if (!row[12] || String(row[12]).length < String(row[11]).length) {
+            row[12] = String(row[11]);
           }
+          row[11] = "";
+        }
+
+        if (uId === "cand_b" || uId === "b" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1)) {
+          if (!row[7] || row[7] === "हाथ" || row[7] === "ALL") row[7] = "2";
+          if (!row[8] || row[8] === "custom") row[8] = "हाथ";
           if (!row[12]) row[12] = "काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
+          row[13] = "28 अक्टूबर 2026";
+          row[14] = "प्रातः 7:00 बजे से सायं 6:00 बजे तक";
         }
 
         // Clean ward and ps_zp_ward values
@@ -5333,6 +5363,8 @@ var USERS_DEFAULT_SEED = [
  */
 function setupUsersSheet(forceReset) {
   var sheet = getOrCreateSheet(SHEET_USERS);
+  var maxRows = Math.max(sheet.getMaxRows(), 500);
+  var maxCols = Math.max(sheet.getMaxColumns(), 20);
 
   // 1. Header Styling
   var headerRange = sheet.getRange(1, 1, 1, USER_HEADERS.length);
