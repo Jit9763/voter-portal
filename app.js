@@ -2954,26 +2954,29 @@ function enforceGatekeeperState() {
     // 3. Hide user scope banner so no confusing extra details appear
     if (scopeBanner) scopeBanner.style.display = 'none';
 
-    // 4. Show ONLY the single, clean, centered permission notice
+    // 4. Show ONLY the single, clean, centered permission notice (Option 3: Private Portal Language)
+    const noticeHtml = `
+      <div style="width: 72px; height: 72px; margin: 0 auto 18px auto; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px;">🔒</div>
+      <h2 style="color: #991b1b; margin: 0 0 10px 0; font-size: 22px; font-weight: 800; font-family: sans-serif;">अनुमति प्रतिबंधित</h2>
+      <p style="color: #374151; font-size: 16px; font-weight: 600; line-height: 1.5; margin: 0 0 8px 0;">
+        आपके खाते की सेवाएँ वर्तमान में बंद हैं।
+      </p>
+      <p style="color: #6b7280; font-size: 14px; margin: 0 0 24px 0;">
+        कृपया एडमिन से संपर्क करें।
+      </p>
+      <button onclick="logoutUser()" class="btn btn-primary" style="padding: 10px 28px; font-size: 15px; font-weight: 700; border-radius: 8px; background: #dc2626; border: none; color: white; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);">
+        🚪 लॉगआउट करें (Logout)
+      </button>
+    `;
+
     if (noAccessEl) {
+      noAccessEl.innerHTML = noticeHtml;
       noAccessEl.style.display = 'block';
     } else {
       const div = document.createElement('div');
       div.id = 'noPermissionsNotice';
-      div.style.cssText = 'max-width: 580px; margin: 60px auto 40px auto; padding: 48px 32px; text-align: center; background: #ffffff; border-radius: 20px; border: 2px dashed #f87171; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);';
-      div.innerHTML = `
-        <div style="width: 80px; height: 80px; margin: 0 auto 20px auto; background: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px;">🔒</div>
-        <h2 style="color: #991b1b; margin: 0 0 12px 0; font-size: 24px; font-weight: 800; font-family: sans-serif;">पोर्टल अनुमतियाँ बंद हैं</h2>
-        <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 8px 0;">
-          मुख्य व्यवस्थापक द्वारा गूगल शीट में आपके खाते की सभी टैब अनुमतियाँ अनचेक (बंद) कर दी गई हैं।
-        </p>
-        <p style="color: #9ca3af; font-size: 14px; margin: 0 0 28px 0;">
-          कृपया मुख्य व्यवस्थापक से संपर्क करके आवश्यक टैब अनुमतियाँ चालू करवाएं।
-        </p>
-        <button onclick="logoutUser()" class="btn btn-primary" style="padding: 12px 32px; font-size: 15px; font-weight: 700; border-radius: 10px; background: #dc2626; border: none; color: white; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);">
-          🚪 लॉगआउट करें (Logout)
-        </button>
-      `;
+      div.style.cssText = 'max-width: 540px; margin: 60px auto 40px auto; padding: 42px 28px; text-align: center; background: #ffffff; border-radius: 18px; border: 2px dashed #f87171; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);';
+      div.innerHTML = noticeHtml;
       const container = document.querySelector('main.app-content') || document.querySelector('.main-content') || document.getElementById('mainPortalApp');
       if (container) container.appendChild(div);
     }
