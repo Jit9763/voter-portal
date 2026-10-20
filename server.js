@@ -883,6 +883,8 @@ async function checkGoogleSheetUpdatesSafe() {
 
     if (!lastKnownSheetFingerprint) {
       lastKnownSheetFingerprint = d.fingerprint;
+      syncCandidatesFromGoogleSheet(false).catch(()=>{});
+      syncUsersFromGoogleSheet(false).catch(()=>{});
       return;
     }
 
@@ -896,7 +898,13 @@ async function checkGoogleSheetUpdatesSafe() {
 }
 
 // Lightweight quota-safe checker runs every 2 minutes (zero quota abuse)
-setInterval(checkGoogleSheetUpdatesSafe, 15000);
+setInterval(checkGoogleSheetUpdatesSafe, 10000);
+
+// REGULAR 20-SECOND AUTO SYNC (Guarantees Google Sheet changes sync within 20s even without redeployment)
+setInterval(() => {
+  syncCandidatesFromGoogleSheet(false).catch(()=>{});
+  syncUsersFromGoogleSheet(false).catch(()=>{});
+}, 20000);
 
 const server = http.createServer(async (req, res) => {
   // CORS & Cache Busting Headers
