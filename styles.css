@@ -528,7 +528,7 @@ body {
 }
 
 .tab-pane.active {
-  display: block;
+  display: block !important;
 }
 
 @keyframes fadeIn {

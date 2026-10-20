@@ -1515,27 +1515,17 @@ function renderAdminTopAdminsTab() {
 function canUserPrint() {
   if (!State.currentUser) return false;
   const u = State.currentUser;
-  if (u.role === 'SUPER_ADMIN' || u.role === 'VYAVASTHAPAK') return true;
+  if (u.role === 'SUPER_ADMIN') return true;
 
-  // 1. Direct explicit permission takes highest priority
+  // 1. Direct explicit permission takes highest priority (Strict!)
   if (u.can_print !== undefined && u.can_print !== null) {
-    return (u.can_print === true || u.can_print === 1 || u.can_print === 'true');
+    return (u.can_print === true || u.can_print === 1 || String(u.can_print).toLowerCase() === 'true');
   }
 
   // 2. Local override check
-  const ov = getUserOverrides()[u.id || u.username] || {};
+  const ov = (typeof getUserOverrides === 'function' ? getUserOverrides()[u.id || u.username] : null) || {};
   if (ov.can_print !== undefined && ov.can_print !== null) {
-    return (ov.can_print === true || ov.can_print === 1 || ov.can_print === 'true');
-  }
-
-  // 3. Candidate & Agent: default to allowed unless explicitly disabled
-  if (u.role === 'CANDIDATE' || u.category === 'CANDIDATE' || String(u.id || '').startsWith('cand_')) {
-    return true;
-  }
-
-  // 4. Tab-based permission: if user has bulkSlipTab allowed, allow printing
-  if (Array.isArray(u.allowed_tabs) && u.allowed_tabs.includes('bulkSlipTab')) {
-    return true;
+    return (ov.can_print === true || ov.can_print === 1 || String(ov.can_print).toLowerCase() === 'true');
   }
 
   return false;
@@ -1544,15 +1534,20 @@ function canUserPrint() {
 function canUserDownload() {
   if (!State.currentUser) return false;
   const u = State.currentUser;
-  if (u.role === 'SUPER_ADMIN' || u.role === 'VYAVASTHAPAK' || u.role === 'INCHARGE' || u.role === 'BLOCK_PRABHARI') return true;
+  if (u.role === 'SUPER_ADMIN') return true;
+
+  // 1. Direct explicit permission takes highest priority (Strict!)
   if (u.can_download !== undefined && u.can_download !== null) {
-    return (u.can_download === true || u.can_download === 1 || u.can_download === 'true');
+    return (u.can_download === true || u.can_download === 1 || String(u.can_download).toLowerCase() === 'true');
   }
-  const ov = getUserOverrides()[u.id || u.username] || {};
+
+  // 2. Local override check
+  const ov = (typeof getUserOverrides === 'function' ? getUserOverrides()[u.id || u.username] : null) || {};
   if (ov.can_download !== undefined && ov.can_download !== null) {
-    return (ov.can_download === true || ov.can_download === 1 || ov.can_download === 'true');
+    return (ov.can_download === true || ov.can_download === 1 || String(ov.can_download).toLowerCase() === 'true');
   }
-  return true;
+
+  return false;
 }
 
 // -------------------------------------------------------------------------
@@ -3158,7 +3153,9 @@ function switchTab(tabId) {
     btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
   });
   document.querySelectorAll('.tab-pane').forEach(pane => {
-    pane.classList.toggle('active', pane.id === tabId);
+    const isActive = (pane.id === tabId);
+    pane.classList.toggle('active', isActive);
+    pane.style.display = isActive ? 'block' : 'none';
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -4136,6 +4133,33 @@ function openVoterSlipModal(voter) {
   // Render modal slip content
   renderModalCandidateSlip(voter);
 
+  // Dynamic UI enforcement: show/hide Print and Download action buttons in modal
+  const hasPrint = canUserPrint();
+  const hasDownload = canUserDownload();
+
+  const btnThermal = document.getElementById('btnSlipThermal') || document.querySelector('#voterSlipModal button[onclick*="printThermal"]');
+  const btnA4 = document.getElementById('btnSlipA4') || document.querySelector('#voterSlipModal button[onclick*="printVoterSlip"]:not([title*="PDF"])');
+  const btnPdf = document.getElementById('btnSlipPdf') || document.querySelector('#voterSlipModal button[onclick*="download"], #voterSlipModal button[title*="PDF"]');
+
+  if (btnThermal) btnThermal.style.display = hasPrint ? 'inline-flex' : 'none';
+  if (btnA4) btnA4.style.display = hasPrint ? 'inline-flex' : 'none';
+  if (btnPdf) btnPdf.style.display = hasDownload ? 'inline-flex' : 'none';
+
+  let permNotice = document.getElementById('modalPermNotice');
+  if (!hasPrint && !hasDownload) {
+    if (!permNotice) {
+      permNotice = document.createElement('div');
+      permNotice.id = 'modalPermNotice';
+      permNotice.style.cssText = 'color:#b91c1c; font-size:0.8rem; font-weight:700; background:#fef2f2; padding:6px 12px; border-radius:6px; border:1px solid #fecaca; margin-right:auto; display:flex; align-items:center; gap:6px;';
+      permNotice.innerHTML = '🔒 प्रिंट व डाउनलोड अनुमति व्यवस्थापक द्वारा बंद है';
+      const mFooter = document.querySelector('#voterSlipModal .modal-footer');
+      if (mFooter) mFooter.insertBefore(permNotice, mFooter.firstChild);
+    }
+    permNotice.style.display = 'flex';
+  } else if (permNotice) {
+    permNotice.style.display = 'none';
+  }
+
   const modal = document.getElementById('voterSlipModal');
   if (modal) modal.style.display = 'flex';
 }
@@ -4218,8 +4242,8 @@ function closeVoterSlipModal() {
 }
 
 function printVoterSlip() {
-  if (!canUserPrint() && !canUserDownload()) {
-    showToast('⚠️ पर्ची प्रिंट या डाउनलोड करने की अनुमति व्यवस्थापक द्वारा वर्जित है!');
+  if (!canUserPrint()) {
+    showToast('⚠️ पर्ची प्रिंट करने की अनुमति मुख्य व्यवस्थापक द्वारा बंद की गई है!');
     return;
   }
   document.body.className = 'printing-slip';
@@ -4230,16 +4254,20 @@ function printVoterSlip() {
 }
 
 function downloadVoterSlipPdf() {
-  if (!canUserPrint() && !canUserDownload()) {
-    showToast('⚠️ पर्ची डाउनलोड करने की अनुमति व्यवस्थापक द्वारा वर्जित है!');
+  if (!canUserDownload()) {
+    showToast('⚠️ पर्ची डाउनलोड करने की अनुमति मुख्य व्यवस्थापक द्वारा बंद की गई है!');
     return;
   }
-  printVoterSlip();
+  document.body.className = 'printing-slip';
+  window.print();
+  setTimeout(() => {
+    document.body.className = '';
+  }, 500);
 }
 
 function printThermalSingleSlip() {
-  if (!canUserPrint() && !canUserDownload()) {
-    showToast('⚠️ थर्मल पर्ची प्रिंट करने की अनुमति व्यवस्थापक द्वारा वर्जित है!');
+  if (!canUserPrint()) {
+    showToast('⚠️ थर्मल पर्ची प्रिंट करने की अनुमति मुख्य व्यवस्थापक द्वारा बंद की गई है!');
     return;
   }
   if (!State.currentSlipVoter) return;
@@ -4934,6 +4962,10 @@ function renderDirectoryTable(votersList) {
 }
 
 function exportDirectoryToCSV() {
+  if (!canUserDownload()) {
+    showToast('⚠️ मतदाता सूची डाउनलोड / एक्सपोर्ट करने की अनुमति मुख्य व्यवस्थापक द्वारा बंद है!');
+    return;
+  }
   if (currentWardVoters.length === 0) {
     showToast('एक्सपोर्ट करने हेतु कोई डाटा उपलब्ध नहीं है।');
     return;
@@ -5715,6 +5747,10 @@ async function syncLatestActiveUsersFromAppsScript() {
 let currentPrintListContext = 'search';
 
 function openPrintVoterListModal(context = 'search') {
+  if (!canUserPrint()) {
+    showToast('⚠️ मतदाता सूची प्रिंट करने की अनुमति मुख्य व्यवस्थापक द्वारा बंद है!');
+    return;
+  }
   currentPrintListContext = context;
   const modal = document.getElementById('printVoterListModal');
   const scopeTitle = document.getElementById('printModalScopeTitle');
@@ -5770,8 +5806,8 @@ function confirmExecuteVoterListPrint() {
 }
 
 function executeVoterListPrint(sortMode, scope, context) {
-  if (!canUserPrint() && !canUserDownload()) {
-    showToast('⚠️ मतदाता सूची प्रिंट या पीडीएफ डाउनलोड की अनुमति केवल सुपर एडमिन अथवा उनके द्वारा अधिकृत कार्मिकों को ही है!');
+  if (!canUserPrint()) {
+    showToast('⚠️ मतदाता सूची प्रिंट करने की अनुमति मुख्य व्यवस्थापक द्वारा बंद है!');
     return;
   }
 
@@ -9614,3 +9650,166 @@ async function checkSilentDataUpdates() {
   } catch (e) {}
 }
 setInterval(checkSilentDataUpdates, 30000);
+
+
+// ================================================================================================
+// REAL-TIME AUTO-SYNC: ZERO HARD REFRESH LIVE PERMISSION SYNC ENGINE
+// Automatically checks for Google Sheet / Server permission changes every 4 seconds
+// and immediately updates UI, tabs, print/download rights without any page refresh!
+// ================================================================================================
+let isCheckingLivePerms = false;
+async function checkLivePermissionsUpdate() {
+  if (isCheckingLivePerms) return;
+  if (!State.currentUser) return;
+  isCheckingLivePerms = true;
+
+  try {
+    const u = State.currentUser;
+    const uKey = String(u.username || u.id || '').toLowerCase();
+    const bust = Date.now();
+
+    let freshUser = null;
+
+    // 1. If running on Node.js server, trigger fast sheet sync on focus & fetch live /api/users
+    if (window.location.hostname === 'localhost' || window.location.port === '3000' || (window.location.protocol.startsWith('http') && !window.location.hostname.includes('github.io'))) {
+      try {
+        const res = await fetch(`/api/users?_t=${bust}`, { cache: 'no-store' });
+        if (res.ok) {
+          const d = await res.json();
+          if (d && Array.isArray(d.users)) {
+            freshUser = d.users.find(x => 
+              String(x.username || '').toLowerCase() === uKey || 
+              String(x.id || '').toLowerCase() === uKey ||
+              (u.booth_no && (String(x.username || '').includes(String(u.booth_no)) || String(x.id || '').includes(String(u.booth_no))))
+            );
+            State.adminControlUsers = d.users;
+          }
+        }
+      } catch(_) {}
+    }
+
+    // 2. If static GitHub Pages or fallback, check portal_users.json
+    if (!freshUser) {
+      try {
+        const res = await fetch(`portal_users.json?_t=${bust}`, { cache: 'no-store' });
+        if (res.ok) {
+          const d = await res.json();
+          if (d && Array.isArray(d.users)) {
+            freshUser = d.users.find(x => 
+              String(x.username || '').toLowerCase() === uKey || 
+              String(x.id || '').toLowerCase() === uKey ||
+              (u.booth_no && (String(x.username || '').includes(String(u.booth_no)) || String(x.id || '').includes(String(u.booth_no))))
+            );
+            State.adminControlUsers = d.users;
+          }
+        }
+      } catch(_) {}
+    }
+
+    // 3. Fallback direct to Google Apps Script
+    if (!freshUser && State.config?.appsScriptUrl) {
+      try {
+        const res = await fetch(`${State.config.appsScriptUrl}?action=getUsers&_t=${bust}`);
+        if (res.ok) {
+          const d = await res.json();
+          if (d && Array.isArray(d.users)) {
+            freshUser = d.users.find(x => 
+              String(x.username || '').toLowerCase() === uKey || 
+              String(x.id || '').toLowerCase() === uKey
+            );
+          }
+        }
+      } catch(_) {}
+    }
+
+    if (freshUser) {
+      let newTabs = freshUser.allowed_tabs;
+      if (typeof newTabs === 'string') {
+        try { newTabs = JSON.parse(newTabs); } catch(e) { newTabs = newTabs.split(',').map(s=>s.trim()).filter(Boolean); }
+      }
+      if (!Array.isArray(newTabs)) newTabs = [];
+
+      if (freshUser.tab_search !== undefined || freshUser.tab_alpha !== undefined || freshUser.tab_bulkslip !== undefined || freshUser.tab_profile !== undefined) {
+        newTabs = [];
+        if (freshUser.tab_search === true || String(freshUser.tab_search).toUpperCase() === 'TRUE') newTabs.push('searchTab');
+        if (freshUser.tab_alpha === true || String(freshUser.tab_alpha).toUpperCase() === 'TRUE') newTabs.push('alphaTab');
+        if (freshUser.tab_bulkslip === true || String(freshUser.tab_bulkslip).toUpperCase() === 'TRUE') newTabs.push('bulkSlipTab');
+        if (freshUser.tab_directory === true || String(freshUser.tab_directory).toUpperCase() === 'TRUE') newTabs.push('directoryTab');
+        if (freshUser.tab_profile === true || String(freshUser.tab_profile).toUpperCase() === 'TRUE') newTabs.push('candidateProfileTab');
+      }
+
+      const isCand = isCandidateUser(u);
+      const isVoter = (typeof getPortalContext === 'function' && getPortalContext() === 'voter') || (window.PORTAL_TYPE === 'voter');
+      if (isCand || isVoter) {
+        newTabs = newTabs.filter(t => t !== 'directoryTab');
+      }
+
+      const newCanPrint = (freshUser.can_print === true || freshUser.can_print === 1 || String(freshUser.can_print).toLowerCase() === 'true');
+      const newCanDownload = (freshUser.can_download === true || freshUser.can_download === 1 || String(freshUser.can_download).toLowerCase() === 'true');
+      const newStatus = (freshUser.status || 'ACTIVE').toUpperCase();
+
+      const curTabsStr = JSON.stringify(Array.isArray(u.allowed_tabs) ? u.allowed_tabs : []);
+      const newTabsStr = JSON.stringify(newTabs);
+
+      const hasTabsChanged = (curTabsStr !== newTabsStr);
+      const hasPrintChanged = (Boolean(u.can_print) !== Boolean(newCanPrint));
+      const hasDownloadChanged = (Boolean(u.can_download) !== Boolean(newCanDownload));
+      const hasStatusChanged = (u.status !== newStatus);
+
+      if (hasTabsChanged || hasPrintChanged || hasDownloadChanged || hasStatusChanged) {
+        console.log('🔄 Live permissions updated dynamically without hard refresh:', {
+          tabs: newTabs,
+          print: newCanPrint,
+          download: newCanDownload,
+          status: newStatus
+        });
+
+        u.allowed_tabs = newTabs;
+        u.can_print = newCanPrint;
+        u.can_download = newCanDownload;
+        u.status = newStatus;
+
+        // Save to active session storage
+        localStorage.setItem(getSessionStorageKey(), JSON.stringify(u));
+
+        // Re-enforce gatekeeper state immediately
+        enforceGatekeeperState();
+
+        if (hasStatusChanged && newStatus !== 'ACTIVE') {
+          showToast('⚠️ आपका खाता निष्क्रिय (Inactive) किया गया है!');
+        } else if (hasTabsChanged) {
+          showToast('⚡ अनुमतियाँ अद्यतन हुईं (Tabs updated)!');
+        } else if (hasPrintChanged || hasDownloadChanged) {
+          showToast('⚡ प्रिंट / डाउनलोड अनुमतियाँ अद्यतन हुईं!');
+        }
+      }
+    }
+  } catch(err) {
+    console.warn('Silent live permission check error:', err);
+  } finally {
+    isCheckingLivePerms = false;
+  }
+}
+
+// 1. Run live check every 4 seconds when portal is in view
+setInterval(() => {
+  if (document.visibilityState !== 'hidden') {
+    checkLivePermissionsUpdate();
+  }
+}, 4000);
+
+// 2. Run immediately when user focuses back on window/tab (Zero delay after Google Sheet edit!)
+window.addEventListener('focus', () => {
+  if (window.location.hostname === 'localhost' || window.location.port === '3000') {
+    fetch('/api/sync-from-sheet?_t=' + Date.now(), { cache: 'no-store' }).catch(()=>{});
+  }
+  setTimeout(checkLivePermissionsUpdate, 300);
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    if (window.location.hostname === 'localhost' || window.location.port === '3000') {
+      fetch('/api/sync-from-sheet?_t=' + Date.now(), { cache: 'no-store' }).catch(()=>{});
+    }
+    setTimeout(checkLivePermissionsUpdate, 300);
+  }
+});
