@@ -9256,7 +9256,7 @@ async function handleGatekeeperLogin(event) {
 
   const unameLower = username.toLowerCase();
   const candMatch = allCandidatePool.find(u => {
-    if (u.role === 'BLO' || u.role === 'बी.एल.ओ.' || u.role === 'CELL_MEMBER' || u.category === 'CELL' || u.role === 'BLOCK_PRABHARI') {
+    if (u.role === 'BLO' || u.role === 'बी.एल.ओ.' || u.role === 'CELL_MEMBER' || u.category === 'CELL' || u.role === 'BLOCK_PRABHARI' || (u.id && String(u.id).toLowerCase().startsWith('blo_')) || (u.username && String(u.username).toLowerCase().startsWith('blo_')) || (u.id && String(u.id).toLowerCase().startsWith('cell_'))) {
       return false;
     }
     const cU = (u.username || '').toLowerCase();
