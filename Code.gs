@@ -673,7 +673,7 @@ var INITIAL_CANDIDATES_SEED = [
     "id": "cand_b",
     "username": "b",
     "password": "bhinai2026",
-    "candidate_name": "कमला शर्मा",
+    "candidate_name": "कमला देवी",
     "mobile": "",
     "post": "पंचायत समिति सदस्य",
     "panchayat": "बांदनवाड़ा",
@@ -1062,7 +1062,8 @@ function setupCandidatesSheet(forceReset) {
           row[11] = "";
         }
 
-        if (uId === "cand_b" || uId === "b" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1)) {
+        if (uId === "cand_b" || uId === "b" || uId === "cand_kamala" || uId === "kamala" || uId === "cand_kamla" || uId === "kamla" || (gp === "बांदनवाड़ा" && post.indexOf("पंचायत समिति") !== -1) || (row[2] && String(row[2]).indexOf("कमला") !== -1)) {
+          row[4] = "पंचायत समिति सदस्य";
           if (!row[7] || row[7] === "हाथ" || row[7] === "ALL") row[7] = "2";
           if (!row[8] || row[8] === "custom") row[8] = "हाथ";
           if (!row[12]) row[12] = "काम किया है, काम करेंगे – आपके विश्वास पर खरे उतरेंगे!\nअपने कर्मठ एवं ईमानदार प्रत्याशी को विजयी बनावें।";
@@ -1281,8 +1282,13 @@ function handleGetCandidates() {
     var uLower = cleanUsername.toLowerCase();
 
     var candName = colName !== -1 ? String(row[colName] || "").trim() : uId;
+    if (candName.indexOf("(") !== -1) candName = candName.split("(")[0].trim();
+    if (candName.indexOf(" - ") !== -1) candName = candName.split(" - ")[0].trim();
     var mobile = colMobile !== -1 ? String(row[colMobile] || "").trim() : "";
     var post = colPost !== -1 ? String(row[colPost] || "सरपंच").trim() : "सरपंच";
+    if (candName.indexOf("कमला") !== -1 || uLower === "b" || uLower === "kamala" || uLower === "kamla") {
+      if (!post || post === "सरपंच") post = "पंचायत समिति सदस्य";
+    }
     var gp = colGp !== -1 ? String(row[colGp] || "").trim() : "";
     var ward = colWard !== -1 ? sanitizeWardValue(row[colWard]) : "ALL";
     var psZpWard = colPsZpWard !== -1 ? sanitizeWardValue(row[colPsZpWard]) : "";
@@ -1424,7 +1430,7 @@ function handleCandidateLogin(username, password) {
       cId === ("cand_" + uLower) ||
       (uLower.startsWith("cand_") && cUser === uLower.replace(/^cand_/i, "")) ||
       cName === uLower ||
-      ((uLower === "kamla" || uLower === "कमला" || uLower === "kamla sharma" || uLower === "कमला शर्मा") && (cUser === "b" || cId === "cand_b" || cName.indexOf("कमला") !== -1))
+      ((uLower === "kamla" || uLower === "कमला" || uLower === "kamala" || uLower === "kamla devi" || uLower === "कमला देवी" || uLower === "kamla sharma" || uLower === "कमला शर्मा") && (cUser === "b" || cId === "cand_b" || cUser === "kamala" || cUser === "kamla" || cName.indexOf("कमला") !== -1))
     ) {
       match = c;
       break;

@@ -3681,6 +3681,9 @@ html, body {
 
 .candidate-banner-info-col {
   flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 116px);
+  overflow: hidden;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -3689,6 +3692,7 @@ html, body {
   gap: 2px;
   height: 62px;
   padding: 0 2px;
+  box-sizing: border-box;
 }
 
 .candidate-banner-header {
@@ -3707,6 +3711,9 @@ html, body {
   margin: 0;
   line-height: 1.1;
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-shadow: 0.2px 0.2px 0px rgba(0,0,0,0.12);
 }
 
